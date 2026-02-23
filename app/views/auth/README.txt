@@ -1,0 +1,1 @@
+Vistas de autenticación (login, register, verify email, etc).

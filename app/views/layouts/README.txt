@@ -1,0 +1,1 @@
+Layouts reutilizables como main.php y admin.php.

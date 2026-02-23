@@ -1,0 +1,1 @@
+Vistas del catálogo y gestión de productos.
