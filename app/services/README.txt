@@ -1,1 +1,0 @@
-Servicios externos como Cloudinary o envío de correos.
