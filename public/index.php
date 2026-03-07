@@ -17,6 +17,13 @@ $router = new Router();
 // rutas
 $router->get('/', 'HomeController@index');
 
+$router->get('/admin', 'AdminController@index');
+$router->get('/admin/products', 'AdminController@products');
+$router->get('/admin/orders', 'AdminController@orders');
+$router->get('/admin/users', 'AdminController@users');
+$router->get('/admin/inventory', 'AdminController@inventory');
+$router->get('/admin/promotions', 'AdminController@promotions');
+
 $router->get('/login', 'AuthController@loginForm');
 $router->get('/logout', 'AuthController@logout');
 $router->post('/login', 'AuthController@login');

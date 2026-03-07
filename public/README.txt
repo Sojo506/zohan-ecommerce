@@ -1,1 +1,0 @@
-Punto de entrada del sistema (index.php) y archivos públicos.

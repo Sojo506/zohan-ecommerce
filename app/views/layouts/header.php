@@ -30,12 +30,23 @@
                         </span>
                     </li>
 
+                    <?php if ($_SESSION['user']['tipo'] === 'ADMIN'): ?>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="<?= App::url('/admin') ?>">
+                                ADMIN
+                            </a>
+                        </li>
+
+                    <?php endif; ?>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= App::url('/logout') ?>">Salir</a>
+                        <a class="nav-link" href="<?= App::url('/logout') ?>">
+                            Salir
+                        </a>
                     </li>
 
                 <?php else: ?>
-
                     <li class="nav-item">
                         <a class="nav-link" href="<?= App::url('/login') ?>">Login</a>
                     </li>

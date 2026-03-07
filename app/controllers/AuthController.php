@@ -29,12 +29,20 @@ class AuthController extends Controller
 
         $pdo = Database::connection();
 
-        $sql = "SELECT c.*, u.NOMBRE, u.APELLIDO_PATERNO, u.IDENTIFICACION
-            FROM CUENTA_TB c
+        $sql = "SELECT 
+            c.ID_CUENTA,
+            c.USERNAME,
+            c.PASSWORD,
+            c.ID_ESTADO,
+            u.IDENTIFICACION,
+            u.NOMBRE,
+            u.APELLIDO_PATERNO,
+            t.NOMBRE AS TIPO_USUARIO
+        FROM CUENTA_TB c
             JOIN USUARIO_TB u ON u.IDENTIFICACION = c.IDENTIFICACION
-            WHERE c.USERNAME = :user
-            LIMIT 1";
-
+            JOIN TIPO_USUARIO_TB t ON t.ID_TIPO_USUARIO = u.ID_TIPO_USUARIO
+        WHERE c.USERNAME = :user
+        LIMIT 1";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([':user' => $user]);
 
@@ -74,7 +82,8 @@ class AuthController extends Controller
             'id_cuenta' => $cuenta['ID_CUENTA'],
             'identificacion' => $cuenta['IDENTIFICACION'],
             'nombre' => $cuenta['NOMBRE'],
-            'apellido' => $cuenta['APELLIDO_PATERNO']
+            'apellido' => $cuenta['APELLIDO_PATERNO'],
+            'tipo' => $cuenta['TIPO_USUARIO']
         ];
 
         header("Location: " . App::url('/'));
