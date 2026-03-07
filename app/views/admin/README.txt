@@ -1,1 +1,0 @@
-Vistas exclusivas del panel de administrador.
