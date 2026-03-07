@@ -182,8 +182,8 @@ class AuthController extends Controller
 
             $pdo->commit();
 
-            // 4) Enviar correo (DEV por ahora)
-            Mailer::sendOtp($correo, $otp);
+            // 4) Enviar correo
+            Mailer::verifyEmail($correo, $otp);
 
             // guardamos cuenta pendiente para la pantalla de verificación
             $_SESSION['pending_account_id'] = $idCuenta;
