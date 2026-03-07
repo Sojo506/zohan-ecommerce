@@ -7,13 +7,6 @@
     <?php unset($_SESSION['flash_error']); ?>
 <?php endif; ?>
 
-<?php if (!empty($_SESSION['DEV_LAST_OTP'])): ?>
-    <div class="alert alert-warning">
-        <b>DEV:</b> OTP enviado a <?= htmlspecialchars($_SESSION['DEV_LAST_OTP_EMAIL'] ?? '') ?>:
-        <b><?= htmlspecialchars($_SESSION['DEV_LAST_OTP']) ?></b>
-    </div>
-<?php endif; ?>
-
 <form method="POST" action="<?= App::url('/verify-otp') ?>" class="card p-3">
     <div class="mb-3">
         <label class="form-label">Código de verificación (6 dígitos)</label>
