@@ -41,10 +41,15 @@ class AuthController extends Controller
         FROM CUENTA_TB c
             JOIN USUARIO_TB u ON u.IDENTIFICACION = c.IDENTIFICACION
             JOIN TIPO_USUARIO_TB t ON t.ID_TIPO_USUARIO = u.ID_TIPO_USUARIO
-        WHERE c.USERNAME = :user
+            LEFT JOIN CORREO_TB co ON co.IDENTIFICACION = c.IDENTIFICACION
+        WHERE c.USERNAME = :username OR co.CORREO = :correo
         LIMIT 1";
+
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([':user' => $user]);
+        $stmt->execute([
+            ':username' => $user,
+            ':correo' => $user
+        ]);
 
         $cuenta = $stmt->fetch();
 
@@ -112,8 +117,15 @@ class AuthController extends Controller
         $pass1 = $_POST['password'] ?? '';
         $pass2 = $_POST['password2'] ?? '';
 
-        // Validaciones mínimas
-        if ($identificacion === '' || $username === '' || $nombre === '' || $ap1 === '' || $correo === '' || $pass1 === '') {
+        if (
+            $identificacion === '' ||
+            $username === '' ||
+            $nombre === '' ||
+            $ap1 === '' ||
+            $correo === '' ||
+            $pass1 === '' ||
+            $pass2 === ''
+        ) {
             $_SESSION['flash_error'] = "Faltan campos obligatorios.";
             header("Location: " . App::url('/register'));
             exit;
@@ -136,31 +148,45 @@ class AuthController extends Controller
         try {
             $pdo->beginTransaction();
 
-            // 1) Insert USUARIO_TB (estado PENDIENTE)
+            // 1) Insertar usuario en USUARIO_TB
             $sqlUser = "INSERT INTO USUARIO_TB
-                (IDENTIFICACION, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO, CORREO, ID_DIRECCION, ID_TIPO_USUARIO, ID_ESTADO)
-                VALUES
-                (:ident, :nom, :ap1, :ap2, :correo, NULL, 2, :estado)";
+            (IDENTIFICACION, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO, ID_DIRECCION, ID_TIPO_USUARIO, ID_ESTADO)
+            VALUES
+            (:ident, :nom, :ap1, :ap2, NULL, :tipoUsuario, :estado)";
 
-            $stmt = $pdo->prepare($sqlUser);
-            $stmt->execute([
+            $stmtUser = $pdo->prepare($sqlUser);
+            $stmtUser->execute([
                 ':ident' => $identificacion,
                 ':nom' => $nombre,
                 ':ap1' => $ap1,
                 ':ap2' => ($ap2 === '' ? null : $ap2),
+                ':tipoUsuario' => 1,
+                ':estado' => $this->ESTADO_PENDIENTE,
+            ]);
+
+            // 2) Insertar correo en CORREO_TB
+            $sqlCorreo = "INSERT INTO CORREO_TB
+            (IDENTIFICACION, CORREO, ID_ESTADO)
+            VALUES
+            (:ident, :correo, :estado)";
+
+            $stmtCorreo = $pdo->prepare($sqlCorreo);
+            $stmtCorreo->execute([
+                ':ident' => $identificacion,
                 ':correo' => $correo,
                 ':estado' => $this->ESTADO_PENDIENTE,
             ]);
 
-            // 2) Insert CUENTA_TB (estado PENDIENTE)
+            // 3) Insertar cuenta en CUENTA_TB
             $hash = Security::hashPassword($pass1);
 
             $sqlCuenta = "INSERT INTO CUENTA_TB
-                (IDENTIFICACION, USERNAME, PASSWORD, INTENTOS_FALLIDOS, ULTIMO_LOGIN, ID_ESTADO)
-                VALUES
-                (:ident, :user, :pass, 0, NULL, :estado)";
-            $stmt2 = $pdo->prepare($sqlCuenta);
-            $stmt2->execute([
+            (IDENTIFICACION, USERNAME, PASSWORD, INTENTOS_FALLIDOS, ULTIMO_LOGIN, ID_ESTADO)
+            VALUES
+            (:ident, :user, :pass, 0, NULL, :estado)";
+
+            $stmtCuenta = $pdo->prepare($sqlCuenta);
+            $stmtCuenta->execute([
                 ':ident' => $identificacion,
                 ':user' => $username,
                 ':pass' => $hash,
@@ -169,19 +195,19 @@ class AuthController extends Controller
 
             $idCuenta = (int)$pdo->lastInsertId();
 
-            // 3) Generar OTP y guardar en CODIGO_OTP_TB
+            // 4) Generar OTP
             $otp = Security::generateOtp(6);
             $otpHash = password_hash($otp, PASSWORD_BCRYPT);
-
             $expiresAt = (new DateTime('+10 minutes'))->format('Y-m-d H:i:s');
 
             $sqlOtp = "INSERT INTO CODIGO_OTP_TB
-                (OTP_CODE, ID_CUENTA, ID_TIPO_OTP, HASH, EXPIRES_AT, INTENTOS, ACTIVE_FLAG, ID_ESTADO)
-                VALUES
-                (:otp, :idCuenta, :tipo, :hash, :exp, 0, 1, :estado)";
-            $stmt3 = $pdo->prepare($sqlOtp);
-            $stmt3->execute([
-                ':otp' => $otp, // lo guardamos también (tu PK usa OTP_CODE + ID_CUENTA)
+            (OTP_CODE, ID_CUENTA, ID_TIPO_OTP, HASH, EXPIRES_AT, INTENTOS, ACTIVE_FLAG, ID_ESTADO)
+            VALUES
+            (:otp, :idCuenta, :tipo, :hash, :exp, 0, 1, :estado)";
+
+            $stmtOtp = $pdo->prepare($sqlOtp);
+            $stmtOtp->execute([
+                ':otp' => $otp,
                 ':idCuenta' => $idCuenta,
                 ':tipo' => $this->OTP_ACTIVAR_CUENTA,
                 ':hash' => $otpHash,
@@ -191,18 +217,18 @@ class AuthController extends Controller
 
             $pdo->commit();
 
-            // 4) Enviar correo
+            // 5) Enviar correo
             Mailer::verifyEmail($correo, $otp);
 
-            // guardamos cuenta pendiente para la pantalla de verificación
             $_SESSION['pending_account_id'] = $idCuenta;
 
             header("Location: " . App::url('/verify-otp'));
             exit;
         } catch (PDOException $e) {
-            $pdo->rollBack();
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
 
-            // Errores comunes por UNIQUE (correo/username)
             $_SESSION['flash_error'] = "No se pudo registrar: " . $e->getMessage();
             header("Location: " . App::url('/register'));
             exit;
@@ -277,10 +303,15 @@ class AuthController extends Controller
         try {
             $pdo->beginTransaction();
 
-            $pdo->prepare("UPDATE CODIGO_OTP_TB SET ACTIVE_FLAG = 0 WHERE ID_CUENTA = :id AND ID_TIPO_OTP = :tipo")
+            $pdo->prepare("UPDATE CODIGO_OTP_TB 
+                           SET ACTIVE_FLAG = 0 
+                           WHERE ID_CUENTA = :id 
+                           AND ID_TIPO_OTP = :tipo")
                 ->execute([':id' => $idCuenta, ':tipo' => $this->OTP_ACTIVAR_CUENTA]);
 
-            $pdo->prepare("UPDATE CUENTA_TB SET ID_ESTADO = :estado WHERE ID_CUENTA = :id")
+            $pdo->prepare("UPDATE CUENTA_TB 
+                           SET ID_ESTADO = :estado 
+                           WHERE ID_CUENTA = :id")
                 ->execute([':estado' => $this->ESTADO_ACTIVO, ':id' => $idCuenta]);
 
             // activar usuario ligado
@@ -290,10 +321,20 @@ class AuthController extends Controller
                            WHERE c.ID_CUENTA = :id")
                 ->execute([':estado' => $this->ESTADO_ACTIVO, ':id' => $idCuenta]);
 
+            // activar correo ligado
+            $pdo->prepare("UPDATE CORREO_TB co
+               JOIN CUENTA_TB c ON c.IDENTIFICACION = co.IDENTIFICACION
+               SET co.ID_ESTADO = :estado
+               WHERE c.ID_CUENTA = :id")
+                ->execute([
+                    ':estado' => $this->ESTADO_ACTIVO,
+                    ':id' => $idCuenta
+                ]);
+
             $pdo->commit();
 
             unset($_SESSION['pending_account_id']);
-            $_SESSION['flash_success'] = "Cuenta activada ✅ Ya podés iniciar sesión.";
+            $_SESSION['flash_success'] = "Cuenta activada | Ya podés iniciar sesión.";
 
             header("Location: " . App::url('/login'));
             exit;
