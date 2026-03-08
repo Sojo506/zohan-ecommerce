@@ -38,7 +38,9 @@
 
                         <li class="nav-item">
                             <span class="nav-link">
-                                Hola <?= htmlspecialchars($_SESSION['user']['nombre']) ?>
+                                <a class="nav-link text-info" href="<?= App::url('/profile') ?>">
+                                    Hola <?= ($_SESSION['user']['nombre']) ?>
+                                </a>
                             </span>
                         </li>
 
