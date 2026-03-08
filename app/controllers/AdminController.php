@@ -1,5 +1,5 @@
 <?php
-
+aca haces cambios
 class AdminController extends Controller
 {
     private function checkAdmin()
