@@ -24,6 +24,8 @@ $router->get('/admin/users', 'AdminController@users');
 $router->get('/admin/inventory', 'AdminController@inventory');
 $router->get('/admin/promotions', 'AdminController@promotions');
 
+$router->get('/profile', 'ProfileController@index');
+
 $router->get('/login', 'AuthController@loginForm');
 $router->get('/logout', 'AuthController@logout');
 $router->post('/login', 'AuthController@login');
