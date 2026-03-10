@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../repositories/ProductRepository.php';
 
 class AdminController extends Controller
 {
@@ -30,7 +31,11 @@ class AdminController extends Controller
     {
         $this->checkAdmin();
 
-        $this->adminView('admin/products', [
+        $repo = new ProductRepository();
+        $products = $repo->all();
+
+        $this->adminView('admin/products/index', [
+            'products' => $products,
             'pageTitle' => 'Productos',
             'currentSection' => 'products'
         ]);
