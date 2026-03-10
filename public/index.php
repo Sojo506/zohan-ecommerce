@@ -77,6 +77,11 @@ $router->get('/admin/inventory/movements', 'InventoryAdminController@movements')
 
 $router->post('/admin/inventory/movement', 'InventoryAdminController@registerMovement');
 
+/* CRUD VENTAS ADMIN */
+$router->get('/admin/sales', 'SaleAdminController@index');
+
+$router->get('/admin/sales/{id}', 'SaleAdminController@detail');
+
 /*  PERFIL  */
 
 $router->get('/profile', 'ProfileController@index');
