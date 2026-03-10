@@ -20,19 +20,42 @@ class Router
 
         $uri = $_GET['url'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+        $uri = parse_url($uri, PHP_URL_PATH);
+
         if ($uri === '') $uri = '/';
 
         if ($uri[0] !== '/') {
             $uri = '/' . $uri;
         }
 
-        if (!isset($this->routes[$method][$uri])) {
+        $routeFound = false;
+        $params = [];
+
+        foreach ($this->routes[$method] ?? [] as $route => $controller) {
+
+            // convertir {id} en regex
+            $pattern = preg_replace('#\{[a-zA-Z_]+\}#', '([a-zA-Z0-9_-]+)', $route);
+
+            $pattern = "#^" . $pattern . "$#";
+
+            if (preg_match($pattern, $uri, $matches)) {
+
+                $routeFound = true;
+
+                array_shift($matches); // quitar coincidencia completa
+                $params = $matches;
+
+                [$controllerName, $methodName] = explode('@', $controller);
+
+                break;
+            }
+        }
+
+        if (!$routeFound) {
             http_response_code(404);
             echo "404 - Página no encontrada (ruta: {$uri})";
             return;
         }
-
-        [$controllerName, $methodName] = explode('@', $this->routes[$method][$uri]);
 
         $path = __DIR__ . '/../controllers/' . $controllerName . '.php';
 
@@ -52,6 +75,6 @@ class Router
             return;
         }
 
-        $controllerInstance->$methodName();
+        call_user_func_array([$controllerInstance, $methodName], $params);
     }
 }
