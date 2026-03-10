@@ -1,4 +1,3 @@
-<!-- Editar categoría -->
 <div class="admin-panel-card">
 
     <div class="admin-panel-card-header d-flex justify-content-between">
@@ -27,3 +26,4 @@
         </form>
 
     </div>
+</div>
