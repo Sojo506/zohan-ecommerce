@@ -18,12 +18,13 @@ class Router
     {
         $method = $_SERVER['REQUEST_METHOD'];
 
-        // sin htaccess: usamos ?url=/ruta
-        $uri = $_GET['url'] ?? '/';
+        $uri = $_GET['url'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
         if ($uri === '') $uri = '/';
 
-        // normalizar (por si viene sin slash)
-        if ($uri[0] !== '/') $uri = '/' . $uri;
+        if ($uri[0] !== '/') {
+            $uri = '/' . $uri;
+        }
 
         if (!isset($this->routes[$method][$uri])) {
             http_response_code(404);
@@ -34,6 +35,7 @@ class Router
         [$controllerName, $methodName] = explode('@', $this->routes[$method][$uri]);
 
         $path = __DIR__ . '/../controllers/' . $controllerName . '.php';
+
         if (!file_exists($path)) {
             http_response_code(500);
             echo "Controlador no existe: {$controllerName}";
@@ -43,6 +45,7 @@ class Router
         require_once $path;
 
         $controllerInstance = new $controllerName();
+
         if (!method_exists($controllerInstance, $methodName)) {
             http_response_code(500);
             echo "Método no existe: {$controllerName}@{$methodName}";
