@@ -11,10 +11,10 @@ class Database
             return self::$pdo;
         }
 
-        $host = Env::get('DB_HOST', 'zohan-ecommerce-isaacmasis-a8e9.i.aivencloud.com');
+        $host = Env::get('DB_HOST', '127.0.0.1');
         $db   = Env::get('DB_NAME', 'zohan_tech_store');
-        $user = Env::get('DB_USER', 'avnadmin');
-        $pass = Env::get('DB_PASS', 'AVNS_peuFS92U1mt0xcvo0qN');
+        $user = Env::get('DB_USER', 'root');
+        $pass = Env::get('DB_PASS', 'CGJS2050');
         $charset = Env::get('DB_CHARSET', 'utf8mb4');
 
         $dsn = "mysql:host={$host};dbname={$db};charset={$charset}";

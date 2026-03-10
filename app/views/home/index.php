@@ -1,4 +1,4 @@
-<main>
+﻿<main>
 
     <!-- HERO -->
     <section class="bg-light border-bottom">
@@ -6,25 +6,25 @@
             <div class="row align-items-center g-4">
                 <div class="col-12 col-lg-6">
                     <h1 class="hero-title fw-bold lh-sm mb-3">
-                        Compra tecnología con confianza:
-                        <span class="text-primary">rápido</span>,
+                        Compra tecnologia con confianza:
+                        <span class="text-primary">rapido</span>,
                         <span class="text-success">seguro</span> y
                         <span class="text-danger">sin vueltas</span>.
                     </h1>
 
                     <p class="lead text-muted mb-4 hero-subtitle">
-                        Laptops, componentes, periféricos y gadgets. Encuentra lo que necesitas con filtros, promos y pagos protegidos.
+                        Laptops, componentes, perifericos y gadgets. Encuentra lo que necesitas con filtros, promos y pagos protegidos.
                     </p>
 
                     <div class="d-flex flex-wrap gap-3 mt-4 small text-muted">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="badge text-bg-success rounded-circle p-2"></span> Envíos rápidos
+                            <span class="badge text-bg-success rounded-circle p-2"></span> Envios rapidos
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge text-bg-primary rounded-circle p-2"></span> Pagos seguros
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="badge text-bg-warning rounded-circle p-2"></span> Garantía y soporte
+                            <span class="badge text-bg-warning rounded-circle p-2"></span> Garantia y soporte
                         </div>
                     </div>
                 </div>
@@ -48,7 +48,7 @@
                                 <div class="col-6">
                                     <div class="p-3 border rounded-3 h-100">
                                         <div class="fw-bold">Novedades</div>
-                                        <div class="text-muted small">Lo último en stock</div>
+                                        <div class="text-muted small">Lo ultimo en stock</div>
                                     </div>
                                 </div>
                             </div>
@@ -70,8 +70,8 @@
         <div class="container">
             <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-2 mb-4">
                 <div>
-                    <h2 class="fw-bold mb-1">Compra por categoría</h2>
-                    <p class="text-muted mb-0">Encuentra rápido lo que buscás.</p>
+                    <h2 class="fw-bold mb-1">Compra por categoria</h2>
+                    <p class="text-muted mb-0">Encuentra rapido lo que buscas.</p>
                 </div>
                 <a href="<?= App::url('/products') ?>" class="btn btn-outline-dark">Ver todo</a>
             </div>
@@ -81,7 +81,7 @@
                     <a href="<?= App::url('/products?category=laptops') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
                             <div class="card-body p-4">
-                                <div class="fs-2 mb-2">💻</div>
+                                <div class="fs-2 mb-2"></div>
                                 <h5 class="fw-bold mb-1">Laptops</h5>
                                 <p class="text-muted mb-0">Estudio, trabajo y gaming.</p>
                             </div>
@@ -93,7 +93,7 @@
                     <a href="<?= App::url('/products?category=components') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
                             <div class="card-body p-4">
-                                <div class="fs-2 mb-2">🧩</div>
+                                <div class="fs-2 mb-2"></div>
                                 <h5 class="fw-bold mb-1">Componentes</h5>
                                 <p class="text-muted mb-0">GPU, RAM, SSD, PSU.</p>
                             </div>
@@ -105,9 +105,9 @@
                     <a href="<?= App::url('/products?category=gaming') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
                             <div class="card-body p-4">
-                                <div class="fs-2 mb-2">🎮</div>
+                                <div class="fs-2 mb-2"></div>
                                 <h5 class="fw-bold mb-1">Gaming</h5>
-                                <p class="text-muted mb-0">Periféricos y setups.</p>
+                                <p class="text-muted mb-0">Perifricos y setups.</p>
                             </div>
                         </div>
                     </a>
@@ -117,7 +117,7 @@
                     <a href="<?= App::url('/products?category=accessories') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
                             <div class="card-body p-4">
-                                <div class="fs-2 mb-2">🎧</div>
+                                <div class="fs-2 mb-2"></div>
                                 <h5 class="fw-bold mb-1">Accesorios</h5>
                                 <p class="text-muted mb-0">Audio, cables, hubs.</p>
                             </div>
@@ -136,83 +136,37 @@
                     <h2 class="fw-bold mb-1">Destacados de la semana</h2>
                     <p class="text-muted mb-0">Productos populares y bien valorados.</p>
                 </div>
-                <a href="<?= App::url('/products') ?>" class="btn btn-primary">Ir al catálogo</a>
+                <a href="<?= App::url('/products') ?>" class="btn btn-primary">Ir al catalogo</a>
             </div>
 
             <div class="row g-3 g-md-4">
-
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 border-0 shadow-sm rounded-4">
-                        <div class="ratio ratio-1x1 bg-white border-bottom">
-                            <div class="d-flex align-items-center justify-content-center text-muted">Imagen</div>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start gap-2">
-                                <h6 class="fw-bold mb-1">Laptop Gamer 15"</h6>
-                                <span class="badge text-bg-success flex-shrink-0">-10%</span>
+                <?php foreach (($featuredProducts ?? []) as $producto): ?>
+                    <?php
+                    $imagen = !empty($producto['URL_IMAGE'])
+                        ? $producto['URL_IMAGE']
+                        : 'https://loremflickr.com/700/700/technology?lock=' . (int)$producto['ID_PRODUCTO'];
+                    ?>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card h-100 border-0 shadow-sm rounded-4">
+                            <div class="ratio ratio-1x1 bg-white border-bottom">
+                                <img src="<?= htmlspecialchars($imagen) ?>" alt="<?= htmlspecialchars($producto['NOMBRE']) ?>" class="w-100 h-100 object-fit-cover">
                             </div>
-                            <p class="text-muted small mb-2">Ryzen / 16GB / 512SSD</p>
-                            <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                                <span class="fw-bold">₡ 599,000</span>
-                                <a href="<?= App::url('/products') ?>" class="btn btn-sm btn-outline-dark">Ver</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 border-0 shadow-sm rounded-4">
-                        <div class="ratio ratio-1x1 bg-white border-bottom">
-                            <div class="d-flex align-items-center justify-content-center text-muted">Imagen</div>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-1">SSD NVMe 1TB</h6>
-                            <p class="text-muted small mb-2">Carga ultra rápida</p>
-                            <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                                <span class="fw-bold">₡ 49,900</span>
-                                <a href="<?= App::url('/products') ?>" class="btn btn-sm btn-outline-dark">Ver</a>
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-1"><?= htmlspecialchars($producto['NOMBRE']) ?></h6>
+                                <p class="text-muted small mb-2"><?= htmlspecialchars(strlen((string)$producto['DESCRIPCION']) > 35 ? substr((string)$producto['DESCRIPCION'], 0, 35) . '...' : (string)$producto['DESCRIPCION']) ?></p>
+                                <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                    <span class="fw-bold">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
+                                    <a href="<?= App::url('/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark">Ver</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 border-0 shadow-sm rounded-4">
-                        <div class="ratio ratio-1x1 bg-white border-bottom">
-                            <div class="d-flex align-items-center justify-content-center text-muted">Imagen</div>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-1">Teclado Mecánico</h6>
-                            <p class="text-muted small mb-2">RGB + switches</p>
-                            <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                                <span class="fw-bold">₡ 29,900</span>
-                                <a href="<?= App::url('/products') ?>" class="btn btn-sm btn-outline-dark">Ver</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 border-0 shadow-sm rounded-4">
-                        <div class="ratio ratio-1x1 bg-white border-bottom">
-                            <div class="d-flex align-items-center justify-content-center text-muted">Imagen</div>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-1">Audífonos Pro</h6>
-                            <p class="text-muted small mb-2">Micrófono + sonido</p>
-                            <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                                <span class="fw-bold">₡ 24,900</span>
-                                <a href="<?= App::url('/products') ?>" class="btn btn-sm btn-outline-dark">Ver</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <?php endforeach; ?>
             </div>
 
             <div class="mt-4 text-center">
                 <a href="<?= App::url('/products') ?>" class="btn btn-outline-secondary btn-lg px-4">
-                    Ver más productos
+                    Ver mas productos
                 </a>
             </div>
         </div>
@@ -223,34 +177,34 @@
         <div class="container">
             <div class="row g-4 align-items-center">
                 <div class="col-12 col-lg-6">
-                    <h2 class="fw-bold mb-3">¿Por qué comprar en Zohan?</h2>
+                    <h2 class="fw-bold mb-3">Por que comprar en Zohan?</h2>
                     <p class="text-muted mb-4">
-                        Hacemos que comprar tecnología sea simple: catálogo claro, compra rápida, y procesos seguros.
+                        Hacemos que comprar tecnologia sea simple: catalogo claro, compra rapida, y procesos seguros.
                     </p>
 
                     <div class="row g-3">
                         <div class="col-12 col-sm-6">
                             <div class="p-4 border rounded-4 h-100">
-                                <div class="fw-bold mb-1">🔒 Seguridad</div>
-                                <div class="text-muted small">Autenticación y protección de sesiones.</div>
+                                <div class="fw-bold mb-1"> Seguridad</div>
+                                <div class="text-muted small">Autenticacion y proteccion de sesiones.</div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6">
                             <div class="p-4 border rounded-4 h-100">
-                                <div class="fw-bold mb-1">🧾 Transparencia</div>
+                                <div class="fw-bold mb-1"> Transparencia</div>
                                 <div class="text-muted small">Precios claros y detalle del producto.</div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6">
                             <div class="p-4 border rounded-4 h-100">
-                                <div class="fw-bold mb-1">🚚 Entrega</div>
-                                <div class="text-muted small">Logística eficiente y seguimiento.</div>
+                                <div class="fw-bold mb-1"> Entrega</div>
+                                <div class="text-muted small">Logistica eficiente y seguimiento.</div>
                             </div>
                         </div>
                         <div class="col-12 col-sm-6">
                             <div class="p-4 border rounded-4 h-100">
-                                <div class="fw-bold mb-1">🛠️ Soporte</div>
-                                <div class="text-muted small">Asistencia antes y después de comprar.</div>
+                                <div class="fw-bold mb-1"> Soporte</div>
+                                <div class="text-muted small">Asistencia antes y despues de comprar.</div>
                             </div>
                         </div>
                     </div>
@@ -259,8 +213,8 @@
                 <div class="col-12 col-lg-6">
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-4 p-md-5">
-                            <h5 class="fw-bold mb-2">Métricas (placeholder)</h5>
-                            <p class="text-muted mb-4">Podés conectarlo a datos reales después.</p>
+                            <h5 class="fw-bold mb-2">Metricas (placeholder)</h5>
+                            <p class="text-muted mb-4">Puedes conectarlo a datos reales despues.</p>
 
                             <div class="row g-3">
                                 <div class="col-6">
@@ -272,7 +226,7 @@
                                 <div class="col-6">
                                     <div class="p-3 bg-light rounded-4">
                                         <div class="fw-bold fs-4">4.8/5</div>
-                                        <div class="text-muted small">Valoración</div>
+                                        <div class="text-muted small">Valoracion</div>
                                     </div>
                                 </div>
                                 <div class="col-6">
@@ -313,13 +267,13 @@
                 <div class="col-12 col-md-4">
                     <div class="card h-100 border-0 shadow-sm rounded-4">
                         <div class="card-body p-4">
-                            <div class="fw-bold">“Excelente servicio”</div>
+                            <div class="fw-bold">Excelente servicio</div>
                             <p class="text-muted mt-2 mb-3">
-                                Me llegó rápido, todo bien empacado y el producto era exactamente lo que decía.
+                                Me lleg rapido, todo bien empacado y el producto era exactamente lo que decia.
                             </p>
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="small text-muted">Cliente #1</span>
-                                <span class="badge text-bg-warning">★★★★★</span>
+                                <span class="badge text-bg-warning">*****</span>
                             </div>
                         </div>
                     </div>
@@ -328,13 +282,13 @@
                 <div class="col-12 col-md-4">
                     <div class="card h-100 border-0 shadow-sm rounded-4">
                         <div class="card-body p-4">
-                            <div class="fw-bold">“Proceso súper fácil”</div>
+                            <div class="fw-bold">Proceso super facil</div>
                             <p class="text-muted mt-2 mb-3">
-                                Filtré por precio y encontré justo lo que necesitaba. El checkout es rápido.
+                                Filtre por precio y encontre justo lo que necesitaba. El checkout es rapido.
                             </p>
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="small text-muted">Cliente #2</span>
-                                <span class="badge text-bg-warning">★★★★★</span>
+                                <span class="badge text-bg-warning">*****</span>
                             </div>
                         </div>
                     </div>
@@ -343,13 +297,13 @@
                 <div class="col-12 col-md-4">
                     <div class="card h-100 border-0 shadow-sm rounded-4">
                         <div class="card-body p-4">
-                            <div class="fw-bold">“Buen soporte”</div>
+                            <div class="fw-bold">Buen soporte</div>
                             <p class="text-muted mt-2 mb-3">
-                                Tenía dudas con compatibilidad y me orientaron perfecto antes de comprar.
+                                Tenia dudas con compatibilidad y me orientaron perfecto antes de comprar.
                             </p>
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="small text-muted">Cliente #3</span>
-                                <span class="badge text-bg-warning">★★★★☆</span>
+                                <span class="badge text-bg-warning">*****</span>
                             </div>
                         </div>
                     </div>
@@ -365,7 +319,7 @@
             <div class="text-center mb-5">
                 <h2 class="fw-bold">Preguntas frecuentes</h2>
                 <p class="text-muted">
-                    Resolvemos las dudas más comunes antes de realizar una compra.
+                    Resolvemos las dudas mas comunes antes de realizar una compra.
                 </p>
             </div>
 
@@ -377,13 +331,13 @@
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    ¿Qué métodos de pago aceptan?
+                                    Que metodos de pago aceptan?
                                 </button>
                             </h2>
                             <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-muted">
-                                    Actualmente aceptamos pagos a través de <strong>PayPal</strong>, lo que permite utilizar tarjetas de crédito o débito de forma segura.
-                                    Todos los pagos están protegidos mediante cifrado y sistemas de seguridad modernos.
+                                    Actualmente aceptamos pagos a traves de <strong>PayPal</strong>, lo que permite utilizar tarjetas de credito o debito de forma segura.
+                                    Todos los pagos estan protegidos mediante cifrado y sistemas de seguridad modernos.
                                 </div>
                             </div>
                         </div>
@@ -392,14 +346,14 @@
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    ¿Realizan envíos a todo el país?
+                                    Realizan envios a todo el pais?
                                 </button>
                             </h2>
                             <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-muted">
-                                    Sí. Realizamos envíos a todo el país mediante empresas de logística confiables.
-                                    El tiempo de entrega depende de la ubicación, pero generalmente tarda entre
-                                    <strong>1 y 3 días hábiles</strong>.
+                                    S. Realizamos envos a todo el pais mediante empresas de logstica confiables.
+                                    El tiempo de entrega depende de la ubicacion, pero generalmente tarda entre
+                                    <strong>1 y 3 dias habiles</strong>.
                                 </div>
                             </div>
                         </div>
@@ -408,13 +362,13 @@
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    ¿Los productos tienen garantía?
+                                    Los productos tienen garantia?
                                 </button>
                             </h2>
                             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-muted">
-                                    Sí. Todos nuestros productos cuentan con garantía del fabricante.
-                                    El tiempo de garantía puede variar dependiendo del producto,
+                                    S. Todos nuestros productos cuentan con garantia del fabricante.
+                                    El tiempo de garanta puede variar dependiendo del producto,
                                     pero normalmente es entre <strong>6 y 12 meses</strong>.
                                 </div>
                             </div>
@@ -424,14 +378,14 @@
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#faq4">
-                                    ¿Puedo devolver un producto?
+                                    Puedo devolver un producto?
                                 </button>
                             </h2>
                             <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-muted">
-                                    Sí. Si el producto presenta defectos o problemas de funcionamiento,
-                                    puedes solicitar un reemplazo o devolución dentro de los
-                                    <strong>7 días posteriores a la compra</strong>.
+                                    S. Si el producto presenta defectos o problemas de funcionamiento,
+                                    puedes solicitar un reemplazo o devolucion dentro de los
+                                    <strong>7 dias posteriores a la compra</strong>.
                                 </div>
                             </div>
                         </div>
@@ -440,13 +394,13 @@
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed fw-semibold" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#faq5">
-                                    ¿Necesito una cuenta para comprar?
+                                    Necesito una cuenta para comprar?
                                 </button>
                             </h2>
                             <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body text-muted">
-                                    Sí. Crear una cuenta te permite realizar compras, guardar tu historial
-                                    de pedidos y gestionar tu información de envío de manera más rápida.
+                                    S. Crear una cuenta te permite realizar compras, guardar tu historial
+                                    de pedidos y gestionar tu informacin de envo de manera mas rpida.
                                 </div>
                             </div>
                         </div>
@@ -456,7 +410,7 @@
             </div>
 
             <div class="text-center mt-5">
-                <h5 class="fw-bold">¿No encontraste tu respuesta?</h5>
+                <h5 class="fw-bold">No encontraste tu respuesta?</h5>
                 <p class="text-muted">
                     Nuestro equipo puede ayudarte con cualquier consulta sobre productos o pedidos.
                 </p>
@@ -470,3 +424,5 @@
     </section>
 
 </main>
+
+

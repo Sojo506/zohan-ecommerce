@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 require_once __DIR__ . '/../app/core/Env.php';
 require_once __DIR__ . '/../app/core/Database.php';
@@ -8,33 +8,52 @@ require_once __DIR__ . '/../app/core/App.php';
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ini_set('default_charset', 'UTF-8');
+mb_internal_encoding('UTF-8');
+header('Content-Type: text/html; charset=utf-8');
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
 
 Env::load(__DIR__ . '/../.env');
 session_start();
 
-$router = new Router();
+ = new Router();
 
 // rutas
-$router->get('/', 'HomeController@index');
+->get('/', 'HomeController@index');
 
-$router->get('/admin', 'AdminController@index');
-$router->get('/admin/products', 'AdminController@products');
-$router->get('/admin/orders', 'AdminController@orders');
-$router->get('/admin/users', 'AdminController@users');
-$router->get('/admin/inventory', 'AdminController@inventory');
-$router->get('/admin/promotions', 'AdminController@promotions');
+->get('/admin', 'AdminController@index');
+->get('/admin/products', 'AdminController@products');
+->get('/admin/orders', 'AdminController@orders');
+->get('/admin/users', 'AdminController@users');
+->get('/admin/inventory', 'AdminController@inventory');
+->get('/admin/promotions', 'AdminController@promotions');
 
-$router->get('/profile', 'ProfileController@index');
+->get('/profile', 'ProfileController@index');
 
-$router->get('/login', 'AuthController@loginForm');
-$router->get('/logout', 'AuthController@logout');
-$router->post('/login', 'AuthController@login');
+->get('/login', 'AuthController@loginForm');
+->get('/logout', 'AuthController@logout');
+->post('/login', 'AuthController@login');
 
-$router->get('/register', 'AuthController@registerForm');
-$router->post('/register', 'AuthController@register');
+->get('/register', 'AuthController@registerForm');
+->post('/register', 'AuthController@register');
 
-$router->get('/verify-otp', 'AuthController@verifyOtpForm');
-$router->post('/verify-otp', 'AuthController@verifyOtp');
+->get('/verify-otp', 'AuthController@verifyOtpForm');
+->post('/verify-otp', 'AuthController@verifyOtp');
+
+->get('/products', 'ProductController@index');
+->get('/product', 'ProductController@show');
+->get('/cart', 'ProductController@cart');
+->post('/cart/add', 'ProductController@addToCart');
+
+->post('/cart/update', 'ProductController@updateCart');
+->post('/cart/remove', 'ProductController@removeFromCart');
+->post('/cart/clear', 'ProductController@clearCart');
 
 // despachar (sin htaccess)
-$router->dispatch();
+->dispatch();
+
+
+
+
