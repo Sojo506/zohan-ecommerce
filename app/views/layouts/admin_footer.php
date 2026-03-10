@@ -10,6 +10,7 @@
                 crossorigin="anonymous"></script>
         <!-- Custom JS -->
         <script src="/zohan-ecommerce/public/js/script.js"></script>
+        <script src="/zohan-ecommerce/public/js/admin.js"></script>
     </body>
 
 </html>
