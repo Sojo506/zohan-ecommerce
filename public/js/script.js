@@ -56,3 +56,61 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+document.querySelectorAll('.btn-delete-image').forEach(button => {
+
+    button.addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        const url = this.dataset.url;
+
+        Swal.fire({
+            title: '¿Eliminar imagen?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+
+        });
+
+    });
+
+});
+
+document.querySelectorAll('.btn-delete-product').forEach(button => {
+
+    button.addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        const url = this.dataset.url;
+
+        Swal.fire({
+            title: '¿Eliminar producto?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+
+        });
+
+    });
+
+});
