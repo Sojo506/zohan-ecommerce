@@ -1,3 +1,16 @@
+<?php if (!empty($_SESSION['flash_success'])): ?>
+<div class="alert alert-success">
+    <?= $_SESSION['flash_success']; ?>
+</div>
+<?php unset($_SESSION['flash_success']); ?>
+<?php endif; ?>
+
+<?php if (!empty($_SESSION['flash_error'])): ?>
+<div class="alert alert-danger">
+    <?= $_SESSION['flash_error']; ?>
+</div>
+<?php unset($_SESSION['flash_error']); ?>
+<?php endif; ?>
 <main>
     <section class="bg-light border-bottom">
         <div class="container py-5">
@@ -48,7 +61,7 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2 flex-wrap">
-                                <a href="/user/edit" class="btn btn-primary">
+                                <a href="<?= App::url('/editProfile') ?>" class="btn btn-primary">
                                     Editar perfil
                                 </a>
                                 <a href="/user/change-password" class="btn btn-outline-secondary">
