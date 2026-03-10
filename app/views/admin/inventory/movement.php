@@ -1,67 +1,81 @@
-<form method="POST">
+<div class="admin-panel-card">
 
-    <div class="mb-3">
+    <div class="admin-panel-card-header d-flex justify-content-between">
 
-        <label>Producto</label>
+        <h4>Registrar movimiento</h4>
 
-        <select name="product" class="form-control">
-
-            <?php foreach ($products as $p): ?>
-
-                <option value="<?= $p['ID_PRODUCTO'] ?>">
-
-                    <?= $p['NOMBRE'] ?>
-
-                </option>
-
-            <?php endforeach ?>
-
-        </select>
+        <a href="<?= App::url('/admin/inventory') ?>" class="btn btn-dark">
+            Volver a inventario
+        </a>
 
     </div>
 
+    <form method="POST">
 
-    <div class="mb-3">
+        <div class="mb-3 p-3">
 
-        <label>Tipo movimiento</label>
+            <label>Producto</label>
 
-        <select name="type" class="form-control">
+            <select name="product" class="form-control">
 
-            <?php foreach ($types as $t): ?>
+                <?php foreach ($products as $p): ?>
 
-                <option value="<?= $t['ID_TIPO_MOVIMIENTO'] ?>">
+                    <option value="<?= $p['ID_PRODUCTO'] ?>">
 
-                    <?= $t['NOMBRE'] ?>
+                        <?= $p['NOMBRE'] ?>
 
-                </option>
+                    </option>
 
-            <?php endforeach ?>
+                <?php endforeach ?>
 
-        </select>
+            </select>
 
-    </div>
+        </div>
 
 
-    <div class="mb-3">
+        <div class="mb-3 p-3">
 
-        <label>Cantidad</label>
+            <label>Tipo movimiento</label>
 
-        <input type="number" name="quantity" class="form-control">
+            <select name="type" class="form-control">
 
-    </div>
+                <?php foreach ($types as $t): ?>
 
-    <div class="mb-3">
+                    <option value="<?= $t['ID_TIPO_MOVIMIENTO'] ?>">
 
-        <label>Motivo</label>
+                        <?= $t['NOMBRE'] ?>
 
-        <textarea name="reason" class="form-control"></textarea>
+                    </option>
 
-    </div>
+                <?php endforeach ?>
 
-    <button class="btn btn-dark">
+            </select>
 
-        Registrar movimiento
+        </div>
 
-    </button>
 
-</form>
+        <div class="mb-3 p-3">
+
+            <label>Cantidad</label>
+
+            <input type="number" name="quantity" class="form-control">
+
+        </div>
+
+        <div class="mb-3 p-3">
+
+            <label>Motivo</label>
+
+            <textarea name="reason" class="form-control"></textarea>
+
+        </div>
+
+        <button class="btn btn-dark">
+
+            Registrar movimiento
+
+        </button>
+
+    </form>
+
+</div>
