@@ -23,35 +23,27 @@
             </div>
 
             <nav class="admin-sidebar-nav">
-                <a href="<?= App::url('/admin') ?>"
-                    class="admin-sidebar-link <?= ($currentSection ?? '') === 'dashboard' ? 'active' : '' ?>">
-                    Dashboard
-                </a>
+                <a href="<?= App::url('/admin') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'dashboard' ? 'active' : '' ?>">Dashboard</a>
 
-                <a href="<?= App::url('/admin/products') ?>"
-                    class="admin-sidebar-link <?= ($currentSection ?? '') === 'products' ? 'active' : '' ?>">
-                    Productos
-                </a>
+                <a href="<?= App::url('/admin/products') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'products' ? 'active' : '' ?>">Productos</a>
 
-                <a href="<?= App::url('/admin/orders') ?>"
-                    class="admin-sidebar-link <?= ($currentSection ?? '') === 'orders' ? 'active' : '' ?>">
-                    Ventas
-                </a>
+                <a href="<?= App::url('/admin/categories') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'categories' ? 'active' : '' ?>">Categorías</a>
 
-                <a href="<?= App::url('/admin/users') ?>"
-                    class="admin-sidebar-link <?= ($currentSection ?? '') === 'users' ? 'active' : '' ?>">
-                    Usuarios
-                </a>
+                <a href="<?= App::url('/admin/brands') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'brands' ? 'active' : '' ?>">Marcas</a>
 
-                <a href="<?= App::url('/admin/inventory') ?>"
-                    class="admin-sidebar-link <?= ($currentSection ?? '') === 'inventory' ? 'active' : '' ?>">
-                    Inventario
-                </a>
+                <a href="<?= App::url('/admin/inventory') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'inventory' ? 'active' : '' ?>">Inventario</a>
 
-                <a href="<?= App::url('/admin/promotions') ?>"
-                    class="admin-sidebar-link <?= ($currentSection ?? '') === 'promotions' ? 'active' : '' ?>">
-                    Promociones
-                </a>
+                <a href="<?= App::url('/admin/comments') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'comments' ? 'active' : '' ?>">Comentarios</a>
+
+                <a href="<?= App::url('/admin/users') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'users' ? 'active' : '' ?>">Usuarios</a>
+
+                <a href="<?= App::url('/admin/sales') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'sales' ? 'active' : '' ?>">Ventas</a>
+
+                <a href="<?= App::url('/admin/invoices') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'invoices' ? 'active' : '' ?>">Facturas</a>
+
+                <a href="<?= App::url('/admin/coupons') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'coupons' ? 'active' : '' ?>">Cupones</a>
+
+                <a href="<?= App::url('/admin/promotions') ?>" class="admin-sidebar-link <?= ($currentSection ?? '') === 'promotions' ? 'active' : '' ?>">Promociones</a>
             </nav>
 
             <div class="admin-sidebar-footer">
