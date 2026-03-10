@@ -80,6 +80,11 @@ $router->post('/admin/inventory/movement', 'InventoryAdminController@registerMov
 /* CRUD VENTAS ADMIN */
 $router->get('/admin/sales', 'SaleAdminController@index');
 
+/* CRUD USUARIOS ADMIN  */
+$router->get('/admin/users', 'UserAdminController@index');
+$router->get('/admin/users/{id}', 'UserAdminController@detail');
+$router->get('/admin/users/{id}/status/{status}', 'UserAdminController@changeStatus');
+$router->get('/admin/users/{id}/role/{role}', 'UserAdminController@changeRole');
 $router->get('/admin/sales/{id}', 'SaleAdminController@detail');
 
 /*  PERFIL  */
