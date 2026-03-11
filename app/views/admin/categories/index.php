@@ -40,7 +40,9 @@
                                 Editar
                             </a>
 
-                            <a href="<?= App::url('/admin/categories/delete/' . $c['ID_CATEGORIA']) ?>" class="btn btn-sm btn-outline-danger">
+                            <a href="#"
+                                class="btn btn-sm btn-outline-danger btn-delete-category"
+                                data-url="<?= App::url('/admin/categories/delete/' . $c['ID_CATEGORIA']) ?>">
                                 Eliminar
                             </a>
 
