@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../repositories/ProductRepository.php';
+require_once __DIR__ . '/../repositories/DashboardRepository.php';
+
 
 class AdminController extends Controller
 {
@@ -21,12 +23,19 @@ class AdminController extends Controller
     {
         $this->checkAdmin();
 
+        $repo = new DashboardRepository();
+
+        $stats = $repo->stats();
+        $recentSales = $repo->recentSales();
+
         $this->adminView('admin/dashboard', [
             'pageTitle' => 'Dashboard',
-            'currentSection' => 'dashboard'
+            'currentSection' => 'dashboard',
+            'stats' => $stats,
+            'recentSales' => $recentSales
         ]);
     }
-
+    
     public function products()
     {
         $this->checkAdmin();
