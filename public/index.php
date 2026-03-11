@@ -70,6 +70,17 @@ $router->post('/admin/categories/update', 'CategoryAdminController@update');
 
 $router->get('/admin/categories/delete/{id}', 'CategoryAdminController@delete');
 
+/*  CRUD MARCAS ADMIN  */
+$router->get('/admin/brands','BrandAdminController@index');
+
+$router->get('/admin/brands/create','BrandAdminController@createForm');
+$router->post('/admin/brands/create','BrandAdminController@create');
+
+$router->get('/admin/brands/edit/{id}','BrandAdminController@editForm');
+$router->post('/admin/brands/update','BrandAdminController@update');
+
+$router->get('/admin/brands/delete/{id}','BrandAdminController@delete');
+
 /* CRUD INVENTARIO ADMIN */
 $router->get('/admin/inventory', 'InventoryAdminController@index');
 $router->get('/admin/inventory/movement', 'InventoryAdminController@movementForm');
