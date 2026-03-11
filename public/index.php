@@ -98,6 +98,25 @@ $router->post('/admin/coupons/update', 'CouponAdminController@update');
 
 $router->get('/admin/coupons/delete/{id}', 'CouponAdminController@delete');
 
+/* CRUD PROMOCIONES ADMIN  */
+$router->get('/admin/promotions', 'PromotionAdminController@index');
+
+$router->get('/admin/promotions/create', 'PromotionAdminController@createForm');
+$router->post('/admin/promotions/create', 'PromotionAdminController@create');
+
+$router->get('/admin/promotions/edit/{id}', 'PromotionAdminController@editForm');
+
+$router->post('/admin/promotions/update', 'PromotionAdminController@update');
+
+$router->get('/admin/promotions/delete/{id}', 'PromotionAdminController@delete');
+
+$router->post('/admin/promotions/assign', 'PromotionAdminController@assignProduct');
+
+$router->get(
+    '/admin/promotions/remove-product/{promo}/{product}',
+    'PromotionAdminController@removeProduct'
+);
+
 /*  PERFIL  */
 
 $router->get('/profile', 'ProfileController@index');
