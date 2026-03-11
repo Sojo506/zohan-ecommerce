@@ -123,6 +123,9 @@ $router->get('/admin/comments/approve/{id}', 'CommentAdminController@approve');
 $router->get('/admin/comments/hide/{id}', 'CommentAdminController@hide');
 $router->get('/admin/comments/delete/{id}', 'CommentAdminController@delete');
 
+/* CRUD AUDITORÍA ADMIN  */
+$router->get('/admin/audit','AuditAdminController@index');
+
 /*  PERFIL  */
 
 $router->get('/profile', 'ProfileController@index');
