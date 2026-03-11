@@ -117,6 +117,12 @@ $router->get(
     'PromotionAdminController@removeProduct'
 );
 
+/* CRUD COMMENTS ADMIN  */
+$router->get('/admin/comments', 'CommentAdminController@index');
+$router->get('/admin/comments/approve/{id}', 'CommentAdminController@approve');
+$router->get('/admin/comments/hide/{id}', 'CommentAdminController@hide');
+$router->get('/admin/comments/delete/{id}', 'CommentAdminController@delete');
+
 /*  PERFIL  */
 
 $router->get('/profile', 'ProfileController@index');
