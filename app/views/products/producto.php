@@ -17,19 +17,49 @@
         ? $preset['imagen']
         : (!empty($producto['URL_IMAGE']) ? $producto['URL_IMAGE'] : 'https://loremflickr.com/1200/800/technology');
 
+    $imagenes = $imagenes ?? [];
+    $imagenes = array_values(array_filter($imagenes, static function ($url) {
+        return is_string($url) && trim($url) !== '';
+    }));
+
+    if (empty($imagenes)) {
+        $imagenes = [$imagen];
+    }
+
+    $imagenPrincipal = $imagenes[0] ?? $imagen;
+
     $titulo = $preset['titulo'] ?? $producto['NOMBRE'];
     $precio = number_format((float)$producto['PRECIO'], 0, ',', '.');
-    $existencias = 3;
+    $existencias = (int)($existencias ?? 0);
     $detalles = $preset['detalles'] ?? ($preset['especificaciones'] ?? []);
     ?>
 
     <section class="card border-0 shadow-sm overflow-hidden">
         <div class="row g-0">
             <div class="col-12 col-lg-6 bg-light">
-                <img src="<?= htmlspecialchars($imagen) ?>"
-                    alt="<?= htmlspecialchars($titulo) ?>"
-                    class="w-100 h-100"
-                    style="object-fit: cover; min-height: 320px;">
+                <div class="p-3">
+                    <div class="ratio ratio-4x3 bg-white rounded-3 overflow-hidden">
+                        <img id="productMainImage" src="<?= htmlspecialchars($imagenPrincipal) ?>"
+                            alt="<?= htmlspecialchars($titulo) ?>"
+                            class="w-100 h-100 object-fit-cover">
+                    </div>
+
+                    <?php if (count($imagenes) > 1): ?>
+                        <div class="d-flex gap-2 mt-3 flex-wrap">
+                            <?php foreach ($imagenes as $index => $imagenUrl): ?>
+                                <button type="button"
+                                    class="btn p-0 border rounded-3 product-thumb <?= $index === 0 ? 'is-active' : '' ?>"
+                                    data-product-thumb="<?= htmlspecialchars($imagenUrl) ?>"
+                                    aria-label="Ver imagen <?= (int)$index + 1 ?>">
+                                    <img src="<?= htmlspecialchars($imagenUrl) ?>"
+                                        alt="<?= htmlspecialchars($titulo) ?> miniatura <?= (int)$index + 1 ?>"
+                                        width="72" height="56"
+                                        style="object-fit: cover; border-radius: 6px;">
+                                </button>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <div class="col-12 col-lg-6">
@@ -74,7 +104,98 @@
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-danger w-100 mb-3">Ver Disponibilidad en Tiendas</button>
+                    <button type="button" class="btn btn-danger w-100 mb-3" data-bs-toggle="collapse" data-bs-target="#storeAvailability" aria-expanded="false" aria-controls="storeAvailability">Ver Disponibilidad en Tiendas</button>
+
+                    <div class="collapse" id="storeAvailability">
+                        <div class="availability-panel">
+                            <div class="availability-header">Disponibilidad en Tiendas</div>
+                            <div class="row g-3">
+                                <div class="col-12 col-lg-6">
+                                    <div class="availability-card">
+                                        <div class="availability-title">ZONA GAM:</div>
+                                        <div class="availability-list">
+                                            <div class="availability-item">
+                                                <div class="availability-location">Escaz&uacute;</div>
+                                                <div class="availability-status-text availability-status--low">Queda 1</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">San Jos&eacute; Centro</div>
+                                                <div class="availability-status-text availability-status--low">Queda 1</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">Alajuela</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">Cartago</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">Desamparados</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">Heredia</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">La Valencia (Heredia)</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">Lindora</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">Plaza San Francisco (Heredia)</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">San Pedro</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">Tib&aacute;s</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="availability-card">
+                                        <div class="availability-title">FUERA DE GAM:</div>
+                                        <div class="availability-list">
+                                            <div class="availability-item">
+                                                <div class="availability-location">Gu&aacute;piles</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">Liberia</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">P&eacute;rez Zeled&oacute;n C- Town</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">P&eacute;rez Zeled&oacute;n Centro</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">San Carlos</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                            <div class="availability-item">
+                                                <div class="availability-location">San Ram&oacute;n</div>
+                                                <div class="availability-status-text availability-status--none">No disponible</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <?php if (!empty($preset['cuotas'])): ?>
                         <div class="border rounded p-3 mb-3 bg-light">
@@ -92,11 +213,15 @@
 
                         <div class="col-12 col-sm-4">
                             <label class="form-label" for="cantidad">Cantidad</label>
-                            <input type="number" min="1" value="1" class="form-control" id="cantidad" name="cantidad">
+                            <input type="number" min="1" max="<?= max(1, (int)$existencias) ?>" value="1" class="form-control" id="cantidad" name="cantidad">
                         </div>
 
                         <div class="col-12 col-sm-8 d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">Anadir al carrito</button>
+                            <?php if ($existencias > 0): ?>
+                                <button type="submit" class="btn btn-primary btn-lg">Anadir al carrito</button>
+                            <?php else: ?>
+                                <button type="button" class="btn btn-outline-secondary btn-lg" disabled>Sin existencias</button>
+                            <?php endif; ?>
                         </div>
                     </form>
 
@@ -122,3 +247,9 @@
         </section>
     <?php endif; ?>
 </main>
+
+
+
+
+
+

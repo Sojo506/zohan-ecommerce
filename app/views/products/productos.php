@@ -128,7 +128,7 @@
                                 <div class="d-flex justify-content-between align-items-center mt-3 mb-1">
                                     <span class="fw-bold fs-5">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
                                 </div>
-                                <div class="text-success small fw-semibold mb-3">Existencias: 3</div>
+                                <div class="text-success small fw-semibold mb-3">Existencias: <?= (int)($producto['STOCK'] ?? 0) ?></div>
 
                                 <div class="d-flex gap-2">
                                     <a href="<?= App::url('/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-outline-dark w-50">
@@ -148,3 +148,5 @@
         <?php endif; ?>
     </section>
 </main>
+
+
