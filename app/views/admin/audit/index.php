@@ -1,49 +1,99 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Auditoría del sistema</h4>
+        <div>
+            <h4 class="mb-0">Auditoría del sistema</h4>
+            <small class="text-muted">Registro de acciones realizadas en el sistema</small>
+        </div>
 
     </div>
 
-    <table class="table">
+    <div class="admin-panel-card-body">
 
-        <thead>
+        <div class="table-responsive">
 
-            <tr>
-                <th>Usuario</th>
-                <th>Acción</th>
-                <th>Tabla</th>
-                <th>Fecha</th>
-            </tr>
+            <table class="table table-hover align-middle">
 
-        </thead>
+                <thead class="table-light">
 
-        <tbody>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Tabla</th>
+                        <th>Fecha</th>
+                    </tr>
 
-            <?php foreach ($logs as $log): ?>
+                </thead>
 
-                <tr>
+                <tbody>
 
-                    <td>
+                    <?php if (empty($logs)): ?>
 
-                        <?= $log['NOMBRE'] ?>
-                        <?= $log['APELLIDO_PATERNO'] ?>
+                        <tr>
+                            <td colspan="4" class="text-center text-muted p-4">
+                                No hay registros de auditoría
+                            </td>
+                        </tr>
 
-                    </td>
+                    <?php endif ?>
 
-                    <td><?= $log['ACCION'] ?></td>
+                    <?php foreach ($logs as $log): ?>
 
-                    <td><?= $log['TABLA_AFECTADA'] ?></td>
+                        <tr>
 
-                    <td><?= $log['FECHA'] ?></td>
+                            <td class="fw-semibold">
 
-                </tr>
+                                <?= htmlspecialchars($log['NOMBRE']) ?>
+                                <?= htmlspecialchars($log['APELLIDO_PATERNO']) ?>
 
-            <?php endforeach ?>
+                            </td>
 
-        </tbody>
+                            <td>
 
-    </table>
+                                <?php
+                                $accion = strtolower($log['ACCION']);
+                                $badge = "secondary";
+
+                                if ($accion === "insert") $badge = "success";
+                                if ($accion === "update") $badge = "warning";
+                                if ($accion === "delete") $badge = "danger";
+                                ?>
+
+                                <span class="badge bg-<?= $badge ?>">
+
+                                    <?= strtoupper($log['ACCION']) ?>
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge bg-dark">
+
+                                    <?= htmlspecialchars($log['TABLA_AFECTADA']) ?>
+
+                                </span>
+
+                            </td>
+
+                            <td class="text-muted">
+
+                                <?= date('d M Y H:i', strtotime($log['FECHA'])) ?>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>

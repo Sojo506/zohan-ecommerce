@@ -18,32 +18,17 @@ class Router
     {
         $method = $_SERVER['REQUEST_METHOD'];
 
-        // soportar htaccess o ?url=
         $uri = $_GET['url'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+        $basePath = dirname($_SERVER['SCRIPT_NAME']);
+
+        if ($basePath !== '/' && str_starts_with($uri, $basePath)) {
+            $uri = substr($uri, strlen($basePath));
+        }
 
         if ($uri === '') {
             $uri = '/';
         }
-
-        // separar query params si vienen dentro de url=/ruta?x=1
-        if (strpos($uri, '?') !== false) {
-            [$uriPath, $uriQuery] = explode('?', $uri, 2);
-            $uri = $uriPath;
-
-            $params = [];
-            parse_str($uriQuery, $params);
-            $_GET = array_merge($_GET, $params);
-        }
-
-        // normalizar path
-        $uri = parse_url($uri, PHP_URL_PATH);
-
-        if ($uri[0] !== '/') {
-            $uri = '/' . $uri;
-        }
-
-        $routeFound = false;
-        $params = [];
 
         foreach ($this->routes[$method] ?? [] as $route => $controller) {
 

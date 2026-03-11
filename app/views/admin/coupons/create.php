@@ -1,12 +1,11 @@
-<!-- Crear cupón -->
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header d-flex justify-content-between">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Crear cupón</h4>
+        <h4 class="mb-0">Crear cupón</h4>
 
-        <a href="<?= App::url('/admin/coupons') ?>" class="btn btn-dark">
-            Volver a cupones
+        <a href="<?= App::url('/admin/coupons') ?>" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Volver
         </a>
 
     </div>
@@ -16,32 +15,74 @@
         <form action="<?= App::url('/admin/coupons/create') ?>" method="POST">
 
             <div class="mb-3">
-                <label for="code" class="form-label">Código</label>
-                <input type="text" name="code" id="code" class="form-control" required>
+
+                <label class="form-label">Código</label>
+
+                <input type="text"
+                    name="code"
+                    class="form-control"
+                    placeholder="Ej: DESCUENTO10"
+                    required>
+
             </div>
 
             <div class="mb-3">
-                <label for="percent" class="form-label">Porcentaje</label>
-                <input type="number" name="percent" id="percent" class="form-control" required>
+
+                <label class="form-label">Porcentaje</label>
+
+                <input type="number"
+                    name="percent"
+                    class="form-control"
+                    min="1"
+                    max="100"
+                    required>
+
             </div>
 
-            <div class="mb-3">
-                <label for="start" class="form-label">Fecha de inicio</label>
-                <input type="date" name="start" id="start" class="form-control" required>
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">Fecha de inicio</label>
+
+                    <input type="date"
+                        name="start"
+                        class="form-control"
+                        required>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">Fecha de fin</label>
+
+                    <input type="date"
+                        name="end"
+                        class="form-control"
+                        required>
+
+                </div>
+
             </div>
 
-            <div class="mb-3">
-                <label for="end" class="form-label">Fecha de fin</label>
-                <input type="date" name="end" id="end" class="form-control" required>
+            <div class="mb-4">
+
+                <label class="form-label">Límite de uso</label>
+
+                <input type="number"
+                    name="limit"
+                    class="form-control"
+                    min="1"
+                    required>
+
             </div>
 
-            <div class="mb-3">
-                <label for="limit" class="form-label">Límite de uso</label>
-                <input type="number" name="limit" id="limit" class="form-control" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Crear cupón</button>
+            <button class="btn btn-dark">
+                <i class="bi bi-plus-circle"></i> Crear cupón
+            </button>
 
         </form>
 
     </div>
+
+</div>

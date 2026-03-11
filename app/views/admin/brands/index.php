@@ -1,60 +1,75 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header d-flex justify-content-between">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Marcas</h4>
+        <div>
+            <h4 class="mb-0">Marcas</h4>
+            <small class="text-muted">Gestión de marcas del catálogo</small>
+        </div>
 
         <a href="<?= App::url('/admin/brands/create') ?>" class="btn btn-dark">
-            Nueva marca
+            <i class="bi bi-plus-circle"></i> Nueva marca
         </a>
 
     </div>
 
-    <table class="table">
+    <div class="admin-panel-card-body">
 
-        <thead>
+        <div class="table-responsive">
 
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th></th>
-            </tr>
+            <table class="table table-hover align-middle">
 
-        </thead>
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
 
-        <tbody>
+                <tbody>
 
-            <?php foreach ($brands as $b): ?>
+                    <?php foreach ($brands as $b): ?>
 
-                <tr>
+                        <tr>
 
-                    <td><?= $b['ID_MARCA'] ?></td>
+                            <td>
+                                <span class="badge bg-dark">
+                                    #<?= $b['ID_MARCA'] ?>
+                                </span>
+                            </td>
 
-                    <td><?= htmlspecialchars($b['NOMBRE']) ?></td>
+                            <td class="fw-semibold">
+                                <?= htmlspecialchars($b['NOMBRE']) ?>
+                            </td>
 
-                    <td>
+                            <td class="text-end">
 
-                        <a href="<?= App::url('/admin/brands/edit/' . $b['ID_MARCA']) ?>"
-                            class="btn btn-sm btn-dark">
+                                <a href="<?= App::url('/admin/brands/edit/' . $b['ID_MARCA']) ?>"
+                                    class="btn btn-sm btn-outline-dark">
 
-                            Editar
+                                    <i class="bi bi-pencil"></i>
+                                </a>
 
-                        </a>
+                                <a href="#"
+                                    class="btn btn-sm btn-outline-danger btn-delete-brand"
+                                    data-url="<?= App::url('/admin/brands/delete/' . $b['ID_MARCA']) ?>">
 
-                        <a href="#"
-                            class="btn btn-sm btn-outline-danger btn-delete-category"
-                            data-url="<?= App::url('/admin/brands/delete/' . $b['ID_MARCA']) ?>">
-                            Eliminar
-                        </a>
+                                    <i class="bi bi-trash"></i>
+                                </a>
 
-                    </td>
+                            </td>
 
-                </tr>
+                        </tr>
 
-            <?php endforeach ?>
+                    <?php endforeach ?>
 
-        </tbody>
+                </tbody>
 
-    </table>
+            </table>
+
+        </div>
+
+    </div>
 
 </div>

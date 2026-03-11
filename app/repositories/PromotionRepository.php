@@ -82,18 +82,35 @@ class PromotionRepository
         $stmt->execute([':id' => $id]);
     }
 
-    public function assignProduct($promoId, $productId)
+    public function assignProduct($promotionId, $productId)
     {
-        $stmt = $this->db->prepare("
-            INSERT INTO PROMOCION_PRODUCTO_TB
-            (ID_PROMOCION,ID_PRODUCTO,ID_ESTADO)
-            VALUES(:promo,:product,1)
-        ");
+        // intentar reactivar
+        $sql = "UPDATE PROMOCION_PRODUCTO_TB
+            SET ID_ESTADO = 1
+            WHERE ID_PROMOCION = :promo
+            AND ID_PRODUCTO = :product";
+
+        $stmt = $this->db->prepare($sql);
 
         $stmt->execute([
-            ':promo' => $promoId,
+            ':promo' => $promotionId,
             ':product' => $productId
         ]);
+
+        // si no existía fila, insertar
+        if ($stmt->rowCount() === 0) {
+
+            $sqlInsert = "INSERT INTO PROMOCION_PRODUCTO_TB
+            (ID_PROMOCION, ID_PRODUCTO, ID_ESTADO)
+            VALUES (:promo, :product, 1)";
+
+            $stmtInsert = $this->db->prepare($sqlInsert);
+
+            $stmtInsert->execute([
+                ':promo' => $promotionId,
+                ':product' => $productId
+            ]);
+        }
     }
 
     public function products($promoId)

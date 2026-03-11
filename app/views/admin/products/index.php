@@ -1,70 +1,97 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header d-flex justify-content-between">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Productos</h4>
+        <div>
+            <h4 class="mb-0">Productos</h4>
+            <small class="text-muted">Gestión de productos del catálogo</small>
+        </div>
 
-        <a href="<?= App::url('/admin/products/create') ?>"
-            class="btn btn-dark">
-            Nuevo producto
+        <a href="<?= App::url('/admin/products/create') ?>" class="btn btn-dark">
+            <i class="bi bi-plus-circle"></i> Nuevo producto
         </a>
 
     </div>
 
     <div class="admin-panel-card-body">
 
-        <table class="table table-striped">
+        <div class="table-responsive">
 
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>SKU</th>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Categoria</th>
-                    <th>Marca</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
+            <table class="table table-hover align-middle">
 
-            <tbody>
-                <?php foreach ($products as $p): ?>
+                <thead class="table-light">
 
                     <tr>
-
-                        <td><?= $p['ID_PRODUCTO'] ?></td>
-
-                        <td><?= $p['SKU'] ?></td>
-
-                        <td><?= $p['NOMBRE'] ?></td>
-
-                        <td>$<?= $p['PRECIO'] ?></td>
-
-                        <td><?= $p['CATEGORIA'] ?></td>
-
-                        <td><?= $p['MARCA'] ?></td>
-
-                        <td>
-
-                            <a href="<?= App::url('/admin/products/edit/' . $p['ID_PRODUCTO']) ?>"
-                                class="btn btn-sm btn-outline-dark">
-                                Editar
-                            </a>
-
-                            <a href="<?= App::url('/admin/products/delete/' . $p['ID_PRODUCTO']) ?>"
-                                class="btn btn-sm btn-outline-danger btn-delete-product">
-                                Eliminar
-                            </a>
-
-                        </td>
-
+                        <th>ID</th>
+                        <th>SKU</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                        <th>Marca</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
 
-                <?php endforeach; ?>
+                </thead>
 
-            </tbody>
+                <tbody>
 
-        </table>
+                    <?php foreach ($products as $p): ?>
+
+                        <tr>
+
+                            <td>
+                                <span class="badge bg-dark">
+                                    #<?= $p['ID_PRODUCTO'] ?>
+                                </span>
+                            </td>
+
+                            <td><?= htmlspecialchars($p['SKU']) ?></td>
+
+                            <td class="fw-semibold">
+                                <?= htmlspecialchars($p['NOMBRE']) ?>
+                            </td>
+
+                            <td class="text-success fw-semibold">
+                                $<?= number_format($p['PRECIO'], 2) ?>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-secondary">
+                                    <?= htmlspecialchars($p['CATEGORIA']) ?>
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    <?= htmlspecialchars($p['MARCA']) ?>
+                                </span>
+                            </td>
+
+                            <td class="text-end">
+
+                                <a href="<?= App::url('/admin/products/edit/' . $p['ID_PRODUCTO']) ?>"
+                                    class="btn btn-sm btn-outline-dark">
+
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <a href="<?= App::url('/admin/products/delete/' . $p['ID_PRODUCTO']) ?>"
+                                    class="btn btn-sm btn-outline-danger btn-delete-product">
+
+                                    <i class="bi bi-trash"></i>
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 

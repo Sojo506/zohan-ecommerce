@@ -2,89 +2,97 @@
 
     <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4 class="mb-0">Promociones</h4>
+        <div>
+            <h4 class="mb-0">Promociones</h4>
+            <small class="text-muted">Gestión de promociones y descuentos</small>
+        </div>
 
         <a href="<?= App::url('/admin/promotions/create') ?>" class="btn btn-dark">
-            Nueva promoción
+            <i class="bi bi-plus-circle"></i> Nueva promoción
         </a>
 
     </div>
 
     <div class="admin-panel-card-body">
 
-        <table class="table table-hover align-middle">
+        <div class="table-responsive">
 
-            <thead>
+            <table class="table table-hover align-middle">
 
-                <tr>
-                    <th>Nombre</th>
-                    <th>Descuento</th>
-                    <th>Inicio</th>
-                    <th>Fin</th>
-                    <th style="width:150px;"></th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                <?php if (empty($promotions)): ?>
+                <thead class="table-light">
 
                     <tr>
-                        <td colspan="5" class="text-center text-muted">
-                            No hay promociones registradas
-                        </td>
+                        <th>Nombre</th>
+                        <th>Descuento</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
 
-                <?php endif ?>
+                </thead>
 
-                <?php foreach ($promotions as $p): ?>
+                <tbody>
 
-                    <tr>
+                    <?php if (empty($promotions)): ?>
 
-                        <td>
-                            <strong><?= $p['NOMBRE'] ?></strong>
-                        </td>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted p-4">
+                                No hay promociones registradas
+                            </td>
+                        </tr>
 
-                        <td>
-                            <span class="badge bg-success">
-                                <?= $p['PORCENTAJE'] ?>%
-                            </span>
-                        </td>
+                    <?php endif ?>
 
-                        <td>
-                            <?= date('d/m/Y', strtotime($p['FECHA_INICIO'])) ?>
-                        </td>
+                    <?php foreach ($promotions as $p): ?>
 
-                        <td>
-                            <?= date('d/m/Y', strtotime($p['FECHA_FIN'])) ?>
-                        </td>
+                        <tr>
 
-                        <td class="text-end">
+                            <td class="fw-semibold">
+                                <?= htmlspecialchars($p['NOMBRE']) ?>
+                            </td>
 
-                            <a href="<?= App::url('/admin/promotions/edit/' . $p['ID_PROMOCION']) ?>"
-                                class="btn btn-sm btn-dark">
+                            <td>
+                                <span class="badge bg-success">
+                                    <?= $p['PORCENTAJE'] ?>%
+                                </span>
+                            </td>
 
-                                Editar
-                            </a>
+                            <td class="text-muted">
+                                <?= date('d M Y', strtotime($p['FECHA_INICIO'])) ?>
+                            </td>
 
-                            <a href="#"
-                                class="btn btn-sm btn-outline-danger btn-delete-promotion"
-                                data-url="<?= App::url('/admin/promotions/delete/' . $p['ID_PROMOCION']) ?>">
+                            <td class="text-muted">
+                                <?= date('d M Y', strtotime($p['FECHA_FIN'])) ?>
+                            </td>
 
-                                Eliminar
+                            <td class="text-end">
 
-                            </a>
+                                <a href="<?= App::url('/admin/promotions/edit/' . $p['ID_PROMOCION']) ?>"
+                                    class="btn btn-sm btn-outline-dark">
 
-                        </td>
+                                    <i class="bi bi-pencil"></i>
 
-                    </tr>
+                                </a>
 
-                <?php endforeach ?>
+                                <a href="#"
+                                    class="btn btn-sm btn-outline-danger btn-delete-promotion"
+                                    data-url="<?= App::url('/admin/promotions/delete/' . $p['ID_PROMOCION']) ?>">
 
-            </tbody>
+                                    <i class="bi bi-trash"></i>
 
-        </table>
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 

@@ -1,61 +1,106 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Usuarios</h4>
+        <div>
+            <h4 class="mb-0">Usuarios</h4>
+            <small class="text-muted">Gestión de usuarios del sistema</small>
+        </div>
 
     </div>
 
-    <table class="table">
+    <div class="admin-panel-card-body">
 
-        <thead>
+        <div class="table-responsive">
 
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Tipo</th>
-                <th>Estado</th>
-                <th></th>
-            </tr>
+            <table class="table table-hover align-middle">
 
-        </thead>
+                <thead class="table-light">
 
-        <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
 
-            <?php foreach ($users as $u): ?>
+                </thead>
 
-                <tr>
+                <tbody>
 
-                    <td><?= $u['IDENTIFICACION'] ?></td>
+                    <?php foreach ($users as $u): ?>
 
-                    <td>
+                        <tr>
 
-                        <?= $u['NOMBRE'] ?>
-                        <?= $u['APELLIDO_PATERNO'] ?>
+                            <td>
 
-                    </td>
+                                <span class="badge bg-dark">
+                                    <?= $u['IDENTIFICACION'] ?>
+                                </span>
 
-                    <td><?= $u['TIPO'] ?></td>
+                            </td>
 
-                    <td><?= $u['ESTADO'] ?></td>
+                            <td class="fw-semibold">
 
-                    <td>
+                                <?= htmlspecialchars($u['NOMBRE']) ?>
+                                <?= htmlspecialchars($u['APELLIDO_PATERNO']) ?>
 
-                        <a href="<?= App::url('/admin/users/' . $u['IDENTIFICACION']) ?>"
-                            class="btn btn-sm btn-dark">
+                            </td>
 
-                            Ver
+                            <td>
 
-                        </a>
+                                <?php if ($u['TIPO'] === 'ADMIN'): ?>
 
-                    </td>
+                                    <span class="badge bg-dark">ADMIN</span>
 
-                </tr>
+                                <?php else: ?>
 
-            <?php endforeach ?>
+                                    <span class="badge bg-primary">CLIENTE</span>
 
-        </tbody>
+                                <?php endif ?>
 
-    </table>
+                            </td>
+
+                            <td>
+
+                                <?php if ($u['ESTADO'] === 'Activo'): ?>
+
+                                    <span class="badge bg-success">
+                                        Activo
+                                    </span>
+
+                                <?php else: ?>
+
+                                    <span class="badge bg-danger">
+                                        Inactivo
+                                    </span>
+
+                                <?php endif ?>
+
+                            </td>
+
+                            <td class="text-end">
+
+                                <a href="<?= App::url('/admin/users/' . $u['IDENTIFICACION']) ?>"
+                                    class="btn btn-sm btn-outline-dark">
+
+                                    <i class="bi bi-person"></i> Ver
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>
