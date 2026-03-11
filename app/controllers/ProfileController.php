@@ -181,17 +181,6 @@ class ProfileController extends Controller
                 ':ident' => $identificacion
             ]);
 
-            // actualizar correo
-            $sqlCorreo = "UPDATE CORREO_TB
-                      SET CORREO = :correo
-                      WHERE IDENTIFICACION = :ident";
-
-            $stmtCorreo = $pdo->prepare($sqlCorreo);
-
-            $stmtCorreo->execute([
-                ':correo' => $correo,
-                ':ident' => $identificacion
-            ]);
 
             $pdo->commit();
 

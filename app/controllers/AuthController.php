@@ -181,7 +181,7 @@ class AuthController extends Controller
                 ':nom' => $nombre,
                 ':ap1' => $ap1,
                 ':ap2' => ($ap2 === '' ? null : $ap2),
-                ':tipoUsuario' => 1, // cliente
+                ':tipoUsuario' => 2, // cliente
                 ':estado' => $this->ESTADO_PENDIENTE,
             ]);
 
