@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../helpers/Security.php';
 require_once __DIR__ . '/../services/Mailer.php';
+require_once __DIR__ . '/../repositories/ProductRepository.php';
 
 class AuthController extends Controller
 {
@@ -90,6 +91,23 @@ class AuthController extends Controller
             'apellido' => $cuenta['APELLIDO_PATERNO'],
             'tipo' => $cuenta['TIPO_USUARIO']
         ];
+
+        try {
+            $repo = new ProductRepository();
+            $sessionCart = $repo->sanitizeCart($_SESSION['cart'] ?? []);
+            $idCuenta = (int)$cuenta['ID_CUENTA'];
+
+            if (!empty($sessionCart)) {
+                $repo->saveCartForAccount($idCuenta, $sessionCart);
+            } else {
+                $dbCart = $repo->fetchCartForAccount($idCuenta);
+                if (!empty($dbCart)) {
+                    $_SESSION['cart'] = $dbCart;
+                }
+            }
+        } catch (PDOException $e) {
+            // Evitar romper login si la sincronizacion falla.
+        }
 
         header("Location: " . App::url('/'));
         exit;
@@ -346,3 +364,4 @@ class AuthController extends Controller
         }
     }
 }
+

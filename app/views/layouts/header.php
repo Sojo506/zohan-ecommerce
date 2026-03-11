@@ -24,15 +24,20 @@
                 Zohan Tech Store
             </a>
 
-            <!-- Botón hamburguesa -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
                 aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Menú colapsable -->
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= App::url('/products') ?>">Productos</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= App::url('/cart') ?>">Carrito</a>
+                    </li>
 
                     <?php if (isset($_SESSION['user'])): ?>
 
