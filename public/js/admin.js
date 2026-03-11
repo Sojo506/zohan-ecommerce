@@ -115,3 +115,40 @@ document.querySelectorAll('.btn-delete-category').forEach(button => {
     });
 
 });
+
+
+document.querySelectorAll('.btn-delete-promotion').forEach(button => {
+
+    button.addEventListener('click', function (e) {
+        console.log("Eliminar promoción");
+        e.preventDefault();
+
+        confirmAction({
+            title: "¿Eliminar promoción?",
+            text: "Esta acción no se puede deshacer",
+            confirmText: "Sí, eliminar",
+            confirmColor: "#dc3545",
+            url: this.dataset.url
+        });
+
+    });
+
+});
+
+document.querySelectorAll('.btn-delete-promotion-product').forEach(button => {
+
+    button.addEventListener('click', function (e) {
+        console.log("Eliminar producto de la promoción");
+        e.preventDefault();
+
+        confirmAction({
+            title: "¿Eliminar producto de la promoción?",
+            text: "Esta acción no se puede deshacer",
+            confirmText: "Sí, eliminar",
+            confirmColor: "#dc3545",
+            url: this.dataset.url
+        });
+
+    });
+
+});
