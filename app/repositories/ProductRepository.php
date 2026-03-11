@@ -1,185 +1,213 @@
 <?php
 
+require_once __DIR__ . '/../models/ProductModel.php';
+
 class ProductRepository
 {
-    private PDO $db;
+    private ProductModel $model;
 
-    public function __construct()
+    public function __construct(?ProductModel $model = null)
     {
-        $this->db = Database::connection();
+        $this->model = $model ?? new ProductModel();
     }
+
+    /* =========================
+       ADMIN PRODUCTOS
+    ========================= */
 
     public function getCategories()
     {
-        $sql = "SELECT ID_CATEGORIA, NOMBRE
-                FROM CATEGORIA_TB
-                WHERE ID_ESTADO = 1
-                ORDER BY NOMBRE";
-
-        return $this->db->query($sql)->fetchAll();
+        return $this->model->obtenerCategorias();
     }
 
     public function getBrands()
     {
-        $sql = "SELECT ID_MARCA, NOMBRE
-                FROM MARCA_TB
-                WHERE ID_ESTADO = 1
-                ORDER BY NOMBRE";
-
-        return $this->db->query($sql)->fetchAll();
+        return $this->model->obtenerMarcas();
     }
 
     public function all()
     {
-        $sql = "SELECT 
-                p.ID_PRODUCTO,
-                p.SKU,
-                p.NOMBRE,
-                p.PRECIO,
-                c.NOMBRE AS CATEGORIA,
-                m.NOMBRE AS MARCA,
-                GROUP_CONCAT(CONCAT(pi.ID_IMAGEN, '::', pi.URL_IMAGE) SEPARATOR '||') AS IMAGENES
-                FROM PRODUCTO_TB p
-                JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
-                JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
-                LEFT JOIN PRODUCTO_IMAGE_TB pi
-                    ON pi.ID_PRODUCTO = p.ID_PRODUCTO
-                    AND pi.ID_ESTADO = 1
-                WHERE p.ID_ESTADO = 1
-                GROUP BY p.ID_PRODUCTO, p.SKU, p.NOMBRE, p.PRECIO, c.NOMBRE, m.NOMBRE
-                ORDER BY p.ID_PRODUCTO DESC";
-
-        return $this->db->query($sql)->fetchAll();
+        return $this->model->obtenerTodosProductos();
     }
 
-    public function create($data)
+    public function create(array $data)
     {
-        $this->db->beginTransaction();
+        return $this->model->crearProducto($data);
+    }
 
-        try {
+    public function find(int $id)
+    {
+        return $this->model->obtenerProductoPorId($id);
+    }
 
-            $sql = "INSERT INTO PRODUCTO_TB
-            (SKU,NOMBRE,DESCRIPCION,PRECIO,STOCK_MINIMO,ID_CATEGORIA,ID_MARCA,ID_ESTADO)
-            VALUES
-            (:sku,:nombre,:desc,:precio,:stock_min,:categoria,:marca,1)";
+    public function update(int $id, array $data)
+    {
+        return $this->model->actualizarProducto($id, $data);
+    }
 
-            $stmt = $this->db->prepare($sql);
+    public function delete(int $id)
+    {
+        return $this->model->eliminarProducto($id);
+    }
 
-            $stmt->execute([
-                ':sku' => $data['sku'],
-                ':nombre' => $data['nombre'],
-                ':desc' => $data['descripcion'],
-                ':precio' => $data['precio'],
-                ':stock_min' => $data['stock_min'],
-                ':categoria' => $data['categoria'],
-                ':marca' => $data['marca']
-            ]);
+    public function addImage(int $productId, string $url)
+    {
+        return $this->model->agregarImagenProducto($productId, $url);
+    }
 
-            $productId = $this->db->lastInsertId();
+    public function getImages(int $productId)
+    {
+        return $this->model->obtenerImagenesProducto($productId);
+    }
 
-            // Crear inventario automáticamente
-            $sqlInventory = "INSERT INTO INVENTARIO_TB
-            (ID_PRODUCTO, STOCK, ID_ESTADO)
-            VALUES
-            (:producto, 0, 1)";
+    public function deleteImage(int $imageId)
+    {
+        return $this->model->eliminarImagenProducto($imageId);
+    }
 
-            $stmtInv = $this->db->prepare($sqlInventory);
+    /* =========================
+       CATALOGO TIENDA
+    ========================= */
 
-            $stmtInv->execute([
-                ':producto' => $productId
-            ]);
+    public function fetchCatalog(array $filtros): array
+    {
+        $productos = $this->model->obtenerProductos($filtros);
+        $categorias = $this->model->obtenerCategoriasConProductos();
+        $marcas = $this->model->obtenerMarcasConProductos();
 
-            $this->db->commit();
+        return [
+            'productos' => $productos,
+            'categorias' => $categorias,
+            'marcas' => $marcas,
+        ];
+    }
 
-            return $productId;
-        } catch (Exception $e) {
+    public function fetchProduct(int $idProducto): ?array
+    {
+        return $this->model->obtenerProductoPorId($idProducto);
+    }
 
-            $this->db->rollBack();
-            throw $e;
+    public function fetchProductImages(int $idProducto): array
+    {
+        return $this->model->obtenerImagenesProducto($idProducto);
+    }
+
+    public function fetchProductStock(int $idProducto): int
+    {
+        return $this->model->obtenerStockProducto($idProducto);
+    }
+
+    /* =========================
+       CARRITO
+    ========================= */
+
+    public function sanitizeCart($cart): array
+    {
+        if (!is_array($cart)) {
+            return [];
         }
+
+        $clean = [];
+
+        foreach ($cart as $id => $cantidad) {
+
+            $idInt = (int)$id;
+            $cantidadInt = (int)$cantidad;
+
+            if ($idInt > 0 && $cantidadInt > 0) {
+                $clean[$idInt] = $cantidadInt;
+            }
+        }
+
+        return $clean;
     }
 
-    public function find($id)
+    public function buildCartSummary(array $cart): array
     {
-        $sql = "SELECT * FROM PRODUCTO_TB
-            WHERE ID_PRODUCTO = :id
-            LIMIT 1";
+        $ids = array_keys($cart);
+        $productos = $this->model->obtenerProductosPorIds($ids);
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id]);
+        $productosIndex = [];
 
-        return $stmt->fetch();
+        foreach ($productos as $producto) {
+            $productosIndex[(int)$producto['ID_PRODUCTO']] = $producto;
+        }
+
+        $items = [];
+        $total = 0;
+        $clean = [];
+
+        foreach ($cart as $id => $cantidad) {
+
+            $idInt = (int)$id;
+            $cantidadInt = (int)$cantidad;
+
+            if ($cantidadInt <= 0 || !isset($productosIndex[$idInt])) {
+                continue;
+            }
+
+            $producto = $productosIndex[$idInt];
+
+            $subtotal = $cantidadInt * (float)$producto['PRECIO'];
+            $total += $subtotal;
+
+            $items[] = [
+                'producto' => $producto,
+                'cantidad' => $cantidadInt,
+                'subtotal' => $subtotal,
+            ];
+
+            $clean[$idInt] = $cantidadInt;
+        }
+
+        return [
+            'items' => $items,
+            'total' => $total,
+            'cart' => $clean,
+        ];
     }
 
-    public function update($id, $data)
+    public function countCart(array $cart): int
     {
-        $sql = "UPDATE PRODUCTO_TB SET
-            SKU = :sku,
-            NOMBRE = :nombre,
-            DESCRIPCION = :desc,
-            PRECIO = :precio,
-            STOCK_MINIMO = :stock_min,
-            ID_CATEGORIA = :categoria,
-            ID_MARCA = :marca
-            WHERE ID_PRODUCTO = :id";
+        $cart = $this->sanitizeCart($cart);
 
-        $stmt = $this->db->prepare($sql);
+        $ids = array_keys($cart);
 
-        $stmt->execute([
-            ':sku' => $data['sku'],
-            ':nombre' => $data['nombre'],
-            ':desc' => $data['descripcion'],
-            ':precio' => $data['precio'],
-            ':stock_min' => $data['stock_min'],
-            ':categoria' => $data['categoria'],
-            ':marca' => $data['marca'],
-            ':id' => $id
-        ]);
+        if (!empty($ids)) {
+
+            $productos = $this->model->obtenerProductosPorIds($ids);
+
+            $validos = [];
+
+            foreach ($productos as $producto) {
+                $validos[(int)$producto['ID_PRODUCTO']] = true;
+            }
+
+            foreach (array_keys($cart) as $id) {
+
+                $idInt = (int)$id;
+
+                if (!isset($validos[$idInt])) {
+                    unset($cart[$id]);
+                }
+            }
+        }
+
+        return array_sum($cart);
     }
 
-    public function delete($id)
+    public function fetchCartForAccount(int $idCuenta): array
     {
-        $sql = "UPDATE PRODUCTO_TB
-            SET ID_ESTADO = 2
-            WHERE ID_PRODUCTO = :id";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id]);
+        return $this->sanitizeCart(
+            $this->model->obtenerCarritoCuenta($idCuenta)
+        );
     }
 
-    public function addImage($productId, $url)
+    public function saveCartForAccount(int $idCuenta, array $cart): void
     {
-        $sql = "INSERT INTO PRODUCTO_IMAGE_TB
-            (ID_PRODUCTO,URL_IMAGE,ID_ESTADO)
-            VALUES(:product,:url,1)";
-
-        $stmt = $this->db->prepare($sql);
-
-        $stmt->execute([
-            ':product' => $productId,
-            ':url' => $url
-        ]);
-    }
-
-    public function getImages($productId)
-    {
-        $sql = "SELECT * FROM PRODUCTO_IMAGE_TB
-            WHERE ID_PRODUCTO = :id
-            AND ID_ESTADO = 1";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $productId]);
-
-        return $stmt->fetchAll();
-    }
-
-    public function deleteImage($imageId)
-    {
-        $sql = "UPDATE PRODUCTO_IMAGE_TB
-            SET ID_ESTADO = 2
-            WHERE ID_IMAGEN = :id";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $imageId]);
+        $this->model->guardarCarritoCuenta(
+            $idCuenta,
+            $this->sanitizeCart($cart)
+        );
     }
 }

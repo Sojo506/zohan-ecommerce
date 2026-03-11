@@ -15,6 +15,13 @@ require_once __DIR__ . '/../app/core/App.php';
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ini_set('default_charset', 'UTF-8');
+mb_internal_encoding('UTF-8');
+header('Content-Type: text/html; charset=utf-8');
+
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
 
 
 /*  CARGAR VARIABLES DE ENTORNO  */
@@ -60,7 +67,9 @@ $router->post('/admin/products/create', 'ProductAdminController@create');
 $router->post('/admin/products/upload-image', 'ProductAdminController@uploadImage');
 $router->post('/admin/products/update', 'ProductAdminController@update');
 
+
 /*  CRUD CATEGORÍAS ADMIN  */
+
 $router->get('/admin/categories', 'CategoryAdminController@index');
 $router->get('/admin/categories/create', 'CategoryAdminController@createForm');
 $router->post('/admin/categories/create', 'CategoryAdminController@create');
@@ -70,35 +79,45 @@ $router->post('/admin/categories/update', 'CategoryAdminController@update');
 
 $router->get('/admin/categories/delete/{id}', 'CategoryAdminController@delete');
 
+
 /*  CRUD MARCAS ADMIN  */
-$router->get('/admin/brands','BrandAdminController@index');
 
-$router->get('/admin/brands/create','BrandAdminController@createForm');
-$router->post('/admin/brands/create','BrandAdminController@create');
+$router->get('/admin/brands', 'BrandAdminController@index');
 
-$router->get('/admin/brands/edit/{id}','BrandAdminController@editForm');
-$router->post('/admin/brands/update','BrandAdminController@update');
+$router->get('/admin/brands/create', 'BrandAdminController@createForm');
+$router->post('/admin/brands/create', 'BrandAdminController@create');
 
-$router->get('/admin/brands/delete/{id}','BrandAdminController@delete');
+$router->get('/admin/brands/edit/{id}', 'BrandAdminController@editForm');
+$router->post('/admin/brands/update', 'BrandAdminController@update');
+
+$router->get('/admin/brands/delete/{id}', 'BrandAdminController@delete');
+
 
 /* CRUD INVENTARIO ADMIN */
+
 $router->get('/admin/inventory', 'InventoryAdminController@index');
 $router->get('/admin/inventory/movement', 'InventoryAdminController@movementForm');
 $router->get('/admin/inventory/movements', 'InventoryAdminController@movements');
 
 $router->post('/admin/inventory/movement', 'InventoryAdminController@registerMovement');
 
-/* CRUD VENTAS ADMIN */
-$router->get('/admin/sales', 'SaleAdminController@index');
 
-/* CRUD USUARIOS ADMIN  */
+/* CRUD VENTAS ADMIN */
+
+$router->get('/admin/sales', 'SaleAdminController@index');
+$router->get('/admin/sales/{id}', 'SaleAdminController@detail');
+
+
+/* CRUD USUARIOS ADMIN */
+
 $router->get('/admin/users', 'UserAdminController@index');
 $router->get('/admin/users/{id}', 'UserAdminController@detail');
 $router->get('/admin/users/{id}/status/{status}', 'UserAdminController@changeStatus');
 $router->get('/admin/users/{id}/role/{role}', 'UserAdminController@changeRole');
-$router->get('/admin/sales/{id}', 'SaleAdminController@detail');
 
-/* CRUD CUPONES ADMIN  */
+
+/* CRUD CUPONES ADMIN */
+
 $router->get('/admin/coupons', 'CouponAdminController@index');
 
 $router->get('/admin/coupons/create', 'CouponAdminController@createForm');
@@ -109,14 +128,15 @@ $router->post('/admin/coupons/update', 'CouponAdminController@update');
 
 $router->get('/admin/coupons/delete/{id}', 'CouponAdminController@delete');
 
-/* CRUD PROMOCIONES ADMIN  */
+
+/* CRUD PROMOCIONES ADMIN */
+
 $router->get('/admin/promotions', 'PromotionAdminController@index');
 
 $router->get('/admin/promotions/create', 'PromotionAdminController@createForm');
 $router->post('/admin/promotions/create', 'PromotionAdminController@create');
 
 $router->get('/admin/promotions/edit/{id}', 'PromotionAdminController@editForm');
-
 $router->post('/admin/promotions/update', 'PromotionAdminController@update');
 
 $router->get('/admin/promotions/delete/{id}', 'PromotionAdminController@delete');
@@ -128,14 +148,19 @@ $router->get(
     'PromotionAdminController@removeProduct'
 );
 
-/* CRUD COMMENTS ADMIN  */
+
+/* CRUD COMMENTS ADMIN */
+
 $router->get('/admin/comments', 'CommentAdminController@index');
 $router->get('/admin/comments/approve/{id}', 'CommentAdminController@approve');
 $router->get('/admin/comments/hide/{id}', 'CommentAdminController@hide');
 $router->get('/admin/comments/delete/{id}', 'CommentAdminController@delete');
 
-/* CRUD AUDITORÍA ADMIN  */
-$router->get('/admin/audit','AuditAdminController@index');
+
+/* CRUD AUDITORÍA ADMIN */
+
+$router->get('/admin/audit', 'AuditAdminController@index');
+
 
 /*  PERFIL  */
 
@@ -159,6 +184,22 @@ $router->post('/register', 'AuthController@register');
 
 $router->get('/verify-otp', 'AuthController@verifyOtpForm');
 $router->post('/verify-otp', 'AuthController@verifyOtp');
+
+
+/*  CATÁLOGO TIENDA */
+
+$router->get('/products', 'ProductController@index');
+$router->get('/product', 'ProductController@show');
+
+
+/*  CARRITO */
+
+$router->get('/cart', 'ProductController@cart');
+
+$router->post('/cart/add', 'ProductController@addToCart');
+$router->post('/cart/update', 'ProductController@updateCart');
+$router->post('/cart/remove', 'ProductController@removeFromCart');
+$router->post('/cart/clear', 'ProductController@clearCart');
 
 
 /*  EJECUTAR ROUTER  */

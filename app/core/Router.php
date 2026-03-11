@@ -18,11 +18,25 @@ class Router
     {
         $method = $_SERVER['REQUEST_METHOD'];
 
+        // soportar htaccess o ?url=
         $uri = $_GET['url'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-        $uri = parse_url($uri, PHP_URL_PATH);
+        if ($uri === '') {
+            $uri = '/';
+        }
 
-        if ($uri === '') $uri = '/';
+        // separar query params si vienen dentro de url=/ruta?x=1
+        if (strpos($uri, '?') !== false) {
+            [$uriPath, $uriQuery] = explode('?', $uri, 2);
+            $uri = $uriPath;
+
+            $params = [];
+            parse_str($uriQuery, $params);
+            $_GET = array_merge($_GET, $params);
+        }
+
+        // normalizar path
+        $uri = parse_url($uri, PHP_URL_PATH);
 
         if ($uri[0] !== '/') {
             $uri = '/' . $uri;
@@ -53,7 +67,7 @@ class Router
 
         if (!$routeFound) {
             http_response_code(404);
-            echo "404 - Página no encontrada (ruta: {$uri})";
+            echo "404 - Pagina no encontrada (ruta: {$uri})";
             return;
         }
 
@@ -71,7 +85,7 @@ class Router
 
         if (!method_exists($controllerInstance, $methodName)) {
             http_response_code(500);
-            echo "Método no existe: {$controllerName}@{$methodName}";
+            echo "Metodo no existe: {$controllerName}@{$methodName}";
             return;
         }
 
