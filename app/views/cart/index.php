@@ -93,7 +93,41 @@
                         <span class="fs-5 fw-bold">&#8353; <?= number_format((float)$total, 0, ',', '.') ?></span>
                     </div>
                     <a href="<?= App::url('/products') ?>" class="btn btn-outline-primary w-100 mb-2">Agregar m&aacute;s productos</a>
-                    <button class="btn btn-primary w-100" type="button" disabled>Proceder al pago (pr&oacute;ximo paso)</button>
+                    
+                    <?php if (isset($_SESSION['user'])): ?>
+                        <div id="paypal-button-container" class="mt-3 w-100"></div>
+
+                        <script src="https://www.paypal.com/sdk/js?client-id=TU_CLIENT_ID_AQUI&currency=USD"></script>
+                        <script>
+                            const totalColones = <?= (float)$total ?>;
+                            const tipoCambio = 510;
+                            const totalUSD = (totalColones / tipoCambio).toFixed(2);
+
+                            paypal.Buttons({
+                                style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'pay' },
+                                
+                                createOrder: function(data, actions) {
+                                    return actions.order.create({
+                                        purchase_units: [{ amount: { value: totalUSD } }]
+                                    });
+                                },
+
+                                onApprove: function(data, actions) {
+                                    return actions.order.capture().then(function(details) {
+                                        alert('¡Pago completado por ' + details.payer.name.given_name + '!');
+                                    });
+                                },
+
+                                onCancel: function (data) { console.log("Pago cancelado."); },
+                                onError: function (err) { console.error("Error PayPal:", err); }
+                            }).render('#paypal-button-container');
+                        </script>
+                    <?php else: ?>
+                        <a href="<?= App::url('/login') ?>" class="btn btn-primary w-100 mt-2">
+                            Inicia sesión para pagar
+                        </a>
+                    <?php endif; ?>
+
                 </div>
             </div>
         </div>
