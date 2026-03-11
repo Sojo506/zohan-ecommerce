@@ -1,67 +1,97 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header d-flex justify-content-between">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Cupones</h4>
+        <div>
+            <h4 class="mb-0">Cupones</h4>
+            <small class="text-muted">Gestión de descuentos y promociones</small>
+        </div>
 
         <a href="<?= App::url('/admin/coupons/create') ?>" class="btn btn-dark">
-            Nuevo cupón
+            <i class="bi bi-plus-circle"></i> Nuevo cupón
         </a>
 
     </div>
 
-    <table class="table">
+    <div class="admin-panel-card-body">
 
-        <thead>
+        <div class="table-responsive">
 
-            <tr>
-                <th>Código</th>
-                <th>%</th>
-                <th>Inicio</th>
-                <th>Fin</th>
-                <th></th>
-            </tr>
+            <table class="table table-hover align-middle">
 
-        </thead>
+                <thead class="table-light">
 
-        <tbody>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descuento</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
 
-            <?php foreach ($coupons as $c): ?>
+                </thead>
 
-                <tr>
+                <tbody>
 
-                    <td><?= $c['CODIGO'] ?></td>
+                    <?php foreach ($coupons as $c): ?>
 
-                    <td><?= $c['PORCENTAJE'] ?>%</td>
+                        <tr>
 
-                    <td><?= $c['FECHA_INICIO'] ?></td>
+                            <td>
 
-                    <td><?= $c['FECHA_FIN'] ?></td>
+                                <span class="badge bg-dark">
+                                    <?= htmlspecialchars($c['CODIGO']) ?>
+                                </span>
 
-                    <td>
+                            </td>
 
-                        <a href="<?= App::url('/admin/coupons/edit/' . $c['ID_CUPON']) ?>"
-                            class="btn btn-sm btn-dark">
+                            <td class="fw-semibold text-success">
 
-                            Editar
+                                <?= $c['PORCENTAJE'] ?>%
 
-                        </a>
+                            </td>
 
-                        <a href="#"
-                            class="btn btn-sm btn-danger btn-delete-category"
-                            data-url="<?= App::url('/admin/coupons/delete/' . $c['ID_CUPON']) ?>">
+                            <td class="text-muted">
 
-                            Eliminar
+                                <?= date('d M Y', strtotime($c['FECHA_INICIO'])) ?>
 
-                        </a>
-                    </td>
+                            </td>
 
-                </tr>
+                            <td class="text-muted">
 
-            <?php endforeach ?>
+                                <?= date('d M Y', strtotime($c['FECHA_FIN'])) ?>
 
-        </tbody>
+                            </td>
 
-    </table>
+                            <td class="text-end">
+
+                                <a href="<?= App::url('/admin/coupons/edit/' . $c['ID_CUPON']) ?>"
+                                    class="btn btn-sm btn-outline-dark">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+                                <a href="#"
+                                    class="btn btn-sm btn-outline-danger btn-delete-coupon"
+                                    data-url="<?= App::url('/admin/coupons/delete/' . $c['ID_CUPON']) ?>">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>

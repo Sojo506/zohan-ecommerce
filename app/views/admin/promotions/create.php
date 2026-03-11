@@ -1,11 +1,11 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header d-flex justify-content-between">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Nueva promoción</h4>
+        <h4 class="mb-0">Nueva promoción</h4>
 
-        <a href="<?= App::url('/admin/promotions') ?>" class="btn btn-dark">
-            Volver
+        <a href="<?= App::url('/admin/promotions') ?>" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Volver
         </a>
 
     </div>
@@ -67,7 +67,7 @@
             </div>
 
             <button class="btn btn-success">
-                Crear promoción
+                <i class="bi bi-plus-circle"></i> Crear promoción
             </button>
 
         </form>

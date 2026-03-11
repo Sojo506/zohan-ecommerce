@@ -1,68 +1,81 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header d-flex justify-content-between">
-        <h4>Editar producto</h4>
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <a href="<?= App::url('/admin/products') ?>" class="btn btn-dark">
-            Volver a la lista
+        <h4 class="mb-0">Editar producto</h4>
+
+        <a href="<?= App::url('/admin/products') ?>" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Volver
         </a>
+
     </div>
 
     <div class="admin-panel-card-body">
 
         <form method="POST" action="<?= App::url('/admin/products/update') ?>">
 
-            <input type="hidden" name="id"
-                value="<?= $product['ID_PRODUCTO'] ?>">
+            <input type="hidden" name="id" value="<?= $product['ID_PRODUCTO'] ?>">
 
-            <div class="mb-3">
-                <label>SKU</label>
-                <input type="text"
-                    name="sku"
-                    class="form-control"
-                    value="<?= htmlspecialchars($product['SKU']) ?>">
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">SKU</label>
+                    <input type="text"
+                        name="sku"
+                        class="form-control"
+                        value="<?= htmlspecialchars($product['SKU']) ?>">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text"
+                        name="nombre"
+                        class="form-control"
+                        value="<?= htmlspecialchars($product['NOMBRE']) ?>">
+                </div>
+
             </div>
 
             <div class="mb-3">
-                <label>Nombre</label>
-                <input type="text"
-                    name="nombre"
-                    class="form-control"
-                    value="<?= htmlspecialchars($product['NOMBRE']) ?>">
-            </div>
+                <label class="form-label">Descripción</label>
 
-            <div class="mb-3">
-                <label>Descripción</label>
                 <textarea name="descripcion"
+                    rows="4"
                     class="form-control"><?= htmlspecialchars($product['DESCRIPCION']) ?></textarea>
             </div>
 
-            <div class="mb-3">
-                <label>Precio</label>
-                <input type="number"
-                    step="0.01"
-                    name="precio"
-                    class="form-control"
-                    value="<?= $product['PRECIO'] ?>">
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Precio</label>
+                    <input type="number"
+                        step="0.01"
+                        name="precio"
+                        class="form-control"
+                        value="<?= $product['PRECIO'] ?>">
+                </div>
+
             </div>
 
             <button class="btn btn-dark">
-                Actualizar producto
+                <i class="bi bi-save"></i> Actualizar producto
             </button>
 
         </form>
 
-        <hr>
+        <hr class="my-4">
 
-        <h5>Imágenes del producto</h5>
+        <!-- IMÁGENES -->
 
-        <div class="row mb-3">
+        <h5 class="mb-3">Imágenes del producto</h5>
+
+        <div class="row g-3 mb-4">
 
             <?php if (!empty($images)): ?>
 
                 <?php foreach ($images as $img): ?>
 
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-3 col-6">
 
                         <div class="card">
 
@@ -70,11 +83,12 @@
                                 class="card-img-top"
                                 style="height:150px;object-fit:cover;">
 
-                            <div class="card-body text-center">
+                            <div class="card-body p-2 text-center">
 
                                 <a href="<?= App::url('/admin/products/delete-image/' . $img['ID_IMAGEN']) ?>"
-                                    class="btn btn-sm btn-danger btn-delete-image">
-                                    Eliminar
+                                    class="btn btn-sm btn-outline-danger btn-delete-image">
+
+                                    <i class="bi bi-trash"></i>
                                 </a>
 
                             </div>
@@ -87,17 +101,21 @@
 
             <?php else: ?>
 
-                <p>No hay imágenes para este producto.</p>
+                <p class="text-muted">No hay imágenes para este producto.</p>
 
             <?php endif; ?>
 
         </div>
 
+
+        <!-- SUBIR IMAGEN -->
+
         <form method="POST"
             enctype="multipart/form-data"
             action="<?= App::url('/admin/products/upload-image') ?>">
 
-            <input type="hidden" name="product_id"
+            <input type="hidden"
+                name="product_id"
                 value="<?= $product['ID_PRODUCTO'] ?>">
 
             <div class="mb-3">
@@ -110,7 +128,7 @@
             </div>
 
             <button class="btn btn-outline-dark">
-                Subir imagen
+                <i class="bi bi-upload"></i> Subir imagen
             </button>
 
         </form>

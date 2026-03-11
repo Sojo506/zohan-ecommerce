@@ -2,13 +2,21 @@
 
     <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4 class="mb-0">
-            <?= htmlspecialchars($user['NOMBRE']) ?>
-            <?= htmlspecialchars($user['APELLIDO_PATERNO']) ?>
-        </h4>
+        <div>
+            <h4 class="mb-0">
 
-        <a href="<?= App::url('/admin/users') ?>" class="btn btn-dark">
-            Volver
+                <?= htmlspecialchars($user['NOMBRE']) ?>
+                <?= htmlspecialchars($user['APELLIDO_PATERNO']) ?>
+
+            </h4>
+
+            <small class="text-muted">
+                Perfil de usuario
+            </small>
+        </div>
+
+        <a href="<?= App::url('/admin/users') ?>" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Volver
         </a>
 
     </div>
@@ -21,29 +29,60 @@
         <div class="row mb-4">
 
             <div class="col-md-4">
+
                 <strong>Identificación</strong>
-                <p><?= $user['IDENTIFICACION'] ?></p>
-            </div>
 
-            <div class="col-md-4">
-                <strong>Rol</strong>
-                <p>
-                    <?= $user['ID_TIPO_USUARIO'] == 1 ? 'ADMIN' : 'CLIENTE' ?>
+                <p class="mb-0">
+                    <?= $user['IDENTIFICACION'] ?>
                 </p>
+
             </div>
 
             <div class="col-md-4">
+
+                <strong>Rol</strong>
+
+                <p class="mb-0">
+
+                    <?php if ($user['ID_TIPO_USUARIO'] == 1): ?>
+
+                        <span class="badge bg-dark">
+                            ADMIN
+                        </span>
+
+                    <?php else: ?>
+
+                        <span class="badge bg-primary">
+                            CLIENTE
+                        </span>
+
+                    <?php endif ?>
+
+                </p>
+
+            </div>
+
+            <div class="col-md-4">
+
                 <strong>Estado</strong>
 
-                <?php if ($user['ID_ESTADO'] == 1): ?>
+                <p class="mb-0">
 
-                    <span class="badge bg-success">Activo</span>
+                    <?php if ($user['ID_ESTADO'] == 1): ?>
 
-                <?php else: ?>
+                        <span class="badge bg-success">
+                            Activo
+                        </span>
 
-                    <span class="badge bg-danger">Inactivo</span>
+                    <?php else: ?>
 
-                <?php endif ?>
+                        <span class="badge bg-danger">
+                            Inactivo
+                        </span>
+
+                    <?php endif ?>
+
+                </p>
 
             </div>
 
@@ -55,60 +94,64 @@
 
         <!-- Correos -->
 
-        <h5>Correos</h5>
+        <h5 class="mb-3">Correos</h5>
 
-        <div class="mb-4">
+        <?php if (!empty($emails)): ?>
 
-            <?php if (!empty($emails)): ?>
+            <ul class="list-group mb-4">
 
-                <ul class="list-group">
+                <?php foreach ($emails as $e): ?>
 
-                    <?php foreach ($emails as $e): ?>
+                    <li class="list-group-item">
 
-                        <li class="list-group-item">
-                            <?= htmlspecialchars($e['CORREO']) ?>
-                        </li>
+                        <i class="bi bi-envelope"></i>
 
-                    <?php endforeach ?>
+                        <?= htmlspecialchars($e['CORREO']) ?>
 
-                </ul>
+                    </li>
 
-            <?php else: ?>
+                <?php endforeach ?>
 
-                <p class="text-muted">No hay correos registrados.</p>
+            </ul>
 
-            <?php endif ?>
+        <?php else: ?>
 
-        </div>
+            <p class="text-muted mb-4">
+                No hay correos registrados.
+            </p>
+
+        <?php endif ?>
 
 
         <!-- Teléfonos -->
 
-        <h5>Teléfonos</h5>
+        <h5 class="mb-3">Teléfonos</h5>
 
-        <div class="mb-4">
+        <?php if (!empty($phones)): ?>
 
-            <?php if (!empty($phones)): ?>
+            <ul class="list-group mb-4">
 
-                <ul class="list-group">
+                <?php foreach ($phones as $p): ?>
 
-                    <?php foreach ($phones as $p): ?>
+                    <li class="list-group-item">
 
-                        <li class="list-group-item">
-                            <?= htmlspecialchars($p['TELEFONO']) ?>
-                        </li>
+                        <i class="bi bi-telephone"></i>
 
-                    <?php endforeach ?>
+                        <?= htmlspecialchars($p['TELEFONO']) ?>
 
-                </ul>
+                    </li>
 
-            <?php else: ?>
+                <?php endforeach ?>
 
-                <p class="text-muted">No hay teléfonos registrados.</p>
+            </ul>
 
-            <?php endif ?>
+        <?php else: ?>
 
-        </div>
+            <p class="text-muted mb-4">
+                No hay teléfonos registrados.
+            </p>
+
+        <?php endif ?>
 
 
         <hr>
@@ -116,7 +159,7 @@
 
         <!-- Administración -->
 
-        <h5>Administración</h5>
+        <h5 class="mb-3">Administración</h5>
 
         <div class="d-flex flex-wrap gap-2">
 
@@ -125,7 +168,7 @@
                 data-url="<?= App::url('/admin/users/' . $user['IDENTIFICACION'] . '/status/1') ?>"
                 data-action="activar">
 
-                Activar
+                <i class="bi bi-check-circle"></i> Activar
 
             </a>
 
@@ -134,7 +177,7 @@
                 data-url="<?= App::url('/admin/users/' . $user['IDENTIFICACION'] . '/status/2') ?>"
                 data-action="desactivar">
 
-                Desactivar
+                <i class="bi bi-x-circle"></i> Desactivar
 
             </a>
 
@@ -143,7 +186,7 @@
                 data-url="<?= App::url('/admin/users/' . $user['IDENTIFICACION'] . '/role/1') ?>"
                 data-action="admin">
 
-                Hacer ADMIN
+                <i class="bi bi-shield-lock"></i> Hacer ADMIN
 
             </a>
 
@@ -152,11 +195,12 @@
                 data-url="<?= App::url('/admin/users/' . $user['IDENTIFICACION'] . '/role/2') ?>"
                 data-action="cliente">
 
-                Hacer CLIENTE
+                <i class="bi bi-person"></i> Hacer CLIENTE
 
             </a>
 
         </div>
+
     </div>
 
 </div>

@@ -1,30 +1,26 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Editar marca</h4>
+        <h4 class="mb-0">Editar marca</h4>
+
+        <a href="<?= App::url('/admin/brands') ?>" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
 
     </div>
 
     <div class="admin-panel-card-body">
 
-        <form method="POST" action="<?= App::url('/admin/brands/update') ?>">
+        <form action="<?= App::url('/admin/brands/update') ?>" method="POST">
 
-            <input
-                type="hidden"
-                name="id"
-                value="<?= $brand['ID_MARCA'] ?>">
+            <input type="hidden" name="id" value="<?= $brand['ID_MARCA'] ?>">
 
             <div class="mb-3">
 
-                <label class="form-label">
+                <label class="form-label">Nombre de la marca</label>
 
-                    Nombre de la marca
-
-                </label>
-
-                <input
-                    type="text"
+                <input type="text"
                     name="name"
                     class="form-control"
                     value="<?= htmlspecialchars($brand['NOMBRE']) ?>"
@@ -33,18 +29,8 @@
             </div>
 
             <button class="btn btn-dark">
-
-                Actualizar marca
-
+                <i class="bi bi-save"></i> Guardar cambios
             </button>
-
-            <a
-                href="<?= App::url('/admin/brands') ?>"
-                class="btn btn-secondary">
-
-                Cancelar
-
-            </a>
 
         </form>
 

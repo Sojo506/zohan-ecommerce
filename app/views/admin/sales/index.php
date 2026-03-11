@@ -1,59 +1,97 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Ventas</h4>
+        <div>
+            <h4 class="mb-0">Ventas</h4>
+            <small class="text-muted">Registro de ventas realizadas</small>
+        </div>
 
     </div>
 
-    <table class="table">
+    <div class="admin-panel-card-body">
 
-        <thead>
+        <div class="table-responsive">
 
-            <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Acción</th>
-            </tr>
+            <table class="table table-hover align-middle">
 
-        </thead>
+                <thead class="table-light">
 
-        <tbody>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acción</th>
+                    </tr>
 
-            <?php foreach ($sales as $sale): ?>
+                </thead>
 
-                <tr>
+                <tbody>
 
-                    <td><?= $sale['ID_VENTA'] ?></td>
+                    <?php foreach ($sales as $sale): ?>
 
-                    <td>
-                        <?= $sale['NOMBRE'] ?>
-                        <?= $sale['APELLIDO_PATERNO'] ?>
-                    </td>
+                        <tr>
 
-                    <td><?= $sale['FECHA_VENTA'] ?></td>
+                            <td>
 
-                    <td><?= $sale['ESTADO'] ?></td>
+                                <span class="badge bg-dark">
+                                    #<?= $sale['ID_VENTA'] ?>
+                                </span>
 
-                    <td>
+                            </td>
 
-                        <a href="<?= App::url('/admin/sales/' . $sale['ID_VENTA']) ?>"
-                            class="btn btn-sm btn-dark">
+                            <td class="fw-semibold">
 
-                            Ver detalle
+                                <?= htmlspecialchars($sale['NOMBRE']) ?>
+                                <?= htmlspecialchars($sale['APELLIDO_PATERNO']) ?>
 
-                        </a>
+                            </td>
 
-                    </td>
+                            <td class="text-muted">
 
-                </tr>
+                                <?= date('d M Y H:i', strtotime($sale['FECHA_VENTA'])) ?>
 
-            <?php endforeach ?>
+                            </td>
 
-        </tbody>
+                            <td>
 
-    </table>
+                                <?php
+                                $estado = strtolower($sale['ESTADO']);
+                                $badge = "secondary";
+
+                                if ($estado === "pagada") $badge = "success";
+                                if ($estado === "pendiente") $badge = "warning";
+                                if ($estado === "cancelada") $badge = "danger";
+                                ?>
+
+                                <span class="badge bg-<?= $badge ?>">
+                                    <?= htmlspecialchars($sale['ESTADO']) ?>
+                                </span>
+
+                            </td>
+
+                            <td class="text-end">
+
+                                <a href="<?= App::url('/admin/sales/' . $sale['ID_VENTA']) ?>"
+                                    class="btn btn-sm btn-outline-dark">
+
+                                    <i class="bi bi-eye"></i> Ver
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>

@@ -1,154 +1,180 @@
-function confirmAction({ title, text = "", confirmText = "Confirmar", confirmColor = "#212529", url }) {
+document.addEventListener("DOMContentLoaded", () => {
+    const toggle = document.getElementById("sidebarToggle");
+    const sidebar = document.getElementById("adminSidebar");
 
-    Swal.fire({
-        title: title,
-        text: text,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: confirmColor,
-        cancelButtonColor: "#6c757d",
-        confirmButtonText: confirmText,
-        cancelButtonText: "Cancelar"
-    }).then((result) => {
+    if (sidebar && toggle) {
+        toggle.addEventListener('click', function () {
+            sidebar.classList.toggle('show');
+        });
+    }
 
-        if (result.isConfirmed) {
-            window.location.href = url;
+    // cerrar sidebar tocando fuera (mobile)
+    document.addEventListener("click", (e) => {
+
+        if (
+            window.innerWidth <= 768 &&
+            sidebar.classList.contains("show") &&
+            !sidebar.contains(e.target) &&
+            !toggle.contains(e.target)
+        ) {
+            sidebar.classList.remove("show");
         }
 
     });
 
-}
+    function confirmAction({ title, text = "", confirmText = "Confirmar", confirmColor = "#212529", url }) {
 
-document.querySelectorAll('.btn-user-action').forEach(button => {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: confirmColor,
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: confirmText,
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
 
-    button.addEventListener('click', function (e) {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
 
-        e.preventDefault();
+        });
 
-        const url = this.dataset.url;
-        const action = this.dataset.action;
+    }
 
-        let message = "";
+    document.querySelectorAll('.btn-user-action').forEach(button => {
 
-        if (action === "activar") message = "¿Activar este usuario?";
-        if (action === "desactivar") message = "¿Desactivar este usuario?";
-        if (action === "admin") message = "¿Convertir usuario en ADMIN?";
-        if (action === "cliente") message = "¿Convertir usuario en CLIENTE?";
+        button.addEventListener('click', function (e) {
 
-        confirmAction({
-            title: message,
-            url: url
+            e.preventDefault();
+
+            const url = this.dataset.url;
+            const action = this.dataset.action;
+
+            let message = "";
+
+            if (action === "activar") message = "¿Activar este usuario?";
+            if (action === "desactivar") message = "¿Desactivar este usuario?";
+            if (action === "admin") message = "¿Convertir usuario en ADMIN?";
+            if (action === "cliente") message = "¿Convertir usuario en CLIENTE?";
+
+            confirmAction({
+                title: message,
+                url: url
+            });
+
         });
 
     });
 
-});
+    document.querySelectorAll('.btn-delete-image').forEach(button => {
 
-document.querySelectorAll('.btn-delete-image').forEach(button => {
+        button.addEventListener('click', function (e) {
 
-    button.addEventListener('click', function (e) {
+            e.preventDefault();
 
-        e.preventDefault();
+            confirmAction({
+                title: "¿Eliminar imagen?",
+                text: "Esta acción no se puede deshacer",
+                confirmText: "Sí, eliminar",
+                confirmColor: "#dc3545",
+                url: this.dataset.url
+            });
 
-        confirmAction({
-            title: "¿Eliminar imagen?",
-            text: "Esta acción no se puede deshacer",
-            confirmText: "Sí, eliminar",
-            confirmColor: "#dc3545",
-            url: this.dataset.url
         });
 
     });
 
-});
+    document.querySelectorAll('.btn-delete-product').forEach(button => {
 
-document.querySelectorAll('.btn-delete-product').forEach(button => {
+        button.addEventListener('click', function (e) {
 
-    button.addEventListener('click', function (e) {
+            e.preventDefault();
 
-        e.preventDefault();
+            confirmAction({
+                title: "¿Eliminar producto?",
+                text: "Esta acción no se puede deshacer",
+                confirmText: "Sí, eliminar",
+                confirmColor: "#dc3545",
+                url: this.dataset.url
+            });
 
-        confirmAction({
-            title: "¿Eliminar producto?",
-            text: "Esta acción no se puede deshacer",
-            confirmText: "Sí, eliminar",
-            confirmColor: "#dc3545",
-            url: this.dataset.url
         });
 
     });
 
-});
+    document.querySelectorAll('.btn-delete-coupon').forEach(button => {
 
-document.querySelectorAll('.btn-delete-coupon').forEach(button => {
+        button.addEventListener('click', function (e) {
 
-    button.addEventListener('click', function (e) {
+            e.preventDefault();
 
-        e.preventDefault();
+            confirmAction({
+                title: "¿Eliminar cupón?",
+                text: "Esta acción no se puede deshacer",
+                confirmText: "Sí, eliminar",
+                confirmColor: "#dc3545",
+                url: this.dataset.url
+            });
 
-        confirmAction({
-            title: "¿Eliminar cupón?",
-            text: "Esta acción no se puede deshacer",
-            confirmText: "Sí, eliminar",
-            confirmColor: "#dc3545",
-            url: this.dataset.url
         });
 
     });
 
-});
+    document.querySelectorAll('.btn-delete-category').forEach(button => {
 
-document.querySelectorAll('.btn-delete-category').forEach(button => {
+        button.addEventListener('click', function (e) {
+            console.log("Eliminar categoría");
+            e.preventDefault();
 
-    button.addEventListener('click', function (e) {
-        console.log("Eliminar categoría");
-        e.preventDefault();
+            confirmAction({
+                title: "¿Eliminar categoría?",
+                text: "Esta acción no se puede deshacer",
+                confirmText: "Sí, eliminar",
+                confirmColor: "#dc3545",
+                url: this.dataset.url
+            });
 
-        confirmAction({
-            title: "¿Eliminar categoría?",
-            text: "Esta acción no se puede deshacer",
-            confirmText: "Sí, eliminar",
-            confirmColor: "#dc3545",
-            url: this.dataset.url
         });
 
     });
 
-});
 
+    document.querySelectorAll('.btn-delete-promotion').forEach(button => {
 
-document.querySelectorAll('.btn-delete-promotion').forEach(button => {
+        button.addEventListener('click', function (e) {
+            console.log("Eliminar promoción");
+            e.preventDefault();
 
-    button.addEventListener('click', function (e) {
-        console.log("Eliminar promoción");
-        e.preventDefault();
+            confirmAction({
+                title: "¿Eliminar promoción?",
+                text: "Esta acción no se puede deshacer",
+                confirmText: "Sí, eliminar",
+                confirmColor: "#dc3545",
+                url: this.dataset.url
+            });
 
-        confirmAction({
-            title: "¿Eliminar promoción?",
-            text: "Esta acción no se puede deshacer",
-            confirmText: "Sí, eliminar",
-            confirmColor: "#dc3545",
-            url: this.dataset.url
         });
 
     });
 
-});
+    document.querySelectorAll('.btn-delete-promotion-product').forEach(button => {
 
-document.querySelectorAll('.btn-delete-promotion-product').forEach(button => {
+        button.addEventListener('click', function (e) {
+            console.log("Eliminar producto de la promoción");
+            e.preventDefault();
 
-    button.addEventListener('click', function (e) {
-        console.log("Eliminar producto de la promoción");
-        e.preventDefault();
+            confirmAction({
+                title: "¿Eliminar producto de la promoción?",
+                text: "Esta acción no se puede deshacer",
+                confirmText: "Sí, eliminar",
+                confirmColor: "#dc3545",
+                url: this.dataset.url
+            });
 
-        confirmAction({
-            title: "¿Eliminar producto de la promoción?",
-            text: "Esta acción no se puede deshacer",
-            confirmText: "Sí, eliminar",
-            confirmColor: "#dc3545",
-            url: this.dataset.url
         });
 
     });
-
 });
+
