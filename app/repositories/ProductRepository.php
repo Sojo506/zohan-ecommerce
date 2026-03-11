@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../models/ProductModel.php';
 
 class ProductRepository
@@ -9,6 +10,64 @@ class ProductRepository
     {
         $this->model = $model ?? new ProductModel();
     }
+
+    /* =========================
+       ADMIN PRODUCTOS
+    ========================= */
+
+    public function getCategories()
+    {
+        return $this->model->obtenerCategorias();
+    }
+
+    public function getBrands()
+    {
+        return $this->model->obtenerMarcas();
+    }
+
+    public function all()
+    {
+        return $this->model->obtenerTodosProductos();
+    }
+
+    public function create(array $data)
+    {
+        return $this->model->crearProducto($data);
+    }
+
+    public function find(int $id)
+    {
+        return $this->model->obtenerProductoPorId($id);
+    }
+
+    public function update(int $id, array $data)
+    {
+        return $this->model->actualizarProducto($id, $data);
+    }
+
+    public function delete(int $id)
+    {
+        return $this->model->eliminarProducto($id);
+    }
+
+    public function addImage(int $productId, string $url)
+    {
+        return $this->model->agregarImagenProducto($productId, $url);
+    }
+
+    public function getImages(int $productId)
+    {
+        return $this->model->obtenerImagenesProducto($productId);
+    }
+
+    public function deleteImage(int $imageId)
+    {
+        return $this->model->eliminarImagenProducto($imageId);
+    }
+
+    /* =========================
+       CATALOGO TIENDA
+    ========================= */
 
     public function fetchCatalog(array $filtros): array
     {
@@ -38,6 +97,10 @@ class ProductRepository
         return $this->model->obtenerStockProducto($idProducto);
     }
 
+    /* =========================
+       CARRITO
+    ========================= */
+
     public function sanitizeCart($cart): array
     {
         if (!is_array($cart)) {
@@ -45,9 +108,12 @@ class ProductRepository
         }
 
         $clean = [];
+
         foreach ($cart as $id => $cantidad) {
+
             $idInt = (int)$id;
             $cantidadInt = (int)$cantidad;
+
             if ($idInt > 0 && $cantidadInt > 0) {
                 $clean[$idInt] = $cantidadInt;
             }
@@ -62,6 +128,7 @@ class ProductRepository
         $productos = $this->model->obtenerProductosPorIds($ids);
 
         $productosIndex = [];
+
         foreach ($productos as $producto) {
             $productosIndex[(int)$producto['ID_PRODUCTO']] = $producto;
         }
@@ -71,6 +138,7 @@ class ProductRepository
         $clean = [];
 
         foreach ($cart as $id => $cantidad) {
+
             $idInt = (int)$id;
             $cantidadInt = (int)$cantidad;
 
@@ -79,6 +147,7 @@ class ProductRepository
             }
 
             $producto = $productosIndex[$idInt];
+
             $subtotal = $cantidadInt * (float)$producto['PRECIO'];
             $total += $subtotal;
 
@@ -101,17 +170,23 @@ class ProductRepository
     public function countCart(array $cart): int
     {
         $cart = $this->sanitizeCart($cart);
+
         $ids = array_keys($cart);
 
         if (!empty($ids)) {
+
             $productos = $this->model->obtenerProductosPorIds($ids);
+
             $validos = [];
+
             foreach ($productos as $producto) {
                 $validos[(int)$producto['ID_PRODUCTO']] = true;
             }
 
             foreach (array_keys($cart) as $id) {
+
                 $idInt = (int)$id;
+
                 if (!isset($validos[$idInt])) {
                     unset($cart[$id]);
                 }
@@ -123,18 +198,16 @@ class ProductRepository
 
     public function fetchCartForAccount(int $idCuenta): array
     {
-        return $this->sanitizeCart($this->model->obtenerCarritoCuenta($idCuenta));
+        return $this->sanitizeCart(
+            $this->model->obtenerCarritoCuenta($idCuenta)
+        );
     }
 
     public function saveCartForAccount(int $idCuenta, array $cart): void
     {
-        $this->model->guardarCarritoCuenta($idCuenta, $this->sanitizeCart($cart));
+        $this->model->guardarCarritoCuenta(
+            $idCuenta,
+            $this->sanitizeCart($cart)
+        );
     }
 }
-?>
-
-
-
-
-
-
