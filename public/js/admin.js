@@ -1,4 +1,26 @@
+function confirmAction({ title, text = "", confirmText = "Confirmar", confirmColor = "#212529", url }) {
+
+    Swal.fire({
+        title: title,
+        text: text,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: confirmColor,
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: confirmText,
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+
+    });
+
+}
+
 document.querySelectorAll('.btn-user-action').forEach(button => {
+
     button.addEventListener('click', function (e) {
 
         e.preventDefault();
@@ -13,24 +35,9 @@ document.querySelectorAll('.btn-user-action').forEach(button => {
         if (action === "admin") message = "¿Convertir usuario en ADMIN?";
         if (action === "cliente") message = "¿Convertir usuario en CLIENTE?";
 
-        Swal.fire({
-
+        confirmAction({
             title: message,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#212529",
-            cancelButtonColor: "#6c757d",
-            confirmButtonText: "Sí, confirmar",
-            cancelButtonText: "Cancelar"
-
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-
-                window.location.href = url;
-
-            }
-
+            url: url
         });
 
     });
@@ -43,23 +50,12 @@ document.querySelectorAll('.btn-delete-image').forEach(button => {
 
         e.preventDefault();
 
-        const url = this.dataset.url;
-
-        Swal.fire({
-            title: '¿Eliminar imagen?',
+        confirmAction({
+            title: "¿Eliminar imagen?",
             text: "Esta acción no se puede deshacer",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-                window.location.href = url;
-            }
-
+            confirmText: "Sí, eliminar",
+            confirmColor: "#dc3545",
+            url: this.dataset.url
         });
 
     });
@@ -72,23 +68,48 @@ document.querySelectorAll('.btn-delete-product').forEach(button => {
 
         e.preventDefault();
 
-        const url = this.dataset.url;
-
-        Swal.fire({
-            title: '¿Eliminar producto?',
+        confirmAction({
+            title: "¿Eliminar producto?",
             text: "Esta acción no se puede deshacer",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
+            confirmText: "Sí, eliminar",
+            confirmColor: "#dc3545",
+            url: this.dataset.url
+        });
 
-            if (result.isConfirmed) {
-                window.location.href = url;
-            }
+    });
 
+});
+
+document.querySelectorAll('.btn-delete-coupon').forEach(button => {
+
+    button.addEventListener('click', function (e) {
+
+        e.preventDefault();
+
+        confirmAction({
+            title: "¿Eliminar cupón?",
+            text: "Esta acción no se puede deshacer",
+            confirmText: "Sí, eliminar",
+            confirmColor: "#dc3545",
+            url: this.dataset.url
+        });
+
+    });
+
+});
+
+document.querySelectorAll('.btn-delete-category').forEach(button => {
+
+    button.addEventListener('click', function (e) {
+        console.log("Eliminar categoría");
+        e.preventDefault();
+
+        confirmAction({
+            title: "¿Eliminar categoría?",
+            text: "Esta acción no se puede deshacer",
+            confirmText: "Sí, eliminar",
+            confirmColor: "#dc3545",
+            url: this.dataset.url
         });
 
     });
