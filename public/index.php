@@ -87,6 +87,17 @@ $router->get('/admin/users/{id}/status/{status}', 'UserAdminController@changeSta
 $router->get('/admin/users/{id}/role/{role}', 'UserAdminController@changeRole');
 $router->get('/admin/sales/{id}', 'SaleAdminController@detail');
 
+/* CRUD CUPONES ADMIN  */
+$router->get('/admin/coupons', 'CouponAdminController@index');
+
+$router->get('/admin/coupons/create', 'CouponAdminController@createForm');
+$router->post('/admin/coupons/create', 'CouponAdminController@create');
+
+$router->get('/admin/coupons/edit/{id}', 'CouponAdminController@editForm');
+$router->post('/admin/coupons/update', 'CouponAdminController@update');
+
+$router->get('/admin/coupons/delete/{id}', 'CouponAdminController@delete');
+
 /*  PERFIL  */
 
 $router->get('/profile', 'ProfileController@index');
