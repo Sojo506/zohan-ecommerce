@@ -207,7 +207,13 @@ $router->post('/cart/update', 'ProductController@updateCart');
 $router->post('/cart/remove', 'ProductController@removeFromCart');
 $router->post('/cart/clear', 'ProductController@clearCart');
 
+/* PAGOS  */
+$router->post('/api/payment/capture', 'PaymentController@capture');
 
+
+<<<<<<< pagos
 /*  EJECUTAR ROUTER  */
-
 $router->dispatch();
+=======
+$router->dispatch();
+>>>>>>> develop
