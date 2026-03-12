@@ -64,7 +64,7 @@
 
                             <td>
 
-                                <?php if ($u['ESTADO'] === 'Activo'): ?>
+                                <?php if ($u['ESTADO'] === 'ACTIVO'): ?>
 
                                     <span class="badge bg-success">
                                         Activo
