@@ -55,7 +55,7 @@
 
                                 <div class="col">
                                     <h5 class="fw-bold mb-0">
-                                        ₡<?= number_format($stats['dinero_gastado'] ?? 0, 0, ',', '.') ?>
+                                        $<?= number_format($stats['dinero_gastado'] ?? 0, 0, ',', '.') ?>
                                     </h5>
                                     <small class="text-muted">Total gastado</small>
                                 </div>
@@ -104,7 +104,7 @@
                                             <div>
                                                 <p class="text-muted small mb-0">Total de la factura</p>
                                                 <span class="fw-bold">
-                                                    ₡ <?= number_format($factura['TOTAL'], 0, ',', '.') ?>
+                                                    $ <?= number_format($factura['TOTAL'], 0, ',', '.') ?>
                                                 </span>
                                             </div>
 
