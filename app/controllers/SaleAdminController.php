@@ -31,7 +31,7 @@ class SaleAdminController extends Controller
         $this->adminView('admin/sales/index', [
             'sales' => $sales,
             'pageTitle' => 'Ventas',
-            'currentSection' => 'orders'
+            'currentSection' => 'sales'
         ]);
     }
 
