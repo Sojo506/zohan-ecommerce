@@ -11,6 +11,9 @@ class AuthController extends Controller
     private int $ESTADO_PENDIENTE = 3;
 
     private int $OTP_ACTIVAR_CUENTA = 1;
+    private int $OTP_CAMBIAR_PASSWORD = 2;
+    private int $OTP_CAMBIAR_CORREO = 3;
+
 
     public function loginForm()
     {
@@ -166,7 +169,7 @@ class AuthController extends Controller
         try {
             $pdo->beginTransaction();
 
-            // 1) Insertar usuario en USUARIO_TB
+            //Insertar usuario en USUARIO_TB
             $sqlUser = "INSERT INTO USUARIO_TB
             (IDENTIFICACION, NOMBRE, APELLIDO_PATERNO, APELLIDO_MATERNO, ID_DIRECCION, ID_TIPO_USUARIO, ID_ESTADO)
             VALUES
@@ -182,7 +185,7 @@ class AuthController extends Controller
                 ':estado' => $this->ESTADO_PENDIENTE,
             ]);
 
-            // 2) Insertar correo en CORREO_TB
+            //Insertar correo en CORREO_TB
             $sqlCorreo = "INSERT INTO CORREO_TB
             (IDENTIFICACION, CORREO, ID_ESTADO)
             VALUES
@@ -195,7 +198,7 @@ class AuthController extends Controller
                 ':estado' => $this->ESTADO_PENDIENTE,
             ]);
 
-            // 3) Insertar cuenta en CUENTA_TB
+            //Insertar cuenta en CUENTA_TB
             $hash = Security::hashPassword($pass1);
 
             $sqlCuenta = "INSERT INTO CUENTA_TB
@@ -213,7 +216,7 @@ class AuthController extends Controller
 
             $idCuenta = (int)$pdo->lastInsertId();
 
-            // 4) Generar OTP
+            //Generar OTP
             $otp = Security::generateOtp(6);
             $otpHash = password_hash($otp, PASSWORD_BCRYPT);
             $expiresAt = (new DateTime('+10 minutes'))->format('Y-m-d H:i:s');
@@ -235,7 +238,7 @@ class AuthController extends Controller
 
             $pdo->commit();
 
-            // 5) Enviar correo
+            //Enviar correo
             Mailer::verifyEmail($correo, $otp);
 
             $_SESSION['pending_account_id'] = $idCuenta;
@@ -276,21 +279,21 @@ class AuthController extends Controller
 
         $pdo = Database::connection();
 
-        // Buscar OTP activo, no expirado, tipo activar cuenta
-        $sql = "SELECT OTP_CODE, HASH, EXPIRES_AT, INTENTOS, ACTIVE_FLAG
-                FROM CODIGO_OTP_TB
-                WHERE ID_CUENTA = :idCuenta
-                  AND ID_TIPO_OTP = :tipo
-                  AND ACTIVE_FLAG = 1
-                ORDER BY CREATED_AT DESC
-                LIMIT 1";
+        // Buscar OTP activo
+        $sql = "SELECT OTP_CODE, HASH, EXPIRES_AT, INTENTOS, ACTIVE_FLAG, ID_TIPO_OTP
+            FROM CODIGO_OTP_TB
+            WHERE ID_CUENTA = :idCuenta
+              AND ACTIVE_FLAG = 1
+            ORDER BY CREATED_AT DESC
+            LIMIT 1";
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':idCuenta' => $idCuenta,
-            ':tipo' => $this->OTP_ACTIVAR_CUENTA
+            ':idCuenta' => $idCuenta
         ]);
 
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
         if (!$row) {
             $_SESSION['flash_error'] = "No se encontró un OTP activo.";
             header("Location: " . App::url('/verify-otp'));
@@ -300,16 +303,19 @@ class AuthController extends Controller
         // Validar expiración
         $now = new DateTime();
         $exp = new DateTime($row['EXPIRES_AT']);
+
         if ($now > $exp) {
-            $_SESSION['flash_error'] = "El OTP expiró. (Luego hacemos botón Reenviar)";
+            $_SESSION['flash_error'] = "El OTP expiró.";
             header("Location: " . App::url('/verify-otp'));
             exit;
         }
 
-        // Validar OTP por hash
+        // Validar código OTP
         if (!password_verify($otp, $row['HASH'])) {
-            // aumentar intentos
-            $pdo->prepare("UPDATE CODIGO_OTP_TB SET INTENTOS = INTENTOS + 1 WHERE ID_CUENTA = :id")
+
+            $pdo->prepare("UPDATE CODIGO_OTP_TB 
+                       SET INTENTOS = INTENTOS + 1 
+                       WHERE ID_CUENTA = :id")
                 ->execute([':id' => $idCuenta]);
 
             $_SESSION['flash_error'] = "Código incorrecto.";
@@ -317,48 +323,120 @@ class AuthController extends Controller
             exit;
         }
 
-        // Si está correcto: desactivar OTP + activar cuenta
         try {
+
             $pdo->beginTransaction();
 
+            // Desactivar OTP usado
             $pdo->prepare("UPDATE CODIGO_OTP_TB 
-                           SET ACTIVE_FLAG = 0 
-                           WHERE ID_CUENTA = :id 
-                           AND ID_TIPO_OTP = :tipo")
-                ->execute([':id' => $idCuenta, ':tipo' => $this->OTP_ACTIVAR_CUENTA]);
+                       SET ACTIVE_FLAG = 0 
+                       WHERE ID_CUENTA = :id")
+                ->execute([':id' => $idCuenta]);
 
-            $pdo->prepare("UPDATE CUENTA_TB 
+            //Otp para cambiar correo y actualizar datos
+            if ($row['ID_TIPO_OTP'] == $this->OTP_CAMBIAR_CORREO) {
+
+                $correoNuevo = $_SESSION['pending_new_email'];
+                $profile = $_SESSION['pending_profile_update'];
+
+                // actualizar correo
+                $pdo->prepare("UPDATE CORREO_TB
+                SET CORREO = :correo
+                WHERE IDENTIFICACION = (
+                SELECT IDENTIFICACION
+                FROM CUENTA_TB
+                WHERE ID_CUENTA = :id
+                )")
+                    ->execute([
+                        ':correo' => $correoNuevo,
+                        ':id' => $idCuenta
+                    ]);
+
+                // actualizar nombre y apellidos
+                $pdo->prepare("UPDATE USUARIO_TB
+                SET NOMBRE = :nombre,
+                APELLIDO_PATERNO = :ap1,
+                APELLIDO_MATERNO = :ap2
+                WHERE IDENTIFICACION = (
+                SELECT IDENTIFICACION
+                FROM CUENTA_TB
+                WHERE ID_CUENTA = :id
+                )")
+                    ->execute([
+                        ':nombre' => $profile['nombre'],
+                        ':ap1' => $profile['ap1'],
+                        ':ap2' => $profile['ap2'] === '' ? null : $profile['ap2'],
+                        ':id' => $idCuenta
+                    ]);
+
+                $profile = $_SESSION['pending_profile_update'];
+                $correoNuevo = $_SESSION['pending_new_email'];
+
+                // actualizar sesión
+                $_SESSION['user']['nombre'] = $profile['nombre'];
+                $_SESSION['user']['apellido'] = $profile['ap1'];
+                $_SESSION['user']['correo'] = $correoNuevo;
+
+                unset($_SESSION['pending_new_email']);
+                unset($_SESSION['pending_profile_update']);
+                unset($_SESSION['pending_account_id']);
+
+                $pdo->commit();
+
+                $_SESSION['flash_success'] = "Perfil actualizado correctamente.";
+
+                header("Location: " . App::url('/profile'));
+                exit;
+            }
+
+            // ===== OTP PARA ACTIVAR CUENTA =====
+            if ($row['ID_TIPO_OTP'] == $this->OTP_ACTIVAR_CUENTA) {
+
+                $pdo->prepare("UPDATE CUENTA_TB 
                            SET ID_ESTADO = :estado 
                            WHERE ID_CUENTA = :id")
-                ->execute([':estado' => $this->ESTADO_ACTIVO, ':id' => $idCuenta]);
+                    ->execute([
+                        ':estado' => $this->ESTADO_ACTIVO,
+                        ':id' => $idCuenta
+                    ]);
 
-            // activar usuario ligado
-            $pdo->prepare("UPDATE USUARIO_TB u
+                // activar usuario
+                $pdo->prepare("UPDATE USUARIO_TB u
                            JOIN CUENTA_TB c ON c.IDENTIFICACION = u.IDENTIFICACION
                            SET u.ID_ESTADO = :estado
                            WHERE c.ID_CUENTA = :id")
-                ->execute([':estado' => $this->ESTADO_ACTIVO, ':id' => $idCuenta]);
+                    ->execute([
+                        ':estado' => $this->ESTADO_ACTIVO,
+                        ':id' => $idCuenta
+                    ]);
 
-            // activar correo ligado
-            $pdo->prepare("UPDATE CORREO_TB co
-               JOIN CUENTA_TB c ON c.IDENTIFICACION = co.IDENTIFICACION
-               SET co.ID_ESTADO = :estado
-               WHERE c.ID_CUENTA = :id")
-                ->execute([
-                    ':estado' => $this->ESTADO_ACTIVO,
-                    ':id' => $idCuenta
-                ]);
+                // activar correo
+                $pdo->prepare("UPDATE CORREO_TB co
+                           JOIN CUENTA_TB c ON c.IDENTIFICACION = co.IDENTIFICACION
+                           SET co.ID_ESTADO = :estado
+                           WHERE c.ID_CUENTA = :id")
+                    ->execute([
+                        ':estado' => $this->ESTADO_ACTIVO,
+                        ':id' => $idCuenta
+                    ]);
+
+                unset($_SESSION['pending_account_id']);
+
+                $pdo->commit();
+
+                $_SESSION['flash_success'] = "Cuenta activada. Ya podés iniciar sesión.";
+                header("Location: " . App::url('/login'));
+                exit;
+            }
 
             $pdo->commit();
-
-            unset($_SESSION['pending_account_id']);
-            $_SESSION['flash_success'] = "Cuenta activada | Ya podés iniciar sesión.";
-
-            header("Location: " . App::url('/login'));
-            exit;
         } catch (PDOException $e) {
-            $pdo->rollBack();
-            $_SESSION['flash_error'] = "Error activando cuenta: " . $e->getMessage();
+
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            $_SESSION['flash_error'] = "Error verificando OTP.";
             header("Location: " . App::url('/verify-otp'));
             exit;
         }

@@ -170,7 +170,8 @@ $router->get('/admin/audit', 'AuditAdminController@index');
 /* RUTAS PERFIL  */
 
 $router->get('/profile', 'ProfileController@index');
-
+$router->get('/editProfile', 'ProfileController@edit');
+$router->post('/update', 'ProfileController@update');
 
 /* RUTAS AUTENTICACIÓN  */
 
