@@ -211,9 +211,4 @@ $router->post('/cart/clear', 'ProductController@clearCart');
 $router->post('/api/payment/capture', 'PaymentController@capture');
 
 
-<<<<<<< pagos
-/*  EJECUTAR ROUTER  */
 $router->dispatch();
-=======
-$router->dispatch();
->>>>>>> develop
