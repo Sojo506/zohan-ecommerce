@@ -1,11 +1,11 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header d-flex justify-content-between">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Editar promoción</h4>
+        <h4 class="mb-0">Editar promoción</h4>
 
-        <a href="<?= App::url('/admin/promotions') ?>" class="btn btn-dark">
-            Volver
+        <a href="<?= App::url('/admin/promotions') ?>" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Volver
         </a>
 
     </div>
@@ -22,7 +22,7 @@
                     type="text"
                     name="name"
                     class="form-control"
-                    value="<?= $promotion['NOMBRE'] ?>"
+                    value="<?= htmlspecialchars($promotion['NOMBRE']) ?>"
                     required>
             </div>
 
@@ -31,7 +31,7 @@
                 <textarea
                     name="description"
                     class="form-control"
-                    rows="3"><?= $promotion['DESCRIPCION'] ?></textarea>
+                    rows="3"><?= htmlspecialchars($promotion['DESCRIPCION']) ?></textarea>
             </div>
 
             <div class="mb-3">
@@ -71,7 +71,7 @@
             </div>
 
             <button class="btn btn-success">
-                Actualizar promoción
+                <i class="bi bi-save"></i> Actualizar promoción
             </button>
 
         </form>
@@ -80,38 +80,43 @@
 
 </div>
 
-
-<!-- PRODUCTOS ASIGNADOS -->
-
 <div class="admin-panel-card mt-4">
 
     <div class="admin-panel-card-header">
-        <h5>Productos en promoción</h5>
+        <h5 class="mb-0">Productos en promoción</h5>
     </div>
 
     <div class="admin-panel-card-body">
 
-        <ul class="list-group mb-3">
+        <?php if (!empty($assigned)): ?>
 
-            <?php foreach ($assigned as $a): ?>
+            <ul class="list-group mb-3">
 
-                <li class="list-group-item d-flex justify-content-between align-items-center">
+                <?php foreach ($assigned as $a): ?>
 
-                    <?= $a['NOMBRE'] ?>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
 
-                    <a href="#"
-                        class="btn btn-sm btn-outline-danger btn-delete-promotion-product"
-                        data-url="<?= App::url('/admin/promotions/remove-product/' . $promotion['ID_PROMOCION'] . '/' . $a['ID_PRODUCTO']) ?>">
+                        <?= htmlspecialchars($a['NOMBRE']) ?>
 
-                        Eliminar
+                        <a href="#"
+                            class="btn btn-sm btn-outline-danger btn-delete-promotion-product"
+                            data-url="<?= App::url('/admin/promotions/remove-product/' . $promotion['ID_PROMOCION'] . '/' . $a['ID_PRODUCTO']) ?>">
 
-                    </a>
+                            <i class="bi bi-x-circle"></i>
 
-                </li>
+                        </a>
 
-            <?php endforeach; ?>
+                    </li>
 
-        </ul>
+                <?php endforeach ?>
+
+            </ul>
+
+        <?php else: ?>
+
+            <p class="text-muted">No hay productos asignados.</p>
+
+        <?php endif ?>
 
         <form action="<?= App::url('/admin/promotions/assign') ?>" method="POST">
 
@@ -121,15 +126,15 @@
 
                 <div class="col-md-8">
 
-                    <select name="product" class="form-control">
+                    <select name="product" class="form-select">
 
                         <?php foreach ($products as $p): ?>
 
                             <option value="<?= $p['ID_PRODUCTO'] ?>">
-                                <?= $p['NOMBRE'] ?>
+                                <?= htmlspecialchars($p['NOMBRE']) ?>
                             </option>
 
-                        <?php endforeach; ?>
+                        <?php endforeach ?>
 
                     </select>
 
@@ -138,7 +143,7 @@
                 <div class="col-md-4">
 
                     <button class="btn btn-primary w-100">
-                        Agregar producto
+                        <i class="bi bi-plus"></i> Agregar producto
                     </button>
 
                 </div>

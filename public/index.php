@@ -55,7 +55,7 @@ $router->get('/admin/inventory', 'AdminController@inventory');
 $router->get('/admin/promotions', 'AdminController@promotions');
 
 
-/*  CRUD PRODUCTOS ADMIN  */
+/*  RUTAS PRODUCTOS ADMIN  */
 
 $router->get('/admin/products/list', 'ProductAdminController@index');
 $router->get('/admin/products/create', 'ProductAdminController@createForm');
@@ -68,7 +68,7 @@ $router->post('/admin/products/upload-image', 'ProductAdminController@uploadImag
 $router->post('/admin/products/update', 'ProductAdminController@update');
 
 
-/*  CRUD CATEGORÍAS ADMIN  */
+/*  RUTAS CATEGORÍAS ADMIN  */
 
 $router->get('/admin/categories', 'CategoryAdminController@index');
 $router->get('/admin/categories/create', 'CategoryAdminController@createForm');
@@ -80,7 +80,7 @@ $router->post('/admin/categories/update', 'CategoryAdminController@update');
 $router->get('/admin/categories/delete/{id}', 'CategoryAdminController@delete');
 
 
-/*  CRUD MARCAS ADMIN  */
+/*  RUTAS MARCAS ADMIN  */
 
 $router->get('/admin/brands', 'BrandAdminController@index');
 
@@ -93,7 +93,7 @@ $router->post('/admin/brands/update', 'BrandAdminController@update');
 $router->get('/admin/brands/delete/{id}', 'BrandAdminController@delete');
 
 
-/* CRUD INVENTARIO ADMIN */
+/* RUTAS INVENTARIO ADMIN */
 
 $router->get('/admin/inventory', 'InventoryAdminController@index');
 $router->get('/admin/inventory/movement', 'InventoryAdminController@movementForm');
@@ -102,13 +102,18 @@ $router->get('/admin/inventory/movements', 'InventoryAdminController@movements')
 $router->post('/admin/inventory/movement', 'InventoryAdminController@registerMovement');
 
 
-/* CRUD VENTAS ADMIN */
+/* RUTAS VENTAS ADMIN */
 
 $router->get('/admin/sales', 'SaleAdminController@index');
 $router->get('/admin/sales/{id}', 'SaleAdminController@detail');
 
+/* RUTAS FACTURAS ADMIN */
+$router->get('/admin/invoices', 'InvoiceAdminController@index');
+$router->get('/admin/invoices/{id}', 'InvoiceAdminController@detail');
+$router->get('/admin/invoices/{id}/status/{status}', 'InvoiceAdminController@changeStatus');
 
-/* CRUD USUARIOS ADMIN */
+
+/* RUTAS USUARIOS ADMIN */
 
 $router->get('/admin/users', 'UserAdminController@index');
 $router->get('/admin/users/{id}', 'UserAdminController@detail');
@@ -116,7 +121,7 @@ $router->get('/admin/users/{id}/status/{status}', 'UserAdminController@changeSta
 $router->get('/admin/users/{id}/role/{role}', 'UserAdminController@changeRole');
 
 
-/* CRUD CUPONES ADMIN */
+/* RUTAS CUPONES ADMIN */
 
 $router->get('/admin/coupons', 'CouponAdminController@index');
 
@@ -129,7 +134,7 @@ $router->post('/admin/coupons/update', 'CouponAdminController@update');
 $router->get('/admin/coupons/delete/{id}', 'CouponAdminController@delete');
 
 
-/* CRUD PROMOCIONES ADMIN */
+/* RUTAS PROMOCIONES ADMIN */
 
 $router->get('/admin/promotions', 'PromotionAdminController@index');
 
@@ -149,7 +154,7 @@ $router->get(
 );
 
 
-/* CRUD COMMENTS ADMIN */
+/* RUTAS COMMENTS ADMIN */
 
 $router->get('/admin/comments', 'CommentAdminController@index');
 $router->get('/admin/comments/approve/{id}', 'CommentAdminController@approve');
@@ -157,42 +162,43 @@ $router->get('/admin/comments/hide/{id}', 'CommentAdminController@hide');
 $router->get('/admin/comments/delete/{id}', 'CommentAdminController@delete');
 
 
-/* CRUD AUDITORÍA ADMIN */
+/* RUTAS AUDITORÍA ADMIN */
 
 $router->get('/admin/audit', 'AuditAdminController@index');
 
 
-/*  PERFIL  */
+/* RUTAS PERFIL  */
 
 $router->get('/profile', 'ProfileController@index');
+$router->get('/editProfile', 'ProfileController@edit');
+$router->post('/update', 'ProfileController@update');
 
-
-/*  AUTENTICACIÓN  */
+/* RUTAS AUTENTICACIÓN  */
 
 $router->get('/login', 'AuthController@loginForm');
 $router->post('/login', 'AuthController@login');
 $router->get('/logout', 'AuthController@logout');
 
 
-/*  REGISTRO  */
+/* RUTAS REGISTRO  */
 
 $router->get('/register', 'AuthController@registerForm');
 $router->post('/register', 'AuthController@register');
 
 
-/*  VERIFICACIÓN OTP  */
+/* RUTAS VERIFICACIÓN OTP  */
 
 $router->get('/verify-otp', 'AuthController@verifyOtpForm');
 $router->post('/verify-otp', 'AuthController@verifyOtp');
 
 
-/*  CATÁLOGO TIENDA */
+/* RUTAS CATÁLOGO TIENDA */
 
 $router->get('/products', 'ProductController@index');
 $router->get('/product', 'ProductController@show');
 
 
-/*  CARRITO */
+/* RUTAS CARRITO */
 
 $router->get('/cart', 'ProductController@cart');
 
@@ -205,5 +211,9 @@ $router->post('/cart/clear', 'ProductController@clearCart');
 $router->post('/api/payment/capture', 'PaymentController@capture');
 
 
+<<<<<<< pagos
 /*  EJECUTAR ROUTER  */
 $router->dispatch();
+=======
+$router->dispatch();
+>>>>>>> develop

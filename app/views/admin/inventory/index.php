@@ -1,48 +1,87 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header d-flex justify-content-between">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Inventario</h4>
+        <div>
+            <h4 class="mb-0">Inventario</h4>
+            <small class="text-muted">Control de stock de productos</small>
+        </div>
 
         <a href="<?= App::url('/admin/inventory/movement') ?>" class="btn btn-dark">
-            Nuevo movimiento
+            <i class="bi bi-arrow-left-right"></i> Nuevo movimiento
         </a>
 
     </div>
 
-    <table class="table">
+    <div class="admin-panel-card-body">
 
-        <thead>
+        <div class="table-responsive">
 
-            <tr>
-                <th>SKU</th>
-                <th>Producto</th>
-                <th>Stock</th>
-                <th>Stock mínimo</th>
-            </tr>
+            <table class="table table-hover align-middle">
 
-        </thead>
+                <thead class="table-light">
 
-        <tbody>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Producto</th>
+                        <th>Stock</th>
+                        <th>Stock mínimo</th>
+                    </tr>
 
-            <?php foreach ($inventory as $i): ?>
+                </thead>
 
-                <tr>
+                <tbody>
 
-                    <td><?= $i['SKU'] ?></td>
+                    <?php foreach ($inventory as $i): ?>
 
-                    <td><?= $i['NOMBRE'] ?></td>
+                        <?php
+                        $lowStock = $i['STOCK'] <= $i['STOCK_MINIMO'];
+                        ?>
 
-                    <td><?= $i['STOCK'] ?></td>
+                        <tr>
 
-                    <td><?= $i['STOCK_MINIMO'] ?></td>
+                            <td>
+                                <span class="badge bg-dark">
+                                    <?= htmlspecialchars($i['SKU']) ?>
+                                </span>
+                            </td>
 
-                </tr>
+                            <td class="fw-semibold">
+                                <?= htmlspecialchars($i['NOMBRE']) ?>
+                            </td>
 
-            <?php endforeach ?>
+                            <td>
 
-        </tbody>
+                                <?php if ($lowStock): ?>
 
-    </table>
+                                    <span class="badge bg-danger">
+                                        <?= $i['STOCK'] ?>
+                                    </span>
+
+                                <?php else: ?>
+
+                                    <span class="badge bg-success">
+                                        <?= $i['STOCK'] ?>
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
+                            <td class="text-muted">
+                                <?= $i['STOCK_MINIMO'] ?>
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>

@@ -2,7 +2,7 @@
 
     <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4 class="mb-0">Editar marca</h4>
+        <h4 class="mb-0">Crear marca</h4>
 
         <a href="<?= App::url('/admin/brands') ?>" class="btn btn-outline-dark">
             <i class="bi bi-arrow-left"></i> Volver
@@ -12,9 +12,7 @@
 
     <div class="admin-panel-card-body">
 
-        <form action="<?= App::url('/admin/brands/update') ?>" method="POST">
-
-            <input type="hidden" name="id" value="<?= $brand['ID_MARCA'] ?>">
+        <form action="<?= App::url('/admin/brands/create') ?>" method="POST">
 
             <div class="mb-3">
 
@@ -23,13 +21,13 @@
                 <input type="text"
                     name="name"
                     class="form-control"
-                    value="<?= htmlspecialchars($brand['NOMBRE']) ?>"
+                    placeholder="Ej: Apple, Samsung, Logitech..."
                     required>
 
             </div>
 
             <button class="btn btn-dark">
-                <i class="bi bi-save"></i> Guardar cambios
+                <i class="bi bi-plus-circle"></i> Crear marca
             </button>
 
         </form>

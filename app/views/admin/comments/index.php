@@ -1,133 +1,144 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header">
-        <h4 class="mb-0">Comentarios</h4>
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
+
+        <div>
+            <h4 class="mb-0">Comentarios</h4>
+            <small class="text-muted">Moderación de opiniones de clientes</small>
+        </div>
+
     </div>
 
     <div class="admin-panel-card-body">
 
-        <table class="table table-hover align-middle">
+        <div class="table-responsive">
 
-            <thead>
+            <table class="table table-hover align-middle">
 
-                <tr>
-                    <th>Producto</th>
-                    <th>Usuario</th>
-                    <th>Calificación</th>
-                    <th>Comentario</th>
-                    <th>Fecha</th>
-                    <th>Estado</th>
-                    <th style="width:200px;"></th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                <?php if (empty($comments)): ?>
+                <thead class="table-light">
 
                     <tr>
-                        <td colspan="7" class="text-center text-muted">
-                            No hay comentarios registrados
-                        </td>
+                        <th>Producto</th>
+                        <th>Usuario</th>
+                        <th>Calificación</th>
+                        <th>Comentario</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th class="text-end" style="width:200px;">Acciones</th>
                     </tr>
 
-                <?php endif ?>
+                </thead>
 
-                <?php foreach ($comments as $c): ?>
+                <tbody>
 
-                    <tr>
+                    <?php if (empty($comments)): ?>
 
-                        <td>
-                            <strong><?= $c['PRODUCTO'] ?></strong>
-                        </td>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted p-4">
+                                No hay comentarios registrados
+                            </td>
+                        </tr>
 
-                        <td>
-                            <?= $c['NOMBRE'] ?>
-                            <?= $c['APELLIDO_PATERNO'] ?>
-                        </td>
+                    <?php endif ?>
 
-                        <td>
+                    <?php foreach ($comments as $c): ?>
 
-                            <span class="badge bg-warning text-dark">
+                        <tr>
 
-                                <?= $c['CALIFICACION'] ?>/5
+                            <td class="fw-semibold">
 
-                            </span>
+                                <?= htmlspecialchars($c['PRODUCTO']) ?>
 
-                        </td>
+                            </td>
 
-                        <td style="max-width:300px;">
+                            <td>
 
-                            <?= htmlspecialchars($c['COMENTARIO']) ?>
+                                <?= htmlspecialchars($c['NOMBRE']) ?>
+                                <?= htmlspecialchars($c['APELLIDO_PATERNO']) ?>
 
-                        </td>
+                            </td>
 
-                        <td>
+                            <td>
 
-                            <?= date('d/m/Y H:i', strtotime($c['FECHA_COMENTARIO'])) ?>
+                                <span class="badge bg-warning text-dark">
 
-                        </td>
+                                    ⭐ <?= $c['CALIFICACION'] ?>/5
 
-                        <td>
-
-                            <?php if ($c['ESTADO'] === 'Activo'): ?>
-
-                                <span class="badge bg-success">
-                                    Visible
                                 </span>
 
-                            <?php else: ?>
+                            </td>
 
-                                <span class="badge bg-secondary">
-                                    Oculto
-                                </span>
+                            <td style="max-width:300px;" class="text-muted">
 
-                            <?php endif ?>
+                                <?= htmlspecialchars($c['COMENTARIO']) ?>
 
-                        </td>
+                            </td>
 
-                        <td class="text-end">
+                            <td class="text-muted">
 
-                            <?php if ($c['ESTADO'] !== 'Activo'): ?>
+                                <?= date('d M Y H:i', strtotime($c['FECHA_COMENTARIO'])) ?>
 
-                                <a href="<?= App::url('/admin/comments/approve/' . $c['ID_COMENTARIO']) ?>"
-                                    class="btn btn-sm btn-success">
+                            </td>
 
-                                    Aprobar
+                            <td>
+
+                                <?php if ($c['ESTADO'] === 'Activo'): ?>
+
+                                    <span class="badge bg-success">
+                                        Visible
+                                    </span>
+
+                                <?php else: ?>
+
+                                    <span class="badge bg-secondary">
+                                        Oculto
+                                    </span>
+
+                                <?php endif ?>
+
+                            </td>
+
+                            <td class="text-end">
+
+                                <?php if ($c['ESTADO'] !== 'Activo'): ?>
+
+                                    <a href="<?= App::url('/admin/comments/approve/' . $c['ID_COMENTARIO']) ?>"
+                                        class="btn btn-sm btn-outline-success">
+
+                                        <i class="bi bi-check-circle"></i>
+                                    </a>
+
+                                <?php endif ?>
+
+                                <?php if ($c['ESTADO'] === 'Activo'): ?>
+
+                                    <a href="<?= App::url('/admin/comments/hide/' . $c['ID_COMENTARIO']) ?>"
+                                        class="btn btn-sm btn-outline-warning">
+
+                                        <i class="bi bi-eye-slash"></i>
+                                    </a>
+
+                                <?php endif ?>
+
+                                <a href="#"
+                                    class="btn btn-sm btn-outline-danger btn-delete"
+                                    data-url="<?= App::url('/admin/comments/delete/' . $c['ID_COMENTARIO']) ?>">
+
+                                    <i class="bi bi-trash"></i>
 
                                 </a>
 
-                            <?php endif ?>
+                            </td>
 
-                            <?php if ($c['ESTADO'] === 'Activo'): ?>
+                        </tr>
 
-                                <a href="<?= App::url('/admin/comments/hide/' . $c['ID_COMENTARIO']) ?>"
-                                    class="btn btn-sm btn-warning">
+                    <?php endforeach ?>
 
-                                    Ocultar
+                </tbody>
 
-                                </a>
+            </table>
 
-                            <?php endif ?>
-
-                            <a href="#"
-                                class="btn btn-sm btn-danger btn-delete"
-                                data-url="<?= App::url('/admin/comments/delete/' . $c['ID_COMENTARIO']) ?>">
-
-                                Eliminar
-
-                            </a>
-
-                        </td>
-
-                    </tr>
-
-                <?php endforeach ?>
-
-            </tbody>
-
-        </table>
+        </div>
 
     </div>
 

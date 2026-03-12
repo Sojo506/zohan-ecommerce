@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../helpers/Security.php';
+require_once __DIR__ . '/../services/Mailer.php';
 require_once __DIR__ . '/../models/UserModel.php';
 require_once __DIR__ . '/../models/ProductModel.php';
 
@@ -75,6 +77,89 @@ class ProfileController extends Controller
 
         $pdo = Database::connection();
 
+        // verificar si el correo ya existe en otro usuario
+        $sql = "SELECT COUNT(*) 
+        FROM CORREO_TB 
+        WHERE CORREO = :correo 
+        AND IDENTIFICACION != :ident";
+
+        $stmt = $pdo->prepare($sql);
+
+        $stmt->execute([
+            ':correo' => $correo,
+            ':ident' => $identificacion
+        ]);
+
+        $existe = $stmt->fetchColumn();
+
+        if ($existe > 0) {
+            $_SESSION['flash_error'] = "El correo ingresado ya está registrado en otra cuenta.";
+            header("Location: " . App::url('/editProfile'));
+            exit;
+        }
+
+        // obtener correo registrado en BD
+        $sqlCorreoActual = "SELECT CORREO
+                    FROM CORREO_TB
+                    WHERE IDENTIFICACION = :ident
+                    LIMIT 1";
+
+        $stmtCorreoActual = $pdo->prepare($sqlCorreoActual);
+        $stmtCorreoActual->execute([':ident' => $identificacion]);
+
+        $correoActual = $stmtCorreoActual->fetchColumn();
+
+        // si el correo cambió se requiere verificación OTP
+        if ($correoActual !== $correo) {
+
+            // obtener id de cuenta
+            $sqlCuenta = "SELECT ID_CUENTA
+                  FROM CUENTA_TB
+                  WHERE IDENTIFICACION = :ident
+                  LIMIT 1";
+
+            $stmtCuenta = $pdo->prepare($sqlCuenta);
+            $stmtCuenta->execute([':ident' => $identificacion]);
+
+            $idCuenta = $stmtCuenta->fetchColumn();
+
+            $otp = Security::generateOtp(6);
+            $otpHash = password_hash($otp, PASSWORD_BCRYPT);
+            $expiresAt = (new DateTime('+10 minutes'))->format('Y-m-d H:i:s');
+
+            $sqlOtp = "INSERT INTO CODIGO_OTP_TB
+            (OTP_CODE, ID_CUENTA, ID_TIPO_OTP, HASH, EXPIRES_AT, INTENTOS, ACTIVE_FLAG, ID_ESTADO)
+            VALUES
+            (:otp, :idCuenta, :tipo, :hash, :exp, 0, 1, :estado)";
+
+            $stmtOtp = $pdo->prepare($sqlOtp);
+
+            $stmtOtp->execute([
+                ':otp' => $otp,
+                ':idCuenta' => $idCuenta,
+                ':tipo' => 3, // cambiar correo
+                ':hash' => $otpHash,
+                ':exp' => $expiresAt,
+                ':estado' => 1
+            ]);
+
+            $_SESSION['pending_new_email'] = $correo;
+            $_SESSION['pending_account_id'] = $idCuenta;
+
+            $_SESSION['pending_profile_update'] = [
+                'nombre' => $nombre,
+                'ap1' => $ap1,
+                'ap2' => $ap2
+            ];
+
+            Mailer::verifyEmail($correo, $otp);
+
+            $_SESSION['flash_success'] = "Se envió un código de verificación al nuevo correo.";
+
+            header("Location: " . App::url('/verify-otp'));
+            exit;
+        }
+
         try {
 
             $pdo->beginTransaction();
@@ -96,17 +181,6 @@ class ProfileController extends Controller
                 ':ident' => $identificacion
             ]);
 
-            // actualizar correo
-            $sqlCorreo = "UPDATE CORREO_TB
-                      SET CORREO = :correo
-                      WHERE IDENTIFICACION = :ident";
-
-            $stmtCorreo = $pdo->prepare($sqlCorreo);
-
-            $stmtCorreo->execute([
-                ':correo' => $correo,
-                ':ident' => $identificacion
-            ]);
 
             $pdo->commit();
 

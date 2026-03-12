@@ -1,13 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const sidebar = document.getElementById('adminSidebar');
-    const toggleButton = document.getElementById('sidebarToggle');
-
-    if (sidebar && toggleButton) {
-        toggleButton.addEventListener('click', function () {
-            sidebar.classList.toggle('show');
-        });
-    }
-
     const pass1 = document.getElementById("pass1");
     const pass2 = document.getElementById("pass2");
     const showPass = document.getElementById("showPass");

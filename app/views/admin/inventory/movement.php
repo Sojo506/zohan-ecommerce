@@ -1,81 +1,89 @@
 <div class="admin-panel-card">
 
-    <div class="admin-panel-card-header d-flex justify-content-between">
+    <div class="admin-panel-card-header d-flex justify-content-between align-items-center">
 
-        <h4>Registrar movimiento</h4>
+        <h4 class="mb-0">Registrar movimiento</h4>
 
-        <a href="<?= App::url('/admin/inventory') ?>" class="btn btn-dark">
-            Volver a inventario
+        <a href="<?= App::url('/admin/inventory') ?>" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Volver
         </a>
 
     </div>
 
-    <form method="POST">
+    <div class="admin-panel-card-body">
 
-        <div class="mb-3 p-3">
+        <form method="POST">
 
-            <label>Producto</label>
+            <div class="mb-3">
 
-            <select name="product" class="form-control">
+                <label class="form-label">Producto</label>
 
-                <?php foreach ($products as $p): ?>
+                <select name="product" class="form-select">
 
-                    <option value="<?= $p['ID_PRODUCTO'] ?>">
+                    <?php foreach ($products as $p): ?>
 
-                        <?= $p['NOMBRE'] ?>
+                        <option value="<?= $p['ID_PRODUCTO'] ?>">
 
-                    </option>
+                            <?= htmlspecialchars($p['NOMBRE']) ?>
 
-                <?php endforeach ?>
+                        </option>
 
-            </select>
+                    <?php endforeach ?>
 
-        </div>
+                </select>
 
-
-        <div class="mb-3 p-3">
-
-            <label>Tipo movimiento</label>
-
-            <select name="type" class="form-control">
-
-                <?php foreach ($types as $t): ?>
-
-                    <option value="<?= $t['ID_TIPO_MOVIMIENTO'] ?>">
-
-                        <?= $t['NOMBRE'] ?>
-
-                    </option>
-
-                <?php endforeach ?>
-
-            </select>
-
-        </div>
+            </div>
 
 
-        <div class="mb-3 p-3">
+            <div class="mb-3">
 
-            <label>Cantidad</label>
+                <label class="form-label">Tipo de movimiento</label>
 
-            <input type="number" name="quantity" class="form-control">
+                <select name="type" class="form-select">
 
-        </div>
+                    <?php foreach ($types as $t): ?>
 
-        <div class="mb-3 p-3">
+                        <option value="<?= $t['ID_TIPO_MOVIMIENTO'] ?>">
 
-            <label>Motivo</label>
+                            <?= htmlspecialchars($t['NOMBRE']) ?>
 
-            <textarea name="reason" class="form-control"></textarea>
+                        </option>
 
-        </div>
+                    <?php endforeach ?>
 
-        <button class="btn btn-dark">
+                </select>
 
-            Registrar movimiento
+            </div>
 
-        </button>
 
-    </form>
+            <div class="mb-3">
+
+                <label class="form-label">Cantidad</label>
+
+                <input type="number"
+                    name="quantity"
+                    class="form-control"
+                    required>
+
+            </div>
+
+
+            <div class="mb-3">
+
+                <label class="form-label">Motivo</label>
+
+                <textarea name="reason"
+                    class="form-control"
+                    rows="3"></textarea>
+
+            </div>
+
+            <button class="btn btn-dark">
+                <i class="bi bi-save"></i> Registrar movimiento
+            </button>
+
+        </form>
+
+    </div>
 
 </div>
