@@ -4,9 +4,10 @@ class PaymentController extends Controller
 {
     public function capture()
     {
-        // 1. Validar que la petición sea JSON y el usuario tenga sesión
+        // Limpiamos cualquier output previo para asegurar que el JSON sea puro
+        if (ob_get_length()) ob_clean();
         header('Content-Type: application/json');
-
+        
         if (!isset($_SESSION['user'])) {
             echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
             return;
@@ -21,38 +22,35 @@ class PaymentController extends Controller
             return;
         }
 
-        // 2. Obtener Token de Acceso de PayPal
+        // Obtener el token
         $accessToken = $this->getPayPalAccessToken();
         if (!$accessToken) {
-            echo json_encode(['success' => false, 'message' => 'Error de autenticación con PayPal']);
+            echo json_encode(['success' => false, 'message' => 'Fallo la autenticacion con PayPal. Revisa tus credenciales o conexión cURL.']);
             return;
         }
 
-        // 3. Capturar el pago en la API de PayPal
+        // Capturar la orden
         $captureResult = $this->capturePayPalOrder($orderID, $accessToken);
 
-        // 4. Validar si PayPal confirma que el cobro se completó
         if (isset($captureResult['status']) && $captureResult['status'] === 'COMPLETED') {
-
+            
             $paypalCaptureId = $captureResult['purchase_units'][0]['payments']['captures'][0]['id'];
             $montoTotalUSD = $captureResult['purchase_units'][0]['payments']['captures'][0]['amount']['value'];
-
-            // Registrar en base de datos
+            
             $guardadoExitoso = $this->guardarVentaEnBD($orderID, $paypalCaptureId, $montoTotalUSD);
 
             if ($guardadoExitoso) {
-                // Vaciar el carrito tras el pago exitoso
-                unset($_SESSION['cart']);
+                unset($_SESSION['cart']); 
                 echo json_encode(['success' => true, 'message' => 'Pago y registro completados']);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Pago realizado, pero falló el registro en BD']);
+                echo json_encode(['success' => false, 'message' => 'El pago se hizo, pero ocurrio un error en la base de datos local']);
             }
         } else {
-            echo json_encode(['success' => false, 'message' => 'El pago no pudo ser capturado']);
+            // Si PayPal rechaza o hay un error en la captura, enviamos el error real de PayPal
+            $errorMsg = $captureResult['message'] ?? 'El pago no fue completado por PayPal';
+            echo json_encode(['success' => false, 'message' => $errorMsg]);
         }
     }
-
-    // --- MÉTODOS PRIVADOS AUXILIARES ---
 
     private function getPayPalAccessToken()
     {
@@ -66,15 +64,25 @@ class PaymentController extends Controller
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=client_credentials");
         curl_setopt($ch, CURLOPT_USERPWD, $clientId . ':' . $secret);
-
+        
+        // --- EVITA ERRORES SSL EN LOCALHOST ---
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        
         $response = curl_exec($ch);
+        
+        if(curl_errno($ch)){
+            // Si falla cURL, logueamos el error (opcional) pero no rompemos el script
+            error_log('Error cURL Token: ' . curl_error($ch));
+        }
+        
         curl_close($ch);
 
         $json = json_decode($response, true);
         return $json['access_token'] ?? null;
     }
 
-    private function capturePayPalOrder($orderID, $accessToken): mixed
+    private function capturePayPalOrder($orderID, $accessToken)
     {
         $url = Env::get('PAYPAL_URL') . "/v2/checkout/orders/{$orderID}/capture";
 
@@ -86,8 +94,17 @@ class PaymentController extends Controller
             "Content-Type: application/json",
             "Authorization: Bearer {$accessToken}"
         ]);
-
+        
+        // --- EVITA ERRORES SSL EN LOCALHOST ---
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        
         $response = curl_exec($ch);
+        
+        if(curl_errno($ch)){
+            error_log('Error cURL Capture: ' . curl_error($ch));
+        }
+        
         curl_close($ch);
 
         return json_decode($response, true);
@@ -97,40 +114,39 @@ class PaymentController extends Controller
     {
         $pdo = Database::connection();
         $idCuenta = $_SESSION['user']['id_cuenta'];
-        $estadoCompletado = 4; // Asumiendo que 4 es 'Completado' en tu ESTADO_TB
+        $estadoCompletado = 4;
 
         try {
             $pdo->beginTransaction();
 
-            // 1. Insertar en VENTA_TB
             $stmt = $pdo->prepare("INSERT INTO VENTA_TB (ID_CUENTA, FECHA_VENTA, ID_ESTADO) VALUES (?, NOW(), ?)");
             $stmt->execute([$idCuenta, $estadoCompletado]);
             $idVenta = $pdo->lastInsertId();
 
-            // 2. Insertar productos del carrito en VENTA_PRODUCTO_TB
             $cart = $_SESSION['cart'] ?? [];
-            $subtotalColones = 0;
+            $subtotalUSD_calculado = 0;
 
-            foreach ($cart as $item) {
-                $idProducto = $item['producto']['ID_PRODUCTO'];
-                $cantidad = $item['cantidad'];
-                $precio = $item['producto']['PRECIO'];
+            foreach ($cart as $idProducto => $cantidad) {
+                $stmtProd = $pdo->prepare("SELECT PRECIO FROM PRODUCTO_TB WHERE ID_PRODUCTO = ?");
+                $stmtProd->execute([$idProducto]);
+                $producto = $stmtProd->fetch();
 
-                $stmtDetalle = $pdo->prepare("INSERT INTO VENTA_PRODUCTO_TB (ID_VENTA, ID_PRODUCTO, CANTIDAD, PRECIO) VALUES (?, ?, ?, ?)");
-                $stmtDetalle->execute([$idVenta, $idProducto, $cantidad, $precio]);
-
-                $subtotalColones += ($precio * $cantidad);
+                if ($producto) {
+                    $precio = $producto['PRECIO'];
+                    
+                    $stmtDetalle = $pdo->prepare("INSERT INTO VENTA_PRODUCTO_TB (ID_VENTA, ID_PRODUCTO, CANTIDAD, PRECIO) VALUES (?, ?, ?, ?)");
+                    $stmtDetalle->execute([$idVenta, $idProducto, $cantidad, $precio]);
+                    
+                    $subtotalUSD_calculado += ($precio * $cantidad);
+                }
             }
 
-            // 3. Insertar en FACTURA_TB (Calculamos impuesto base 13% IVA aprox)
-            $impuesto = $subtotalColones * 0.13;
-            $totalColones = $subtotalColones + $impuesto;
+            $impuesto = $subtotalUSD_calculado * 0.13;
 
             $stmtFactura = $pdo->prepare("INSERT INTO FACTURA_TB (ID_VENTA, IMPUESTO, SUBTOTAL, TOTAL, ID_ESTADO) VALUES (?, ?, ?, ?, ?)");
-            $stmtFactura->execute([$idVenta, $impuesto, $subtotalColones, $totalColones, $estadoCompletado]);
+            $stmtFactura->execute([$idVenta, $impuesto, $subtotalUSD_calculado, $totalUSD, $estadoCompletado]);
             $idFactura = $pdo->lastInsertId();
 
-            // 4. Insertar en PAGO_PAYPAL_TB (ID_MONEDA 1 = USD)
             $stmtPago = $pdo->prepare("INSERT INTO PAGO_PAYPAL_TB (ID_FACTURA, PAYPAL_ORDER_ID, PAYPAL_CAPTURE_ID, TOTAL, ID_MONEDA, ID_ESTADO) VALUES (?, ?, ?, ?, 1, ?)");
             $stmtPago->execute([$idFactura, $paypalOrderId, $paypalCaptureId, $totalUSD, $estadoCompletado]);
 
@@ -139,6 +155,7 @@ class PaymentController extends Controller
 
         } catch (Exception $e) {
             $pdo->rollBack();
+            error_log("Error Base Datos: " . $e->getMessage()); 
             return false;
         }
     }
