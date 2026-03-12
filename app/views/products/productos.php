@@ -126,7 +126,7 @@
                                 </p>
 
                                 <div class="d-flex justify-content-between align-items-center mt-3 mb-1">
-                                    <span class="fw-bold fs-5">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
+                                    <span class="fw-bold fs-5">$ <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
                                 </div>
                                 <div class="text-success small fw-semibold mb-3">Existencias: <?= (int)($producto['STOCK'] ?? 0) ?></div>
 

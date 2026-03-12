@@ -8,10 +8,16 @@
     </div>
 
     <?php if (!empty($_SESSION['flash_success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <?= htmlspecialchars($_SESSION['flash_success']) ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Listo',
+                    text: <?= json_encode($_SESSION['flash_success']) ?>,
+                    confirmButtonText: 'Entendido'
+                });
+            });
+        </script>
         <?php unset($_SESSION['flash_success']); ?>
     <?php endif; ?>
 
@@ -53,7 +59,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>&#8353; <?= number_format((float) $producto['PRECIO'], 0, ',', '.') ?></td>
+                                <td>$ <?= number_format((float) $producto['PRECIO'], 0, ',', '.') ?></td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
                                         <form action="<?= App::url('/cart/update') ?>" method="post" class="m-0">
@@ -73,7 +79,7 @@
                                         </form>
                                     </div>
                                 </td>
-                                <td class="fw-semibold">&#8353; <?= number_format((float) $item['subtotal'], 0, ',', '.') ?>
+                                <td class="fw-semibold">$ <?= number_format((float) $item['subtotal'], 0, ',', '.') ?>
                                 </td>
                                 <td>
                                     <form action="<?= App::url('/cart/remove') ?>" method="post">
@@ -93,7 +99,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted">Total:</span>
-                        <span class="fs-5 fw-bold">&#8353; <?= number_format((float) $total, 0, ',', '.') ?></span>
+                        <span class="fs-5 fw-bold">$ <?= number_format((float) $total, 0, ',', '.') ?></span>
                     </div>
                     <a href="<?= App::url('/products') ?>" class="btn btn-outline-primary w-100 mb-2">Agregar m&aacute;s
                         productos</a>
@@ -132,23 +138,59 @@
                                         })
                                         .then(function (resultado) {
                                             if (resultado.success) {
-                                                alert('¡' + resultado.message + '!');
-                                                window.location.href = '<?= App::url('/profile') ?>';
-                                            } else {
-                                                alert('Hubo un problema: ' + resultado.message);
+                                                return Swal.fire({
+                                                    icon: 'success',
+                                                    title: 'Pago procesado',
+                                                    text: resultado.message,
+                                                    showDenyButton: true,
+                                                    confirmButtonText: 'Ir a mi perfil',
+                                                    denyButtonText: 'Seguir comprando',
+                                                    allowOutsideClick: false,
+                                                    allowEscapeKey: false
+                                                }).then(function (decision) {
+                                                    if (decision.isConfirmed) {
+                                                        window.location.href = '<?= App::url('/profile') ?>';
+                                                        return;
+                                                    }
+
+                                                    if (decision.isDenied) {
+                                                        window.location.href = '<?= App::url('/products') ?>';
+                                                    }
+                                                });
                                             }
+
+                                            return Swal.fire({
+                                                icon: 'error',
+                                                title: 'No se pudo procesar el pago',
+                                                text: resultado.message || 'Ocurrió un problema al confirmar la compra.',
+                                                confirmButtonText: 'Entendido'
+                                            });
                                         })
-                                        .catch(function (error) {
-                                            console.error('Error de comunicación con el backend:', error);
-                                            alert('Ocurrió un error inesperado al procesar el pago.');
+                                        .catch(function () {
+                                            return Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error inesperado',
+                                                text: 'Ocurrió un error inesperado al procesar el pago.',
+                                                confirmButtonText: 'Entendido'
+                                            });
                                         });
                                 },
 
-                                onCancel: function (data) {
-                                    console.log("El usuario cerró la ventana de PayPal sin pagar.");
+                                onCancel: function () {
+                                    Swal.fire({
+                                        icon: 'info',
+                                        title: 'Pago cancelado',
+                                        text: 'Cerraste la ventana de PayPal antes de completar el pago.',
+                                        confirmButtonText: 'Seguir comprando'
+                                    });
                                 },
-                                onError: function (err) {
-                                    console.error("Error devuelto por el widget de PayPal:", err);
+                                onError: function () {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error con PayPal',
+                                        text: 'PayPal devolvió un error al intentar procesar el pago.',
+                                        confirmButtonText: 'Entendido'
+                                    });
                                 }
                             }).render('#paypal-button-container');
                         </script>

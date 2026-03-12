@@ -68,113 +68,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-    document.querySelectorAll('.btn-delete-image').forEach(button => {
+    function bindDeleteConfirmation(selector, title) {
+        document.querySelectorAll(selector).forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
 
-        button.addEventListener('click', function (e) {
-
-            e.preventDefault();
-
-            confirmAction({
-                title: "¿Eliminar imagen?",
-                text: "Esta acción no se puede deshacer",
-                confirmText: "Sí, eliminar",
-                confirmColor: "#dc3545",
-                url: this.dataset.url
+                confirmAction({
+                    title: title,
+                    text: "Esta acción no se puede deshacer",
+                    confirmText: "Sí, eliminar",
+                    confirmColor: "#dc3545",
+                    url: this.dataset.url
+                });
             });
-
         });
+    }
 
-    });
-
-    document.querySelectorAll('.btn-delete-product').forEach(button => {
-
-        button.addEventListener('click', function (e) {
-
-            e.preventDefault();
-
-            confirmAction({
-                title: "¿Eliminar producto?",
-                text: "Esta acción no se puede deshacer",
-                confirmText: "Sí, eliminar",
-                confirmColor: "#dc3545",
-                url: this.dataset.url
-            });
-
-        });
-
-    });
-
-    document.querySelectorAll('.btn-delete-coupon').forEach(button => {
-
-        button.addEventListener('click', function (e) {
-
-            e.preventDefault();
-
-            confirmAction({
-                title: "¿Eliminar cupón?",
-                text: "Esta acción no se puede deshacer",
-                confirmText: "Sí, eliminar",
-                confirmColor: "#dc3545",
-                url: this.dataset.url
-            });
-
-        });
-
-    });
-
-    document.querySelectorAll('.btn-delete-category').forEach(button => {
-
-        button.addEventListener('click', function (e) {
-            console.log("Eliminar categoría");
-            e.preventDefault();
-
-            confirmAction({
-                title: "¿Eliminar categoría?",
-                text: "Esta acción no se puede deshacer",
-                confirmText: "Sí, eliminar",
-                confirmColor: "#dc3545",
-                url: this.dataset.url
-            });
-
-        });
-
-    });
-
-
-    document.querySelectorAll('.btn-delete-promotion').forEach(button => {
-
-        button.addEventListener('click', function (e) {
-            console.log("Eliminar promoción");
-            e.preventDefault();
-
-            confirmAction({
-                title: "¿Eliminar promoción?",
-                text: "Esta acción no se puede deshacer",
-                confirmText: "Sí, eliminar",
-                confirmColor: "#dc3545",
-                url: this.dataset.url
-            });
-
-        });
-
-    });
-
-    document.querySelectorAll('.btn-delete-promotion-product').forEach(button => {
-
-        button.addEventListener('click', function (e) {
-            console.log("Eliminar producto de la promoción");
-            e.preventDefault();
-
-            confirmAction({
-                title: "¿Eliminar producto de la promoción?",
-                text: "Esta acción no se puede deshacer",
-                confirmText: "Sí, eliminar",
-                confirmColor: "#dc3545",
-                url: this.dataset.url
-            });
-
-        });
-
-    });
+    bindDeleteConfirmation('.btn-delete-image', "¿Eliminar imagen?");
+    bindDeleteConfirmation('.btn-delete-product', "¿Eliminar producto?");
+    bindDeleteConfirmation('.btn-delete-coupon', "¿Eliminar cupón?");
+    bindDeleteConfirmation('.btn-delete-category', "¿Eliminar categoría?");
+    bindDeleteConfirmation('.btn-delete-promotion', "¿Eliminar promoción?");
+    bindDeleteConfirmation('.btn-delete-promotion-product', "¿Eliminar producto de la promoción?");
+    bindDeleteConfirmation('.btn-delete-brand', "¿Eliminar marca?");
+    bindDeleteConfirmation('.btn-delete', "¿Eliminar elemento?");
 });
-

@@ -1,14 +1,28 @@
 <?php if (!empty($_SESSION['flash_success'])): ?>
-<div class="alert alert-success">
-    <?= $_SESSION['flash_success']; ?>
-</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Listo',
+            text: <?= json_encode($_SESSION['flash_success']) ?>,
+            confirmButtonText: 'Entendido'
+        });
+    });
+</script>
 <?php unset($_SESSION['flash_success']); ?>
 <?php endif; ?>
 
 <?php if (!empty($_SESSION['flash_error'])): ?>
-<div class="alert alert-danger">
-    <?= $_SESSION['flash_error']; ?>
-</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'error',
+            title: 'Ocurrió un problema',
+            text: <?= json_encode($_SESSION['flash_error']) ?>,
+            confirmButtonText: 'Entendido'
+        });
+    });
+</script>
 <?php unset($_SESSION['flash_error']); ?>
 <?php endif; ?>
 <main>

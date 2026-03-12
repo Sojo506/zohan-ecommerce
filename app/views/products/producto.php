@@ -82,7 +82,7 @@
                     <?php endif; ?>
 
                     <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
-                        <div class="fs-2 fw-bold text-danger">&#8353; <?= htmlspecialchars($precio) ?></div>
+                        <div class="fs-2 fw-bold text-danger">$ <?= htmlspecialchars($precio) ?></div>
                         <div class="text-success fw-semibold">Existencias: <?= (int)$existencias ?></div>
                     </div>
 

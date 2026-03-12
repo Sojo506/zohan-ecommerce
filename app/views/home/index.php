@@ -155,7 +155,7 @@
                                 <h6 class="fw-bold mb-1"><?= htmlspecialchars($producto['NOMBRE']) ?></h6>
                                 <p class="text-muted small mb-2"><?= htmlspecialchars(strlen((string)$producto['DESCRIPCION']) > 35 ? substr((string)$producto['DESCRIPCION'], 0, 35) . '...' : (string)$producto['DESCRIPCION']) ?></p>
                                 <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                                    <span class="fw-bold">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
+                                    <span class="fw-bold">$ <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
                                     <a href="<?= App::url('/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark">Ver</a>
                                 </div>
                             </div>
