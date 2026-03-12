@@ -258,6 +258,11 @@
                     Administrar usuarios
                 </a>
 
+                <a href="<?= App::url('/admin/reports') ?>" class="btn btn-outline-dark">
+                    <i class="bi bi-bar-chart-line"></i>
+                    Ver reportes
+                </a>
+
                 <a href="<?= App::url('/admin/inventory') ?>" class="btn btn-outline-dark">
                     <i class="bi bi-boxes"></i>
                     Revisar inventario

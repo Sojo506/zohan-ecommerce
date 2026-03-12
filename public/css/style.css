@@ -413,6 +413,80 @@ footer .btn.btn-outline-light {
 
 }
 
+.admin-report-stat {
+
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 20px;
+    height: 100%;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+
+}
+
+.admin-report-stat-label {
+
+    display: block;
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 8px;
+
+}
+
+.admin-report-stat-value {
+
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #0f172a;
+
+}
+
+.admin-report-link {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    color: #111827;
+    text-decoration: none;
+    transition: all .2s ease;
+
+}
+
+.admin-report-link:hover {
+
+    transform: translateY(-2px);
+    border-color: #2563eb;
+    color: #111827;
+    background: #eff6ff;
+
+}
+
+.admin-report-link i {
+
+    font-size: 20px;
+    color: #2563eb;
+
+}
+
+.admin-report-alert {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #fecaca;
+    background: linear-gradient(180deg, #fff7ed 0%, #fff1f2 100%);
+
+}
+
 
 
 /* SALES TABLE */

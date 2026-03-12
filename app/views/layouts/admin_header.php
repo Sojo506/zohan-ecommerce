@@ -105,6 +105,12 @@
                     <span>Facturas</span>
                 </a>
 
+                <a href="<?= App::url('/admin/reports') ?>"
+                    class="admin-sidebar-link <?= ($currentSection ?? '') === 'reports' ? 'active' : '' ?>">
+                    <i class="bi bi-bar-chart-line"></i>
+                    <span>Reportes</span>
+                </a>
+
                 <a href="<?= App::url('/admin/coupons') ?>"
                     class="admin-sidebar-link <?= ($currentSection ?? '') === 'coupons' ? 'active' : '' ?>">
                     <i class="bi bi-ticket-perforated"></i>

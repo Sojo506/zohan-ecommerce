@@ -112,6 +112,10 @@ $router->get('/admin/invoices', 'InvoiceAdminController@index');
 $router->get('/admin/invoices/{id}', 'InvoiceAdminController@detail');
 $router->get('/admin/invoices/{id}/status/{status}', 'InvoiceAdminController@changeStatus');
 
+/* RUTAS REPORTES ADMIN */
+$router->get('/admin/reports', 'ReportAdminController@index');
+$router->get('/admin/reports/pdf/{type}', 'ReportAdminController@download');
+
 
 /* RUTAS USUARIOS ADMIN */
 
