@@ -204,12 +204,12 @@ $router->get('/product', 'ProductController@show');
 
 /* RUTAS CARRITO */
 
-$router->get('/cart', 'ProductController@cart');
+$router->get('/cart', 'CartController@index');
 
-$router->post('/cart/add', 'ProductController@addToCart');
-$router->post('/cart/update', 'ProductController@updateCart');
-$router->post('/cart/remove', 'ProductController@removeFromCart');
-$router->post('/cart/clear', 'ProductController@clearCart');
+$router->post('/cart/add', 'CartController@add');
+$router->post('/cart/update', 'CartController@update');
+$router->post('/cart/remove', 'CartController@remove');
+$router->post('/cart/clear', 'CartController@clear');
 
 /* PAGOS  */
 $router->post('/api/payment/capture', 'PaymentController@capture');
