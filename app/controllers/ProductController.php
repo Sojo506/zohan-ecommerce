@@ -65,6 +65,20 @@ class ProductController extends Controller
         }
 
         $imagenes = $this->repository->fetchProductImages($idProducto);
+        $imagenes = array_values(array_filter(array_map(static function ($imagen) {
+            if (is_array($imagen)) {
+                return trim((string)($imagen['URL_IMAGE'] ?? ''));
+            }
+
+            return trim((string)$imagen);
+        }, $imagenes), static function ($imagenUrl) {
+            return $imagenUrl !== '';
+        }));
+
+        if (!empty($imagenes)) {
+            $producto['URL_IMAGE'] = $imagenes[0];
+        }
+
         $existencias = $this->repository->fetchProductStock($idProducto);
 
         $this->view('products/producto', [
