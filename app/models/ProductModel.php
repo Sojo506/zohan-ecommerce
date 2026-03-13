@@ -120,7 +120,7 @@ class ProductModel
     }
     public function obtenerImagenesProducto(int $idProducto): array
     {
-        $sql = "SELECT URL_IMAGE
+        $sql = "SELECT ID_IMAGEN, URL_IMAGE
                 FROM PRODUCTO_IMAGE_TB
                 WHERE ID_PRODUCTO = :idProducto
                   AND ID_ESTADO = 1
@@ -128,16 +128,8 @@ class ProductModel
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':idProducto' => $idProducto]);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $imagenes = [];
-        foreach ($rows as $row) {
-            if (!empty($row['URL_IMAGE'])) {
-                $imagenes[] = $row['URL_IMAGE'];
-            }
-        }
-
-        return $imagenes;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function obtenerStockProducto(int $idProducto): int

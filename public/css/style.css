@@ -35,6 +35,16 @@ footer .btn.btn-outline-light {
     min-width: 44px;
 }
 
+.product-thumb {
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-thumb.is-active {
+    border-color: #212529 !important;
+    box-shadow: 0 0 0 2px rgba(33, 37, 41, 0.12);
+}
+
 .accordion-button:not(.collapsed) {
     background-color: #f8f9fa;
     color: #212529;
