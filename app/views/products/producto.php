@@ -13,7 +13,7 @@
     <?php endif; ?>
 
     <?php
-    $imagen = !empty($preset['imagen'])
+    $imagenFallback = !empty($preset['imagen'])
         ? $preset['imagen']
         : (!empty($producto['URL_IMAGE']) ? $producto['URL_IMAGE'] : 'https://loremflickr.com/1200/800/technology');
 
@@ -23,10 +23,10 @@
     }));
 
     if (empty($imagenes)) {
-        $imagenes = [$imagen];
+        $imagenes = [$imagenFallback];
     }
 
-    $imagenPrincipal = $imagenes[0] ?? $imagen;
+    $imagenPrincipal = $imagenes[0] ?? $imagenFallback;
 
     $titulo = $preset['titulo'] ?? $producto['NOMBRE'];
     $precio = number_format((float)$producto['PRECIO'], 0, ',', '.');
@@ -50,6 +50,7 @@
                                 <button type="button"
                                     class="btn p-0 border rounded-3 product-thumb <?= $index === 0 ? 'is-active' : '' ?>"
                                     data-product-thumb="<?= htmlspecialchars($imagenUrl) ?>"
+                                    data-product-thumb-index="<?= (int)$index ?>"
                                     aria-label="Ver imagen <?= (int)$index + 1 ?>">
                                     <img src="<?= htmlspecialchars($imagenUrl) ?>"
                                         alt="<?= htmlspecialchars($titulo) ?> miniatura <?= (int)$index + 1 ?>"
@@ -247,9 +248,3 @@
         </section>
     <?php endif; ?>
 </main>
-
-
-
-
-
-

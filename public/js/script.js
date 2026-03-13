@@ -46,4 +46,24 @@ document.addEventListener("DOMContentLoaded", () => {
             form.classList.add("was-validated");
         });
     });
+
+    const mainProductImage = document.getElementById("productMainImage");
+    const productThumbs = document.querySelectorAll("[data-product-thumb]");
+
+    if (mainProductImage && productThumbs.length > 0) {
+        productThumbs.forEach((thumb) => {
+            thumb.addEventListener("click", () => {
+                const nextImage = thumb.getAttribute("data-product-thumb");
+
+                if (!nextImage) {
+                    return;
+                }
+
+                mainProductImage.setAttribute("src", nextImage);
+
+                productThumbs.forEach((item) => item.classList.remove("is-active"));
+                thumb.classList.add("is-active");
+            });
+        });
+    }
 });
