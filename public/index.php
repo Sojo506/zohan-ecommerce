@@ -176,6 +176,10 @@ $router->get('/admin/audit', 'AuditAdminController@index');
 $router->get('/profile', 'ProfileController@index');
 $router->get('/editProfile', 'ProfileController@edit');
 $router->post('/update', 'ProfileController@update');
+$router->get('/sendPasswordOtp', 'ProfileController@sendPasswordOtp');
+$router->get('/changePassword', 'ProfileController@changePassword');
+$router->post('/changePassword', 'ProfileController@updatePassword');
+
 
 /* RUTAS AUTENTICACIÓN  */
 
