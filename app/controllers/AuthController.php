@@ -429,6 +429,21 @@ class AuthController extends Controller
                 exit;
             }
 
+            // ===== OTP PARA CAMBIAR CONTRASEÑA =====
+            if ($row['ID_TIPO_OTP'] == $this->OTP_CAMBIAR_PASSWORD) {
+
+                // marcar que el usuario ya verificó OTP
+                $_SESSION['password_otp_verified'] = true;
+
+                unset($_SESSION['pending_account_id']);
+
+                $pdo->commit();
+
+                $_SESSION['flash_success'] = "Código verificado. Ahora puedes cambiar tu contraseña.";
+                header("Location: " . App::url('/changePassword'));
+                exit;
+            }
+
             $pdo->commit();
         } catch (PDOException $e) {
 
