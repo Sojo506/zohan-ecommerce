@@ -202,5 +202,167 @@ class ProfileController extends Controller
             exit;
         }
     }
+
+    public function sendPasswordOtp()
+    {
+        if (!isset($_SESSION['user'])) {
+            header("Location: " . App::url('/login'));
+            exit;
+        }
+
+        $identificacion = $_SESSION['user']['identificacion'];
+
+        $pdo = Database::connection();
+
+        // obtener id cuenta
+        $stmt = $pdo->prepare("
+        SELECT ID_CUENTA 
+        FROM CUENTA_TB
+        WHERE IDENTIFICACION = :ident
+        LIMIT 1");
+
+        $stmt->execute([':ident' => $identificacion]);
+
+        $idCuenta = $stmt->fetchColumn();
+
+        if (!$idCuenta) {
+            $_SESSION['flash_error'] = "No se pudo generar el código.";
+            header("Location: " . App::url('/profile'));
+            exit;
+        }
+
+        // generar OTP
+        $otp = Security::generateOtp(6);
+        $otpHash = password_hash($otp, PASSWORD_BCRYPT);
+        $expiresAt = (new DateTime('+10 minutes'))->format('Y-m-d H:i:s');
+
+        $sql = "INSERT INTO CODIGO_OTP_TB
+        (OTP_CODE, ID_CUENTA, ID_TIPO_OTP, HASH, EXPIRES_AT, INTENTOS, ACTIVE_FLAG, ID_ESTADO)
+        VALUES
+        (:otp, :idCuenta, :tipo, :hash, :exp, 0, 1, 1)";
+
+        $stmt = $pdo->prepare($sql);
+
+        $stmt->execute([
+            ':otp' => $otp,
+            ':idCuenta' => $idCuenta,
+            ':tipo' => 2, // OTP cambiar contraseña
+            ':hash' => $otpHash,
+            ':exp' => $expiresAt
+        ]);
+
+        // guardar sesión para verificar
+        $_SESSION['pending_account_id'] = $idCuenta;
+
+        $stmtCorreo = $pdo->prepare("
+            SELECT CORREO
+            FROM CORREO_TB
+            WHERE IDENTIFICACION = :ident
+            LIMIT 1");
+
+        $stmtCorreo->execute([
+            ':ident' => $identificacion
+        ]);
+
+        $correo = $stmtCorreo->fetchColumn();
+
+        // enviar correo
+        Mailer::verifyEmail($correo, $otp);
+
+        $_SESSION['flash_success'] = "Te enviamos un código de verificación a tu correo.";
+
+        header("Location: " . App::url('/verify-otp'));
+        exit;
+    }
+
+    public function changePassword()
+    {
+        if (!isset($_SESSION['user'])) {
+            header("Location: " . App::url('/login'));
+            exit;
+        }
+
+        // seguridad
+        if (!isset($_SESSION['password_otp_verified'])) {
+            header("Location: " . App::url('/profile'));
+            exit;
+        }
+
+        $identificacion = $_SESSION['user']['identificacion'];
+
+        $userModel = new UserModel();
+        $user = $userModel->obtenerUsuario($identificacion);
+
+        $this->view('user/changePassword', [
+            'user' => $user
+        ]);
+    }
+
+    public function updatePassword()
+    {
+        if (!isset($_SESSION['user'])) {
+            header("Location: " . App::url('/login'));
+            exit;
+        }
+
+        if (!isset($_SESSION['password_otp_verified'])) {
+            header("Location: " . App::url('/profile'));
+            exit;
+        }
+
+        $pass1 = trim($_POST['password'] ?? '');
+        $pass2 = trim($_POST['password2'] ?? '');
+
+        if ($pass1 === '' || $pass2 === '') {
+            $_SESSION['flash_error'] = "Debes completar ambos campos.";
+            header("Location: " . App::url('/changePassword'));
+            exit;
+        }
+
+        if ($pass1 !== $pass2) {
+            $_SESSION['flash_error'] = "Las contraseñas no coinciden.";
+            header("Location: " . App::url('/changePassword'));
+            exit;
+        }
+
+        if (strlen($pass1) < 6) {
+            $_SESSION['flash_error'] = "La contraseña debe tener mínimo 6 caracteres.";
+            header("Location: " . App::url('/changePassword'));
+            exit;
+        }
+
+        $identificacion = $_SESSION['user']['identificacion'];
+
+        $pdo = Database::connection();
+
+        $hash = password_hash($pass1, PASSWORD_BCRYPT);
+
+        try {
+
+            $stmt = $pdo->prepare("
+            UPDATE CUENTA_TB
+            SET PASSWORD = :pass
+            WHERE IDENTIFICACION = :ident
+            ");
+
+            $stmt->execute([
+                ':pass' => $hash,
+                ':ident' => $identificacion
+            ]);
+
+            // limpiar sesión OTP
+            unset($_SESSION['password_otp_verified']);
+
+            $_SESSION['flash_success'] = "Contraseña actualizada correctamente.";
+
+            header("Location: " . App::url('/profile'));
+            exit;
+        } catch (PDOException $e) {
+
+            $_SESSION['flash_error'] = "Error actualizando contraseña.";
+            header("Location: " . App::url('/changePassword'));
+            exit;
+        }
+    }
 }
 ?>
