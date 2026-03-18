@@ -179,6 +179,8 @@ $router->post('/update', 'ProfileController@update');
 $router->get('/sendPasswordOtp', 'ProfileController@sendPasswordOtp');
 $router->get('/changePassword', 'ProfileController@changePassword');
 $router->post('/changePassword', 'ProfileController@updatePassword');
+$router->get('/invoiceDetail/{id}', 'ProfileController@invoiceDetail');
+$router->post('/invoiceDetail/comment', 'ProfileController@commentProduct');
 
 
 /* RUTAS AUTENTICACIÓN  */
