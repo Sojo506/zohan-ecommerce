@@ -69,4 +69,20 @@ class CommentRepository
 
         $stmt->execute([':id' => $id]);
     }
+
+    public function createForProduct(int $productId, string $identificacion, string $comment, int $rating = 5): bool
+    {
+        $sql = "INSERT INTO COMENTARIO_TB
+                (ID_PRODUCTO, IDENTIFICACION, CALIFICACION, COMENTARIO, ID_ESTADO)
+                VALUES (:product, :ident, :rating, :comment, 1)";
+
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([
+            ':product' => $productId,
+            ':ident' => $identificacion,
+            ':rating' => $rating,
+            ':comment' => $comment
+        ]);
+    }
 }
