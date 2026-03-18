@@ -160,7 +160,7 @@
                                                 </span>
                                             </div>
 
-                                            <a href="/factura/<?= $factura['ID_FACTURA'] ?>"
+                                            <a href="<?= App::url('/invoiceDetail/' . (int) $factura['ID_FACTURA']) ?>"
                                                 class="btn btn-sm btn-outline-dark">
                                                 Ver detalle
                                             </a>
