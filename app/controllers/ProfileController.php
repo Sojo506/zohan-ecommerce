@@ -3,6 +3,9 @@ require_once __DIR__ . '/../helpers/Security.php';
 require_once __DIR__ . '/../services/Mailer.php';
 require_once __DIR__ . '/../models/UserModel.php';
 require_once __DIR__ . '/../models/ProductModel.php';
+require_once __DIR__ . '/../repositories/InvoiceRepository.php';
+require_once __DIR__ . '/../repositories/CommentRepository.php';
+
 
 class ProfileController extends Controller
 {
@@ -364,5 +367,83 @@ class ProfileController extends Controller
             exit;
         }
     }
+
+        public function invoiceDetail($id)
+    {
+        if (!isset($_SESSION['user'])) {
+            header("Location: " . App::url('/login'));
+            exit;
+        }
+
+        $invoiceId = $id;
+        $identificacion = $_SESSION['user']['identificacion'];
+
+        $invoiceRepo = new InvoiceRepository();
+        $invoice = $invoiceRepo->findForUser($invoiceId, $identificacion);
+
+        if (!$invoice) {
+            $_SESSION['flash_error'] = "Factura no encontrada.";
+            header("Location: " . App::url('/profile'));
+            exit;
+        }
+
+        $products = $invoiceRepo->saleProductsDetailed($invoiceId);
+
+        $this->view('user/invoiceDetail', [
+            'invoice' => $invoice,
+            'products' => $products,
+            'user' => $_SESSION['user']
+        ]);
+    }
+
+    public function commentProduct()
+    {
+        if (ob_get_length()) {
+            ob_clean();
+        }
+
+        if (!isset($_SESSION['user'])) {
+            header("Location: " . App::url('/login'));
+            exit;
+        }
+
+        $payload = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($payload)) {
+            $payload = $_POST;
+        }
+
+        $invoiceId = (int)($payload['invoice_id'] ?? 0);
+        $productId = (int)($payload['product_id'] ?? 0);
+        $comment = trim((string)($payload['comment'] ?? ''));
+        $rating = (int)($payload['rating'] ?? 5);
+        if ($rating < 1) {
+            $rating = 1;
+        }
+        if ($rating > 5) {
+            $rating = 5;
+        }
+
+        if ($invoiceId <= 0 || $productId <= 0 || $comment === '') {
+            echo json_encode(['success' => false, 'message' => 'Datos incompletos.']);
+            return;
+        }
+
+        if (mb_strlen($comment) > 1000) {
+            echo json_encode(['success' => false, 'message' => 'El comentario es demasiado largo.']);
+            return;
+        }
+
+        $identificacion = $_SESSION['user']['identificacion'];
+
+        $commentRepo = new CommentRepository();
+        $saved = $commentRepo->createForProduct($productId, $identificacion, $comment, $rating);
+        if ($saved) {
+            echo json_encode(['success' => true, 'message' => 'Comentario enviado.']);
+            return;
+        }
+
+        echo json_encode(['success' => false, 'message' => 'No se pudo guardar el comentario.']);
+    }
+
 }
 ?>

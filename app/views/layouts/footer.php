@@ -108,6 +108,8 @@
 
         <!-- Custom JS -->
         <script src="/zohan-ecommerce/public/js/script.js"></script>
+        <script src="/zohan-ecommerce/public/js/invoiceDetail.js"></script>
+
 
 </body>
         

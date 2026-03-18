@@ -509,6 +509,26 @@ footer .btn.btn-outline-light {
 }
 
 
+/* RATING COMMENT */
+
+.rating-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.rating-pill {
+    min-width: 36px;
+    font-weight: 600;
+}
+
+.rating-pill.is-active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+}
+
 
 /* RESPONSIVE */
 

@@ -122,4 +122,101 @@ class InvoiceRepository
 
         return $stmt->fetch();
     }
+
+        public function findForUser(int $invoiceId, string $identificacion)
+    {
+        $sql = "SELECT
+                    F.ID_FACTURA,
+                    F.ID_VENTA,
+                    F.IMPUESTO,
+                    F.SUBTOTAL,
+                    F.TOTAL,
+                    F.FECHA_FACTURA,
+                    E.NOMBRE AS ESTADO,
+                    U.NOMBRE,
+                    U.APELLIDO_PATERNO,
+                    U.APELLIDO_MATERNO,
+                    U.IDENTIFICACION,
+                    CONCAT_WS(', ',
+                        D.DETALLES,
+                        DI.NOMBRE_DISTRITO,
+                        CA.NOMBRE_CANTON,
+                        P.NOMBRE_PROVINCIA,
+                        PA.NOMBRE_PAIS
+                    ) AS DIRECCION
+                FROM FACTURA_TB F
+                JOIN VENTA_TB V ON V.ID_VENTA = F.ID_VENTA
+                JOIN CUENTA_TB C ON C.ID_CUENTA = V.ID_CUENTA
+                JOIN USUARIO_TB U ON U.IDENTIFICACION = C.IDENTIFICACION
+                JOIN ESTADO_TB E ON E.ID_ESTADO = F.ID_ESTADO
+                LEFT JOIN DIRECCION_TB D ON D.ID_DIRECCION = U.ID_DIRECCION
+                LEFT JOIN DISTRITO_TB DI ON DI.ID_DISTRITO = D.ID_DISTRITO
+                LEFT JOIN CANTON_TB CA ON CA.ID_CANTON = DI.ID_CANTON
+                LEFT JOIN PROVINCIA_TB P ON P.ID_PROVINCIA = CA.ID_PROVINCIA
+                LEFT JOIN PAIS_TB PA ON PA.ID_PAIS = P.ID_PAIS
+                WHERE F.ID_FACTURA = :id
+                  AND U.IDENTIFICACION = :ident
+                LIMIT 1";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id' => $invoiceId,
+            ':ident' => $identificacion
+        ]);
+
+        $row = $stmt->fetch();
+
+        return $row ?: null;
+    }
+
+    public function saleProductsDetailed(int $invoiceId): array
+    {
+        $sql = "SELECT
+                    P.ID_PRODUCTO,
+                    P.NOMBRE,
+                    P.DESCRIPCION,
+                    VP.CANTIDAD,
+                    VP.PRECIO AS PRECIO_UNITARIO,
+                    (VP.CANTIDAD * VP.PRECIO) AS SUBTOTAL_LINEA,
+                    IMG.URL_IMAGE
+                FROM FACTURA_TB F
+                JOIN VENTA_TB V ON V.ID_VENTA = F.ID_VENTA
+                JOIN VENTA_PRODUCTO_TB VP ON VP.ID_VENTA = V.ID_VENTA
+                JOIN PRODUCTO_TB P ON P.ID_PRODUCTO = VP.ID_PRODUCTO
+                LEFT JOIN (
+                    SELECT ID_PRODUCTO, MIN(URL_IMAGE) AS URL_IMAGE
+                    FROM PRODUCTO_IMAGE_TB
+                    WHERE ID_ESTADO = 1
+                    GROUP BY ID_PRODUCTO
+                ) IMG ON IMG.ID_PRODUCTO = P.ID_PRODUCTO
+                WHERE F.ID_FACTURA = :id
+                ORDER BY P.NOMBRE ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $invoiceId]);
+
+        return $stmt->fetchAll();
+    }
+
+    public function userOwnsInvoiceProduct(int $invoiceId, int $productId, string $identificacion): bool
+    {
+        $sql = "SELECT COUNT(*)
+                FROM FACTURA_TB F
+                JOIN VENTA_TB V ON V.ID_VENTA = F.ID_VENTA
+                JOIN CUENTA_TB C ON C.ID_CUENTA = V.ID_CUENTA
+                JOIN USUARIO_TB U ON U.IDENTIFICACION = C.IDENTIFICACION
+                JOIN VENTA_PRODUCTO_TB VP ON VP.ID_VENTA = V.ID_VENTA
+                WHERE F.ID_FACTURA = :factura
+                  AND VP.ID_PRODUCTO = :producto
+                  AND U.IDENTIFICACION = :ident";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':factura' => $invoiceId,
+            ':producto' => $productId,
+            ':ident' => $identificacion
+        ]);
+
+        return (int)$stmt->fetchColumn() > 0;
+    }
 }
