@@ -8,6 +8,7 @@ class SaleAdminController extends Controller
 
     private function checkAdmin()
     {
+        // El detalle de ventas solo debe estar disponible para usuarios administradores.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -42,6 +43,7 @@ class SaleAdminController extends Controller
         $repo = new SaleRepository();
         $invoiceRepo = new InvoiceRepository();
 
+        // Une la venta con sus productos y la factura relacionada para la vista de detalle.
         $sale = $repo->find($id);
         $products = $repo->products($id);
 

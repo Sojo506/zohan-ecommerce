@@ -7,6 +7,8 @@ class HomeController extends Controller
     public function index()
     {
         $productModel = new ProductModel();
+
+        // La portada destaca una selección acotada de productos de la semana.
         $featuredProducts = $productModel->obtenerProductosDestacadosSemana(4);
 
         $this->view('home/index', [

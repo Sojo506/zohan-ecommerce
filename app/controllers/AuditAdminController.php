@@ -7,6 +7,7 @@ class AuditAdminController extends Controller
 
     private function checkAdmin()
     {
+        // La bitácora solo se expone a administradores porque contiene trazas operativas.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -25,6 +26,7 @@ class AuditAdminController extends Controller
 
         $repo = new AuditRepository();
 
+        // Recupera el histórico completo para revisión en la vista de auditoría.
         $logs = $repo->all();
 
         $this->adminView('admin/audit/index', [

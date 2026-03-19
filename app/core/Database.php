@@ -1,4 +1,3 @@
-<!-- Este archivo se encarga de manejar la conexión a la base de datos utilizando PDO -->
 <?php
 
 class Database
@@ -7,6 +6,7 @@ class Database
 
     public static function connection(): PDO
     {
+        // Reutiliza la misma conexión PDO durante toda la petición.
         if (self::$pdo !== null) {
             return self::$pdo;
         }
@@ -19,6 +19,7 @@ class Database
 
         $dsn = "mysql:host={$host};dbname={$db};charset={$charset}";
 
+        // Configuración base para trabajar con excepciones y resultados asociativos.
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

@@ -9,11 +9,14 @@ class CartController extends Controller
     public function __construct()
     {
         $this->repository = new CartRepository();
+
+        // Sincroniza el carrito persistido con la sesión antes de atender cualquier acción.
         $this->repository->syncSessionCart();
     }
 
     public function index()
     {
+        // El resumen devuelve solo productos válidos y recalcula subtotales y total general.
         $summary = $this->repository->buildSummary();
 
         $this->view('cart/index', [
@@ -62,6 +65,7 @@ class CartController extends Controller
 
     private function flash(array $result): void
     {
+        // Unifica el mensaje que la vista leerá después de cada operación del carrito.
         if (($result['success'] ?? false) === true) {
             $_SESSION['flash_success'] = $result['message'] ?? 'Operacion completada.';
             return;
@@ -72,6 +76,7 @@ class CartController extends Controller
 
     private function redirect(string $url): void
     {
+        // Centraliza la salida para que todos los flujos terminen con un redirect limpio.
         header('Location: ' . $url);
         exit;
     }

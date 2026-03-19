@@ -8,6 +8,7 @@ class InventoryAdminController extends Controller
 {
     private function checkAdmin()
     {
+        // Los movimientos de stock se protegen porque alteran existencias reales.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -41,6 +42,7 @@ class InventoryAdminController extends Controller
         $productRepo = new ProductRepository();
         $movementRepo = new InventoryMovementRepository();
 
+        // El formulario necesita catálogo de productos y tipos de movimiento disponibles.
         $products = $productRepo->all();
         $types = $movementRepo->getTypes();
 
@@ -67,12 +69,14 @@ class InventoryAdminController extends Controller
 
         $currentStock = $inventory['STOCK'];
 
+        // Tipo 1 suma existencias; cualquier otro tipo registrado resta unidades.
         if ($type == 1) {
             $newStock = $currentStock + $quantity;
         } else {
             $newStock = $currentStock - $quantity;
         }
 
+        // Primero actualiza el stock vigente y luego deja trazado el movimiento en el histórico.
         $inventoryRepo->updateStock($product, $newStock);
 
         $movementRepo->create($_POST);

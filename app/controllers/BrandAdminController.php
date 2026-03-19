@@ -7,6 +7,7 @@ class BrandAdminController extends Controller
 
     private function checkAdmin()
     {
+        // Todas las operaciones de marcas pasan por esta validación simple de acceso.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -50,6 +51,7 @@ class BrandAdminController extends Controller
 
         $repo = new BrandRepository();
 
+        // El formulario envía solo el nombre, y el repositorio resuelve la persistencia.
         $repo->create($_POST['name']);
 
         header("Location: " . App::url('/admin/brands'));
@@ -61,6 +63,7 @@ class BrandAdminController extends Controller
 
         $repo = new BrandRepository();
 
+        // Carga la marca actual para reutilizar el mismo dato como estado inicial del formulario.
         $brand = $repo->find($id);
 
         $this->adminView('admin/brands/edit', [

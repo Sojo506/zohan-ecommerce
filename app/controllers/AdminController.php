@@ -7,6 +7,7 @@ class AdminController extends Controller
 {
     private function checkAdmin()
     {
+        // Este controlador concentra pantallas del backoffice y exige sesión con rol ADMIN.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -25,6 +26,7 @@ class AdminController extends Controller
 
         $repo = new DashboardRepository();
 
+        // El dashboard combina métricas agregadas con las ventas más recientes.
         $stats = $repo->stats();
         $recentSales = $repo->recentSales();
 
@@ -40,6 +42,7 @@ class AdminController extends Controller
     {
         $this->checkAdmin();
 
+        // Reutiliza el listado completo para mostrar la tabla principal de productos en admin.
         $repo = new ProductRepository();
         $products = $repo->all();
 

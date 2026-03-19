@@ -7,6 +7,7 @@ class CommentAdminController extends Controller
 
     private function checkAdmin()
     {
+        // Moderar comentarios requiere permisos de administración.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -40,6 +41,7 @@ class CommentAdminController extends Controller
 
         $repo = new CommentRepository();
 
+        // El estado 1 representa un comentario visible/aprobado.
         $repo->changeStatus($id, 1);
 
         header("Location: " . App::url('/admin/comments'));
@@ -51,6 +53,7 @@ class CommentAdminController extends Controller
 
         $repo = new CommentRepository();
 
+        // El estado 2 permite ocultarlo sin eliminar su registro histórico.
         $repo->changeStatus($id, 2);
 
         header("Location: " . App::url('/admin/comments'));

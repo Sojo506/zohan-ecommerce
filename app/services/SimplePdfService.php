@@ -36,6 +36,7 @@ class SimplePdfService
             $sectionTitle = strtoupper((string) ($section['title'] ?? 'SECCION'));
             $sectionLines = $section['lines'] ?? [];
 
+            // Si ya no cabe otra sección completa, abre una nueva página antes del encabezado.
             if ($currentY <= self::BOTTOM_MARGIN + 40) {
                 $pages[] = $currentPage;
                 $pageNumber++;
@@ -123,6 +124,7 @@ class SimplePdfService
         $objects = [];
         $pageObjectNumbers = [];
 
+        // Construye manualmente los objetos PDF mínimos: catálogo, páginas y fuentes.
         $objects[1] = '<< /Type /Catalog /Pages 2 0 R >>';
         $objects[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
         $objects[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';
@@ -190,6 +192,7 @@ class SimplePdfService
     {
         $commands = ['BT'];
 
+        // Cada línea se transforma en comandos PDF de fuente, posición y texto.
         foreach ($lines as $line) {
             $commands[] = sprintf('/%s %d Tf', $line['font'] ?? 'F1', (int) ($line['size'] ?? self::BODY_FONT_SIZE));
             $commands[] = sprintf('1 0 0 1 %d %d Tm', (int) ($line['x'] ?? self::LEFT_MARGIN), (int) ($line['y'] ?? self::TOP_MARGIN));
@@ -203,6 +206,7 @@ class SimplePdfService
 
     private function escapePdfText(string $text): string
     {
+        // PDF básico no maneja UTF-8 de forma nativa, así que se convierte y se escapan caracteres reservados.
         $encoded = iconv('UTF-8', 'Windows-1252//TRANSLIT//IGNORE', $text);
 
         if ($encoded === false) {

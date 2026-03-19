@@ -13,6 +13,7 @@ class PaymentController extends Controller
 
     public function capture()
     {
+        // Limpia cualquier salida previa para no romper la respuesta JSON del endpoint.
         if (ob_get_length()) {
             ob_clean();
         }
@@ -24,6 +25,7 @@ class PaymentController extends Controller
             return;
         }
 
+        // PayPal envía el identificador de la orden en el cuerpo JSON de la petición.
         $data = json_decode(file_get_contents('php://input'), true);
         $orderId = $data['orderID'] ?? null;
 
@@ -48,9 +50,12 @@ class PaymentController extends Controller
 
         $paypalCaptureId = $captureResult['purchase_units'][0]['payments']['captures'][0]['id'] ?? '';
         $amountUsd = $captureResult['purchase_units'][0]['payments']['captures'][0]['amount']['value'] ?? 0;
+
+        // Solo después de una captura confirmada se registra la venta en la BD local.
         $result = $this->repository->registerCapturedPayment($orderId, $paypalCaptureId, $amountUsd);
 
         if (($result['success'] ?? false) === true) {
+            // El carrito se vacía únicamente cuando el registro local terminó bien.
             $this->repository->clearCart();
 
             $message = 'Pago y registro completados';

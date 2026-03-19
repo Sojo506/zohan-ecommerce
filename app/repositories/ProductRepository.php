@@ -107,6 +107,7 @@ class ProductRepository
             return [];
         }
 
+        // Normaliza el carrito para quedarse solo con pares producto/cantidad válidos.
         $clean = [];
 
         foreach ($cart as $id => $cantidad) {
@@ -127,6 +128,7 @@ class ProductRepository
         $ids = array_keys($cart);
         $productos = $this->model->obtenerProductosPorIds($ids);
 
+        // Reindexa por ID para validar existencia y consultar cada producto en O(1).
         $productosIndex = [];
 
         foreach ($productos as $producto) {
@@ -157,6 +159,7 @@ class ProductRepository
                 'subtotal' => $subtotal,
             ];
 
+            // Devuelve también el carrito depurado para actualizar la sesión con IDs vigentes.
             $clean[$idInt] = $cantidadInt;
         }
 
@@ -183,6 +186,7 @@ class ProductRepository
                 $validos[(int)$producto['ID_PRODUCTO']] = true;
             }
 
+            // El conteo ignora productos eliminados o inválidos aunque sigan en sesión.
             foreach (array_keys($cart) as $id) {
 
                 $idInt = (int)$id;

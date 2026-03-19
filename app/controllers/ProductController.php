@@ -12,6 +12,8 @@ class ProductController extends Controller
     {
         $this->repository = new ProductRepository();
         $this->cartRepository = new CartRepository($this->repository);
+
+        // Mantiene la sesión del carrito alineada con el estado persistido del usuario.
         $this->cartRepository->syncSessionCart();
     }
 
@@ -19,6 +21,7 @@ class ProductController extends Controller
     {
         $categoria = trim((string)($_GET['category'] ?? ''));
         if ($categoria !== '') {
+            // Traduce slugs de la URL al nombre de categoría que entiende el modelo.
             $map = [
                 'components' => 'componentes',
                 'accessories' => 'accesorios',
@@ -65,6 +68,8 @@ class ProductController extends Controller
         }
 
         $imagenes = $this->repository->fetchProductImages($idProducto);
+
+        // Normaliza la lista porque algunas consultas devuelven filas completas y otras solo URLs.
         $imagenes = array_values(array_filter(array_map(static function ($imagen) {
             if (is_array($imagen)) {
                 return trim((string)($imagen['URL_IMAGE'] ?? ''));
@@ -76,6 +81,7 @@ class ProductController extends Controller
         }));
 
         if (!empty($imagenes)) {
+            // La primera imagen funciona como portada principal del detalle.
             $producto['URL_IMAGE'] = $imagenes[0];
         }
 

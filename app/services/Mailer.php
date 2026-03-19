@@ -13,6 +13,7 @@ class Mailer
 
         try {
 
+            // Toda la configuración SMTP sale del .env para no hardcodear credenciales.
             $mail->isSMTP();
             $mail->Host = Env::get('MAIL_HOST');
             $mail->SMTPAuth = true;
@@ -57,6 +58,7 @@ class Mailer
         $mail = new PHPMailer(true);
 
         try {
+            // Repite la misma configuración base para enviar correos transaccionales distintos.
             $mail->isSMTP();
             $mail->Host = Env::get('MAIL_HOST');
             $mail->SMTPAuth = true;
@@ -83,6 +85,7 @@ class Mailer
             $total = number_format((float)($data['total'] ?? 0), 2);
 
             $rows = '';
+            // Escapa cada valor antes de interpolarlo en HTML para evitar contenido inseguro en el correo.
             foreach (($data['items'] ?? []) as $item) {
                 $rows .= sprintf(
                     '<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb;">%s</td><td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:center;">%d</td><td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;">$ %s</td></tr>',

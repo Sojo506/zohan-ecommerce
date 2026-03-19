@@ -7,6 +7,7 @@ class CouponAdminController extends Controller
 
     private function checkAdmin()
     {
+        // Los cupones impactan precios, así que este CRUD se restringe al panel admin.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -50,6 +51,7 @@ class CouponAdminController extends Controller
 
         $repo = new CouponRepository();
 
+        // Se delega al repositorio el parseo de fechas, montos y reglas del cupón.
         $repo->create($_POST);
 
         header("Location: " . App::url('/admin/coupons'));
@@ -61,6 +63,7 @@ class CouponAdminController extends Controller
 
         $repo = new CouponRepository();
 
+        // La edición parte del cupón persistido para mostrar el estado real en el formulario.
         $coupon = $repo->find($id);
 
         $this->adminView('admin/coupons/edit', [

@@ -7,6 +7,7 @@ class InvoiceAdminController extends Controller
 {
     private function checkAdmin()
     {
+        // Las facturas y sus cambios de estado están reservados al personal administrativo.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -39,6 +40,7 @@ class InvoiceAdminController extends Controller
 
         $repo = new InvoiceRepository();
 
+        // Reúne cabecera, detalle de productos y rastro del pago para la pantalla de detalle.
         $invoice = $repo->find($id);
         $products = $repo->saleProducts($id);
         $payment = $repo->paypalPayment($id);
@@ -64,6 +66,7 @@ class InvoiceAdminController extends Controller
         $repo = new InvoiceRepository();
         $repo->changeStatus($id, $status);
 
+        // Si la auditoría está disponible, deja evidencia del cambio administrativo.
         if (class_exists('AuditRepository')) {
             $audit = new AuditRepository();
             $audit->log('CAMBIO ESTADO', 'FACTURA_TB');

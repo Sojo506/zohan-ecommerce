@@ -7,6 +7,7 @@ class ReportAdminController extends Controller
 {
     private function checkAdmin()
     {
+        // Los reportes exponen métricas sensibles, por eso se limitan al rol administrador.
         if (!isset($_SESSION['user'])) {
             header('Location: ' . App::url('/login'));
             exit;
@@ -49,11 +50,13 @@ class ReportAdminController extends Controller
             return;
         }
 
+        // El controlador arma la estructura del reporte y delega el render final al servicio PDF.
         $pdf->download($report['filename'], $report['title'], $report['sections']);
     }
 
     private function buildReport(ReportRepository $repo, string $type): ?array
     {
+        // Mapea el slug de la ruta al generador de contenido correspondiente.
         switch ($type) {
             case 'executive-summary':
                 return $this->executiveSummaryReport($repo);
@@ -72,6 +75,7 @@ class ReportAdminController extends Controller
         $monthlyRevenue = $repo->monthlyRevenue();
         $topProducts = $repo->topSellingProducts(5);
 
+        // Convierte métricas agregadas en líneas de texto listas para imprimir en PDF.
         $trendLines = [];
         foreach ($monthlyRevenue as $row) {
             $trendLines[] = sprintf(

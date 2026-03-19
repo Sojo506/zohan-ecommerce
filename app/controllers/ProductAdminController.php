@@ -9,6 +9,7 @@ class ProductAdminController extends Controller
 {
     private function checkAdmin()
     {
+        // Este panel protege sus acciones con una validación manual de sesión y rol.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -69,6 +70,7 @@ class ProductAdminController extends Controller
 
         $repo = new ProductRepository();
 
+        // Para editar se cargan tanto el producto base como catálogos e imágenes asociadas.
         $product = $repo->find($id);
 
         $categories = $repo->getCategories();
@@ -123,6 +125,7 @@ class ProductAdminController extends Controller
 
         $cloudinary = new CloudinaryService();
 
+        // Se sube el archivo temporal y luego se persiste solo la URL devuelta por Cloudinary.
         $url = $cloudinary->upload($_FILES['image']['tmp_name']);
 
         $repo = new ProductRepository();

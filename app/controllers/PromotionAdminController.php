@@ -8,6 +8,7 @@ class PromotionAdminController extends Controller
 
     private function checkAdmin()
     {
+        // Crear y asignar promociones requiere acceso administrativo.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -65,6 +66,8 @@ class PromotionAdminController extends Controller
 
         $promotion = $repo->find($id);
         $products = $productRepo->all();
+
+        // Además de la promoción, carga qué productos ya están vinculados para editar la relación.
         $assigned = $repo->products($id);
 
         $this->adminView('admin/promotions/edit', [
@@ -104,6 +107,7 @@ class PromotionAdminController extends Controller
 
         $repo = new PromotionRepository();
 
+        // Asocia un producto existente a la promoción seleccionada desde el formulario.
         $repo->assignProduct(
             $_POST['promotion'],
             $_POST['product']

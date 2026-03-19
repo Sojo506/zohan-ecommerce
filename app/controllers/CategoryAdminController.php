@@ -7,6 +7,7 @@ class CategoryAdminController extends Controller
 
     private function checkAdmin()
     {
+        // Las categorías se administran solo desde el panel autenticado.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -50,6 +51,7 @@ class CategoryAdminController extends Controller
 
         $repo = new CategoryRepository();
 
+        // La creación es directa porque el repositorio recibe únicamente el nombre saneado desde el form.
         $repo->create($_POST['name']);
 
         header("Location: " . App::url('/admin/categories'));
@@ -62,6 +64,7 @@ class CategoryAdminController extends Controller
 
         $repo = new CategoryRepository();
 
+        // Se obtiene la categoría puntual para poblar el formulario de edición.
         $category = $repo->find($id);
 
         $this->adminView('admin/categories/edit', [

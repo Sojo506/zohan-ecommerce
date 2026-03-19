@@ -18,10 +18,12 @@ class Router
     {
         $method = $_SERVER['REQUEST_METHOD'];
 
+        // Acepta tanto la ruta amigable guardada en ?url= como la URI nativa del servidor.
         $uri = $_GET['url'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
         $basePath = dirname($_SERVER['SCRIPT_NAME']);
 
+        // Permite ejecutar la app desde una subcarpeta sin redefinir cada ruta manualmente.
         if ($basePath !== '/' && str_starts_with($uri, $basePath)) {
             $uri = substr($uri, strlen($basePath));
         }
@@ -30,9 +32,11 @@ class Router
             $uri = '/';
         }
 
+        $routeFound = false;
+
         foreach ($this->routes[$method] ?? [] as $route => $controller) {
 
-            // convertir {id} en regex
+            // Convierte placeholders como /admin/products/{id} en una regex capturable.
             $pattern = preg_replace('#\{[a-zA-Z_]+\}#', '([a-zA-Z0-9_-]+)', $route);
 
             $pattern = "#^" . $pattern . "$#";
@@ -66,6 +70,7 @@ class Router
 
         require_once $path;
 
+        // La ruta define controlador y método como "Clase@metodo", y aquí se resuelven dinámicamente.
         $controllerInstance = new $controllerName();
 
         if (!method_exists($controllerInstance, $methodName)) {

@@ -7,6 +7,7 @@ class UserAdminController extends Controller
 
     private function checkAdmin()
     {
+        // Cambios de rol o estado se protegen para evitar administración anónima.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -40,6 +41,7 @@ class UserAdminController extends Controller
 
         $repo = new UserRepository();
 
+        // El detalle reúne datos base del usuario y sus medios de contacto asociados.
         $user = $repo->find($id);
         $emails = $repo->emails($id);
         $phones = $repo->phones($id);
@@ -70,6 +72,7 @@ class UserAdminController extends Controller
 
         $repo = new UserRepository();
 
+        // El valor del rol llega desde la ruta para simplificar acciones rápidas desde la tabla.
         $repo->changeRole($id, $role);
 
         header("Location: " . App::url('/admin/users/' . $id));

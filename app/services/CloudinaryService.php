@@ -8,6 +8,7 @@ class CloudinaryService
 
     public function __construct()
     {
+        // Centraliza la configuración del SDK para que el controlador solo envíe el archivo temporal.
         $this->cloudinary = new Cloudinary([
             'cloud' => [
                 'cloud_name' => $_ENV['CLOUDINARY_CLOUD_NAME'],
@@ -26,7 +27,7 @@ class CloudinaryService
             ->uploadApi()
             ->upload($filePath);
 
-        // devolver SOLO la URL
+        // La app guarda únicamente la URL HTTPS final, no el payload completo de Cloudinary.
         return $result['secure_url'];
     }
 }

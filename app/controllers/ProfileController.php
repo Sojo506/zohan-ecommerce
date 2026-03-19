@@ -27,6 +27,7 @@ class ProfileController extends Controller
         // ahora trae facturas
         $facturas = $productoModel->obtenerFacturasUsuario($idUsuario);
 
+        // La vista de perfil mezcla datos personales, historial de compra y métricas resumidas.
         $stats = $usuarioModel->obtenerStatsUsuario($idUsuario);
 
         $this->view('user/profile', [
@@ -112,7 +113,7 @@ class ProfileController extends Controller
 
         $correoActual = $stmtCorreoActual->fetchColumn();
 
-        // si el correo cambió se requiere verificación OTP
+        // Si cambia el correo, primero se valida posesión del nuevo buzón mediante OTP.
         if ($correoActual !== $correo) {
 
             // obtener id de cuenta
@@ -155,6 +156,7 @@ class ProfileController extends Controller
                 'ap2' => $ap2
             ];
 
+            // La actualización definitiva queda pendiente hasta que el usuario verifique el código.
             Mailer::verifyEmail($correo, $otp);
 
             $_SESSION['flash_success'] = "Se envió un código de verificación al nuevo correo.";
@@ -165,6 +167,7 @@ class ProfileController extends Controller
 
         try {
 
+            // Si el correo no cambió, el perfil se actualiza directamente en una transacción corta.
             $pdo->beginTransaction();
 
             // actualizar usuario
@@ -254,7 +257,7 @@ class ProfileController extends Controller
             ':exp' => $expiresAt
         ]);
 
-        // guardar sesión para verificar
+        // Este ID de cuenta luego lo reutiliza AuthController al validar el OTP ingresado.
         $_SESSION['pending_account_id'] = $idCuenta;
 
         $stmtCorreo = $pdo->prepare("
@@ -285,7 +288,7 @@ class ProfileController extends Controller
             exit;
         }
 
-        // seguridad
+        // Solo se permite llegar aquí después de validar correctamente el OTP.
         if (!isset($_SESSION['password_otp_verified'])) {
             header("Location: " . App::url('/profile'));
             exit;
@@ -338,6 +341,7 @@ class ProfileController extends Controller
 
         $pdo = Database::connection();
 
+        // La contraseña nunca se guarda en texto plano; solo persiste el hash bcrypt.
         $hash = password_hash($pass1, PASSWORD_BCRYPT);
 
         try {
@@ -379,6 +383,8 @@ class ProfileController extends Controller
         $identificacion = $_SESSION['user']['identificacion'];
 
         $invoiceRepo = new InvoiceRepository();
+
+        // Valida que la factura realmente pertenezca al usuario autenticado.
         $invoice = $invoiceRepo->findForUser($invoiceId, $identificacion);
 
         if (!$invoice) {
@@ -398,6 +404,7 @@ class ProfileController extends Controller
 
     public function commentProduct()
     {
+        // El endpoint puede responder AJAX, así que limpia cualquier salida previa inesperada.
         if (ob_get_length()) {
             ob_clean();
         }
@@ -407,6 +414,7 @@ class ProfileController extends Controller
             exit;
         }
 
+        // Acepta payload JSON o form tradicional para ser reutilizable desde distintas vistas.
         $payload = json_decode(file_get_contents('php://input'), true);
         if (!is_array($payload)) {
             $payload = $_POST;
@@ -416,6 +424,8 @@ class ProfileController extends Controller
         $productId = (int)($payload['product_id'] ?? 0);
         $comment = trim((string)($payload['comment'] ?? ''));
         $rating = (int)($payload['rating'] ?? 5);
+
+        // Acota la puntuación al rango esperado por la lógica de comentarios.
         if ($rating < 1) {
             $rating = 1;
         }
