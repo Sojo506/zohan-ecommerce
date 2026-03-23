@@ -118,83 +118,86 @@ class ProductModel
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function obtenerProductoPorId(int $idProducto): ?array
-    {
-        $sql = "SELECT
-                    p.ID_PRODUCTO,
-                    p.NOMBRE,
-                    p.DESCRIPCION,
-                    p.PRECIO,
-                    c.NOMBRE AS CATEGORIA,
-                    m.NOMBRE AS MARCA,
-                    img.URL_IMAGE,
-                    COALESCE(inv.STOCK, 0) AS STOCK,
-                    promo.PORCENTAJE AS DESCUENTO,
-                    promo.PROMO_NOMBRE
-                FROM PRODUCTO_TB p
-                JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
-                JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
-                LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
-                LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
-                LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
-                WHERE p.ID_PRODUCTO = :idProducto
-                  AND p.ID_ESTADO = 1
-                LIMIT 1";
+public function obtenerProductoPorId(int $idProducto): ?array
+{
+    $sql = "SELECT
+                p.ID_PRODUCTO,
+                p.SKU,
+                p.NOMBRE,
+                p.DESCRIPCION,
+                p.PRECIO,
+                p.STOCK_MINIMO,
+                p.ID_CATEGORIA,
+                p.ID_MARCA,
+                c.NOMBRE AS CATEGORIA,
+                m.NOMBRE AS MARCA,
+                img.URL_IMAGE,
+                COALESCE(inv.STOCK, 0) AS STOCK,
+                promo.PORCENTAJE AS DESCUENTO,
+                promo.PROMO_NOMBRE
+            FROM PRODUCTO_TB p
+            JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
+            JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
+            LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
+            LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+            LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
+            WHERE p.ID_PRODUCTO = :idProducto
+              AND p.ID_ESTADO = 1
+            LIMIT 1";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':idProducto' => $idProducto]);
-        $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':idProducto' => $idProducto]);
 
-        return $producto ?: null;
+    $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $producto ?: null;
+}
+
+public function obtenerProductosSimilares(string $categoria, int $idProducto, int $limite = 6): array
+{
+    $categoria = trim($categoria);
+    if ($categoria === '') {
+        return [];
     }
 
-    public function obtenerProductosSimilares(string $categoria, int $idProducto, int $limite = 6): array
-    {
-        $categoria = trim($categoria);
-        if ($categoria === '') {
-            return [];
-        }
+    $sql = "SELECT
+                p.ID_PRODUCTO,
+                p.NOMBRE,
+                p.DESCRIPCION,
+                p.PRECIO,
+                c.NOMBRE AS CATEGORIA,
+                m.NOMBRE AS MARCA,
+                img.URL_IMAGE,
+                COALESCE(inv.STOCK, 0) AS STOCK,
+                promo.PORCENTAJE AS DESCUENTO,
+                promo.PROMO_NOMBRE
+            FROM PRODUCTO_TB p
+            JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
+            JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
+            LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
+            LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+            LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
+            WHERE p.ID_ESTADO = 1
+              AND p.ID_PRODUCTO <> :idProducto
+              AND (
+                    LOWER(c.NOMBRE) = :categoriaExacta
+                    OR REPLACE(LOWER(c.NOMBRE), ' ', '') = :categoriaLimpia
+              )
+            ORDER BY p.ID_PRODUCTO DESC
+            LIMIT :limite";
 
-        $sql = "SELECT
-                    p.ID_PRODUCTO,
-                    p.NOMBRE,
-                    p.DESCRIPCION,
-                    p.PRECIO,
-                    c.NOMBRE AS CATEGORIA,
-                    m.NOMBRE AS MARCA,
-                    img.URL_IMAGE,
-                    COALESCE(inv.STOCK, 0) AS STOCK,
-                    promo.PORCENTAJE AS DESCUENTO,
-                    promo.PROMO_NOMBRE
-                FROM PRODUCTO_TB p
-                JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
-                JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
-                LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
-                LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
-                LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
-                WHERE p.ID_ESTADO = 1
-                  AND p.ID_PRODUCTO <> :idProducto
-                  AND (
-                        LOWER(c.NOMBRE) = :categoriaExacta
-                        OR REPLACE(LOWER(c.NOMBRE), ' ', '') = :categoriaLimpia
-                  )
-                ORDER BY p.ID_PRODUCTO DESC
-                LIMIT :limite";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bindValue(':idProducto', $idProducto, PDO::PARAM_INT);
+    $stmt->bindValue(':categoriaExacta', strtolower($categoria));
+    $stmt->bindValue(':categoriaLimpia', str_replace(' ', '', strtolower($categoria)));
+    $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
+    $stmt->execute();
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':idProducto', $idProducto, PDO::PARAM_INT);
-        $stmt->bindValue(':categoriaExacta', strtolower($categoria));
-        $stmt->bindValue(':categoriaLimpia', str_replace(' ', '', strtolower($categoria)));
-        $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
     public function obtenerImagenesProducto(int $idProducto): array
     {
-        $sql = "SELECT URL_IMAGE
+        $sql = "SELECT ID_IMAGEN, URL_IMAGE
                 FROM PRODUCTO_IMAGE_TB
                 WHERE ID_PRODUCTO = :idProducto
                   AND ID_ESTADO = 1
@@ -202,16 +205,8 @@ class ProductModel
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':idProducto' => $idProducto]);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $imagenes = [];
-        foreach ($rows as $row) {
-            if (!empty($row['URL_IMAGE'])) {
-                $imagenes[] = $row['URL_IMAGE'];
-            }
-        }
-
-        return $imagenes;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function obtenerStockProducto(int $idProducto): int
@@ -426,14 +421,155 @@ class ProductModel
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function obtenerTodosProductos(): array
+    {
+        $sql = "SELECT 
+                p.ID_PRODUCTO,
+                p.SKU,
+                p.NOMBRE,
+                p.DESCRIPCION,
+                p.PRECIO,
+                p.STOCK_MINIMO,
+                c.NOMBRE AS CATEGORIA,
+                m.NOMBRE AS MARCA,
+                GROUP_CONCAT(CONCAT(pi.ID_IMAGEN,'::',pi.URL_IMAGE) SEPARATOR '||') AS IMAGENES
+            FROM PRODUCTO_TB p
+            JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
+            JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
+            LEFT JOIN PRODUCTO_IMAGE_TB pi 
+                ON pi.ID_PRODUCTO = p.ID_PRODUCTO
+                AND pi.ID_ESTADO = 1
+            WHERE p.ID_ESTADO = 1
+            GROUP BY p.ID_PRODUCTO
+            ORDER BY p.ID_PRODUCTO DESC";
+
+        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerCategorias(): array
+    {
+        $sql = "SELECT ID_CATEGORIA, NOMBRE
+            FROM CATEGORIA_TB
+            WHERE ID_ESTADO = 1
+            ORDER BY NOMBRE";
+
+        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerMarcas(): array
+    {
+        $sql = "SELECT ID_MARCA, NOMBRE
+            FROM MARCA_TB
+            WHERE ID_ESTADO = 1
+            ORDER BY NOMBRE";
+
+        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function crearProducto(array $data)
+    {
+        $this->db->beginTransaction();
+
+        try {
+
+            $sql = "INSERT INTO PRODUCTO_TB
+        (SKU,NOMBRE,DESCRIPCION,PRECIO,STOCK_MINIMO,ID_CATEGORIA,ID_MARCA,ID_ESTADO)
+        VALUES
+        (:sku,:nombre,:desc,:precio,:stock_min,:categoria,:marca,1)";
+
+            $stmt = $this->db->prepare($sql);
+
+            $stmt->execute([
+                ':sku' => $data['sku'],
+                ':nombre' => $data['nombre'],
+                ':desc' => $data['descripcion'],
+                ':precio' => $data['precio'],
+                ':stock_min' => $data['stock_min'],
+                ':categoria' => $data['categoria'],
+                ':marca' => $data['marca']
+            ]);
+
+            $productId = $this->db->lastInsertId();
+
+            $sqlInventory = "INSERT INTO INVENTARIO_TB
+        (ID_PRODUCTO,STOCK,ID_ESTADO)
+        VALUES
+        (:producto,0,1)";
+
+            $stmtInv = $this->db->prepare($sqlInventory);
+
+            $stmtInv->execute([
+                ':producto' => $productId
+            ]);
+
+            $this->db->commit();
+
+            return $productId;
+        } catch (Exception $e) {
+
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    public function actualizarProducto(int $id, array $data)
+    {
+        $sql = "UPDATE PRODUCTO_TB SET
+            SKU = :sku,
+            NOMBRE = :nombre,
+            DESCRIPCION = :desc,
+            PRECIO = :precio,
+            STOCK_MINIMO = :stock_min,
+            ID_CATEGORIA = :categoria,
+            ID_MARCA = :marca
+            WHERE ID_PRODUCTO = :id";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            ':sku' => $data['sku'],
+            ':nombre' => $data['nombre'],
+            ':desc' => $data['descripcion'],
+            ':precio' => $data['precio'],
+            ':stock_min' => $data['stock_min'],
+            ':categoria' => $data['categoria'],
+            ':marca' => $data['marca'],
+            ':id' => $id
+        ]);
+    }
+
+    public function eliminarProducto(int $id)
+    {
+        $sql = "UPDATE PRODUCTO_TB
+            SET ID_ESTADO = 2
+            WHERE ID_PRODUCTO = :id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+    }
+
+    public function agregarImagenProducto(int $productId, string $url)
+    {
+        $sql = "INSERT INTO PRODUCTO_IMAGE_TB
+            (ID_PRODUCTO,URL_IMAGE,ID_ESTADO)
+            VALUES(:product,:url,1)";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            ':product' => $productId,
+            ':url' => $url
+        ]);
+    }
+
+    public function eliminarImagenProducto(int $imageId)
+    {
+        $sql = "UPDATE PRODUCTO_IMAGE_TB
+            SET ID_ESTADO = 2
+            WHERE ID_IMAGEN = :id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $imageId]);
+    }
 }
-?>
-
-
-
-
-
-
-
-
-

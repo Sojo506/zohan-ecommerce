@@ -1,24 +1,27 @@
 <?php
+
 require_once __DIR__ . '/../repositories/ProductRepository.php';
+require_once __DIR__ . '/../repositories/CartRepository.php';
 
 class ProductController extends Controller
 {
     private ProductRepository $repository;
+    private CartRepository $cartRepository;
 
     public function __construct()
     {
         $this->repository = new ProductRepository();
-        $cart = $this->repository->sanitizeCart($_SESSION['cart'] ?? []);
-        if (empty($cart) && isset($_SESSION['user']['id_cuenta'])) {
-            $cart = $this->repository->fetchCartForAccount((int)$_SESSION['user']['id_cuenta']);
-        }
-        $this->setCart($cart, false);
+        $this->cartRepository = new CartRepository($this->repository);
+
+        // Mantiene la sesión del carrito alineada con el estado persistido del usuario.
+        $this->cartRepository->syncSessionCart();
     }
 
     public function index()
     {
         $categoria = trim((string)($_GET['category'] ?? ''));
         if ($categoria !== '') {
+            // Traduce slugs de la URL al nombre de categoría que entiende el modelo.
             $map = [
                 'components' => 'componentes',
                 'accessories' => 'accesorios',
@@ -37,15 +40,13 @@ class ProductController extends Controller
         ];
 
         $data = $this->repository->fetchCatalog($filtros);
-        $cart = $this->repository->sanitizeCart($_SESSION['cart'] ?? []);
-        $this->setCart($cart);
 
         $this->view('products/productos', [
             'productos' => $data['productos'],
             'categorias' => $data['categorias'],
             'marcas' => $data['marcas'],
             'filtros' => $filtros,
-            'cartCount' => $this->repository->countCart($cart)
+            'cartCount' => $this->cartRepository->countCurrentCart()
         ]);
     }
 
@@ -67,20 +68,41 @@ class ProductController extends Controller
             exit;
         }
 
-        $cart = $this->repository->sanitizeCart($_SESSION['cart'] ?? []);
-        $this->setCart($cart);
         $imagenes = $this->repository->fetchProductImages($idProducto);
+
+        // Normaliza la lista porque algunas consultas devuelven filas completas y otras solo URLs.
+        $imagenes = array_values(array_filter(array_map(static function ($imagen) {
+            if (is_array($imagen)) {
+                return trim((string)($imagen['URL_IMAGE'] ?? ''));
+            }
+
+            return trim((string)$imagen);
+        }, $imagenes), static function ($imagenUrl) {
+            return $imagenUrl !== '';
+        }));
+
+        if (!empty($imagenes)) {
+            // La primera imagen funciona como portada principal del detalle.
+            $producto['URL_IMAGE'] = $imagenes[0];
+        }
+
         $existencias = $this->repository->fetchProductStock($idProducto);
+
         $similares = [];
         if (!empty($producto['CATEGORIA'])) {
-            $similares = $this->repository->fetchSimilarProducts((string)$producto['CATEGORIA'], $idProducto, 6);
+            $similares = $this->repository->fetchSimilarProducts(
+                (string)$producto['CATEGORIA'],
+                $idProducto,
+                6
+            );
         }
+
         $this->view('products/producto', [
             'producto' => $producto,
             'imagenes' => $imagenes,
             'existencias' => $existencias,
             'similares' => $similares,
-            'cartCount' => $this->repository->countCart($cart)
+            'cartCount' => $this->cartRepository->countCurrentCart()
         ]);
     }
 
@@ -134,6 +156,7 @@ class ProductController extends Controller
         } else {
             $_SESSION['flash_success'] = 'Producto agregado al carrito.';
         }
+
         $this->redirectBack();
     }
 
@@ -168,89 +191,38 @@ class ProductController extends Controller
         $accion = trim((string)($_POST['accion'] ?? ''));
         $ajustada = false;
 
-        if ($accion === 'sumar') {
-            if ($actual >= $stock) {
-                $_SESSION['flash_error'] = 'No hay mas existencias disponibles.';
-                $this->setCart($cart);
-                header('Location: ' . App::url('/cart'));
-                exit;
-            }
-            $cantidad = $actual + 1;
-        } elseif ($accion === 'restar') {
-            $cantidad = $actual - 1;
+        if (in_array($accion, ['sumar', 'increase', 'increment'], true)) {
+            $nuevaCantidad = $actual + 1;
+        } elseif (in_array($accion, ['restar', 'decrease', 'decrement'], true)) {
+            $nuevaCantidad = $actual - 1;
         } else {
-            $cantidad = (int)($_POST['cantidad'] ?? $actual);
-            if ($cantidad > $stock) {
-                $cantidad = $stock;
-                $ajustada = true;
-            }
+            $nuevaCantidad = max(1, (int)($_POST['cantidad'] ?? $actual));
         }
 
-        if ($cantidad <= 0) {
+        if ($nuevaCantidad <= 0) {
             unset($cart[$idProducto]);
             $_SESSION['flash_success'] = 'Producto eliminado del carrito.';
+            $this->setCart($cart);
+            header('Location: ' . App::url('/cart'));
+            exit;
+        }
+
+        if ($nuevaCantidad > $stock) {
+            $nuevaCantidad = $stock;
+            $ajustada = true;
+        }
+
+        $cart[$idProducto] = $nuevaCantidad;
+        $this->setCart($cart);
+
+        if ($ajustada) {
+            $_SESSION['flash_success'] = 'Cantidad ajustada a existencias.';
         } else {
-            $cart[$idProducto] = $cantidad;
-            if ($ajustada) {
-                $_SESSION['flash_success'] = 'Cantidad ajustada a existencias.';
-            } else {
-                $_SESSION['flash_success'] = 'Cantidad actualizada en el carrito.';
-            }
+            $_SESSION['flash_success'] = 'Carrito actualizado.';
         }
 
-        $this->setCart($cart);
         header('Location: ' . App::url('/cart'));
         exit;
-    }
-
-    public function removeFromCart()
-    {
-        $idProducto = (int)($_POST['id_producto'] ?? 0);
-        $cart = $this->repository->sanitizeCart($_SESSION['cart'] ?? []);
-
-        if (isset($cart[$idProducto])) {
-            unset($cart[$idProducto]);
-            $_SESSION['flash_success'] = 'Producto eliminado del carrito.';
-        }
-
-        $this->setCart($cart);
-        header('Location: ' . App::url('/cart'));
-        exit;
-    }
-
-    public function clearCart()
-    {
-        $this->setCart([]);
-        $_SESSION['flash_success'] = 'Carrito vaciado.';
-        header('Location: ' . App::url('/cart'));
-        exit;
-    }
-
-    private function setCart(array $cart, bool $persist = true): void
-    {
-        $_SESSION['cart'] = $cart;
-
-        if ($persist) {
-            $this->persistCartForLoggedUser($cart);
-        }
-    }
-
-    private function persistCartForLoggedUser(array $cart): void
-    {
-        if (!isset($_SESSION['user']['id_cuenta'])) {
-            return;
-        }
-
-        $idCuenta = (int)$_SESSION['user']['id_cuenta'];
-        if ($idCuenta <= 0) {
-            return;
-        }
-
-        try {
-            $this->repository->saveCartForAccount($idCuenta, $cart);
-        } catch (PDOException $e) {
-            // Evitar romper la navegacion si la persistencia falla.
-        }
     }
 
     private function redirectBack(): void
@@ -260,8 +232,3 @@ class ProductController extends Controller
         exit;
     }
 }
-?>
-
-
-
-

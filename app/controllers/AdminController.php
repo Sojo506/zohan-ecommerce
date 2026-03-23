@@ -1,9 +1,13 @@
 <?php
+require_once __DIR__ . '/../repositories/ProductRepository.php';
+require_once __DIR__ . '/../repositories/DashboardRepository.php';
+
 
 class AdminController extends Controller
 {
     private function checkAdmin()
     {
+        // Este controlador concentra pantallas del backoffice y exige sesión con rol ADMIN.
         if (!isset($_SESSION['user'])) {
             header("Location: " . App::url('/login'));
             exit;
@@ -20,17 +24,30 @@ class AdminController extends Controller
     {
         $this->checkAdmin();
 
+        $repo = new DashboardRepository();
+
+        // El dashboard combina métricas agregadas con las ventas más recientes.
+        $stats = $repo->stats();
+        $recentSales = $repo->recentSales();
+
         $this->adminView('admin/dashboard', [
             'pageTitle' => 'Dashboard',
-            'currentSection' => 'dashboard'
+            'currentSection' => 'dashboard',
+            'stats' => $stats,
+            'recentSales' => $recentSales
         ]);
     }
-
+    
     public function products()
     {
         $this->checkAdmin();
 
-        $this->adminView('admin/products', [
+        // Reutiliza el listado completo para mostrar la tabla principal de productos en admin.
+        $repo = new ProductRepository();
+        $products = $repo->all();
+
+        $this->adminView('admin/products/index', [
+            'products' => $products,
             'pageTitle' => 'Productos',
             'currentSection' => 'products'
         ]);

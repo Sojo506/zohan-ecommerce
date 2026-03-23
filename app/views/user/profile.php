@@ -1,3 +1,68 @@
+<?php if (!empty($_SESSION['flash_success'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Listo',
+                text: <?= json_encode($_SESSION['flash_success']) ?>,
+                confirmButtonText: 'Entendido'
+            });
+        });
+    </script>
+    <?php unset($_SESSION['flash_success']); ?>
+<?php endif; ?>
+
+<?php if (!empty($_SESSION['flash_error'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ocurrió un problema',
+                text: <?= json_encode($_SESSION['flash_error']) ?>,
+                confirmButtonText: 'Entendido'
+            });
+        });
+    </script>
+    <?php unset($_SESSION['flash_error']); ?>
+<?php endif; ?>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const btn = document.getElementById("btnCambiarPassword");
+
+        if (btn) {
+
+            btn.addEventListener("click", function(e) {
+
+                e.preventDefault();
+
+                const correoUsuario = <?= json_encode($user['CORREO']) ?>;
+
+                Swal.fire({
+                    icon: "info",
+                    title: "Confirmación requerida",
+                    html: `Antes de poder cambiar tu contraseña, debemos confirmar que realmente eres tú.<br><br>
+                       Te enviaremos un código de verificación a tu correo:<br>
+                       <b>${correoUsuario}</b>`,
+                    showCancelButton: true,
+                    confirmButtonText: "Entendido",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        window.location.href = "<?= App::url('/sendPasswordOtp') ?>";
+
+                    }
+
+                });
+
+            });
+
+        }
+
+    });
+</script>
 <main>
     <section class="bg-light border-bottom">
         <div class="container py-5">
@@ -42,16 +107,16 @@
 
                                 <div class="col">
                                     <h5 class="fw-bold mb-0">
-                                        ₡<?= number_format($stats['dinero_gastado'] ?? 0, 0, ',', '.') ?>
+                                        $<?= number_format($stats['dinero_gastado'] ?? 0, 0, ',', '.') ?>
                                     </h5>
                                     <small class="text-muted">Total gastado</small>
                                 </div>
                             </div>
                             <div class="d-flex gap-2 flex-wrap">
-                                <a href="/user/edit" class="btn btn-primary">
+                                <a href="<?= App::url('/editProfile') ?>" class="btn btn-primary">
                                     Editar perfil
                                 </a>
-                                <a href="/user/change-password" class="btn btn-outline-secondary">
+                                <a class="btn btn-outline-secondary" id="btnCambiarPassword">
                                     Cambiar contraseña
                                 </a>
                             </div>
@@ -91,11 +156,11 @@
                                             <div>
                                                 <p class="text-muted small mb-0">Total de la factura</p>
                                                 <span class="fw-bold">
-                                                    ₡ <?= number_format($factura['TOTAL'], 0, ',', '.') ?>
+                                                    $ <?= number_format($factura['TOTAL'], 0, ',', '.') ?>
                                                 </span>
                                             </div>
 
-                                            <a href="/factura/<?= $factura['ID_FACTURA'] ?>"
+                                            <a href="<?= App::url('/invoiceDetail/' . (int) $factura['ID_FACTURA']) ?>"
                                                 class="btn btn-sm btn-outline-dark">
                                                 Ver detalle
                                             </a>

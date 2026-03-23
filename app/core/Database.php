@@ -1,4 +1,3 @@
-<!-- Este archivo se encarga de manejar la conexión a la base de datos utilizando PDO -->
 <?php
 
 class Database
@@ -7,6 +6,7 @@ class Database
 
     public static function connection(): PDO
     {
+        // Reutiliza la misma conexión PDO durante toda la petición.
         if (self::$pdo !== null) {
             return self::$pdo;
         }
@@ -14,11 +14,12 @@ class Database
         $host = Env::get('DB_HOST', '127.0.0.1');
         $db   = Env::get('DB_NAME', 'zohan_tech_store');
         $user = Env::get('DB_USER', 'root');
-        $pass = Env::get('DB_PASS', 'CGJS2050');
+        $pass = Env::get('DB_PASS', 'Plkmqaz1209');
         $charset = Env::get('DB_CHARSET', 'utf8mb4');
 
         $dsn = "mysql:host={$host};dbname={$db};charset={$charset}";
 
+        // Configuración base para trabajar con excepciones y resultados asociativos.
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

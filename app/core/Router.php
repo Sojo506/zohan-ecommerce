@@ -18,36 +18,50 @@ class Router
     {
         $method = $_SERVER['REQUEST_METHOD'];
 
-        // sin htaccess: usamos ?url=/ruta
-        $uri = $_GET['url'] ?? '/';
+        // Acepta tanto la ruta amigable guardada en ?url= como la URI nativa del servidor.
+        $uri = $_GET['url'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+        $basePath = dirname($_SERVER['SCRIPT_NAME']);
+
+        // Permite ejecutar la app desde una subcarpeta sin redefinir cada ruta manualmente.
+        if ($basePath !== '/' && str_starts_with($uri, $basePath)) {
+            $uri = substr($uri, strlen($basePath));
+        }
+
         if ($uri === '') {
             $uri = '/';
         }
 
-        // Si vienen query params embebidos en url=/ruta?x=1, separarlos.
-        if (strpos($uri, '?') !== false) {
-            [$uriPath, $uriQuery] = explode('?', $uri, 2);
-            $uri = $uriPath;
+        $routeFound = false;
 
-            $params = [];
-            parse_str($uriQuery, $params);
-            $_GET = array_merge($_GET, $params);
+        foreach ($this->routes[$method] ?? [] as $route => $controller) {
+
+            // Convierte placeholders como /admin/products/{id} en una regex capturable.
+            $pattern = preg_replace('#\{[a-zA-Z_]+\}#', '([a-zA-Z0-9_-]+)', $route);
+
+            $pattern = "#^" . $pattern . "$#";
+
+            if (preg_match($pattern, $uri, $matches)) {
+
+                $routeFound = true;
+
+                array_shift($matches); // quitar coincidencia completa
+                $params = $matches;
+
+                [$controllerName, $methodName] = explode('@', $controller);
+
+                break;
+            }
         }
 
-        // normalizar (por si viene sin slash)
-        if ($uri[0] !== '/') {
-            $uri = '/' . $uri;
-        }
-
-        if (!isset($this->routes[$method][$uri])) {
+        if (!$routeFound) {
             http_response_code(404);
             echo "404 - Pagina no encontrada (ruta: {$uri})";
             return;
         }
 
-        [$controllerName, $methodName] = explode('@', $this->routes[$method][$uri]);
-
         $path = __DIR__ . '/../controllers/' . $controllerName . '.php';
+
         if (!file_exists($path)) {
             http_response_code(500);
             echo "Controlador no existe: {$controllerName}";
@@ -56,13 +70,15 @@ class Router
 
         require_once $path;
 
+        // La ruta define controlador y método como "Clase@metodo", y aquí se resuelven dinámicamente.
         $controllerInstance = new $controllerName();
+
         if (!method_exists($controllerInstance, $methodName)) {
             http_response_code(500);
             echo "Metodo no existe: {$controllerName}@{$methodName}";
             return;
         }
 
-        $controllerInstance->$methodName();
+        call_user_func_array([$controllerInstance, $methodName], $params);
     }
 }

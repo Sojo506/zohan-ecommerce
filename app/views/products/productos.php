@@ -144,6 +144,7 @@
                                         <?= htmlspecialchars($producto['NOMBRE']) ?>
                                     </a>
                                 </h5>
+
                                 <p class="card-text text-muted flex-grow-1">
                                     <?= htmlspecialchars(strlen((string)$producto['DESCRIPCION']) > 130 ? substr((string)$producto['DESCRIPCION'], 0, 127) . '...' : (string)$producto['DESCRIPCION']) ?>
                                 </p>
@@ -154,6 +155,7 @@
                                         <span class="text-muted text-decoration-line-through small">&#8353; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
                                     <?php endif; ?>
                                 </div>
+
                                 <div class="text-success small fw-semibold mb-3">Existencias: <?= (int)($producto['STOCK'] ?? 0) ?></div>
 
                                 <div class="d-flex gap-2">

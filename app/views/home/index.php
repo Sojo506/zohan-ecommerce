@@ -190,10 +190,10 @@
                                     </span>
                                     <span class="rating-count">(<?= $ratingCount ?>)</span>
                                 </div>
-                                <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                                    <span class="fw-bold">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
-                                    <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark">Ver</a>
-                                </div>
+                              <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                  <span class="fw-bold">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
+                                  <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark">Ver</a>
+                              </div>
                             </div>
                         </div>
                     </div>

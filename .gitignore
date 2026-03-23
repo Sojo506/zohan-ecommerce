@@ -46,3 +46,4 @@ node_modules/
 # Local files
 # ==============================
 .htaccess.bak
+app/resources/datos.sql
