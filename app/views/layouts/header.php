@@ -32,7 +32,7 @@
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= App::url('/products') ?>">Productos</a>
+                        <a class="nav-link" href="<?= App::url('/tienda') ?>">Tienda</a>
                     </li>
 
                     <li class="nav-item">
@@ -86,3 +86,4 @@
     </nav>
 
     <div class="container mt-4">
+

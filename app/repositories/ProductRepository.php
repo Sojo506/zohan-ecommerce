@@ -38,6 +38,12 @@ class ProductRepository
         return $this->model->obtenerStockProducto($idProducto);
     }
 
+    public function fetchSimilarProducts(string $categoria, int $idProducto, int $limite = 6): array
+    {
+        return $this->model->obtenerProductosSimilares($categoria, $idProducto, $limite);
+    }
+
+
     public function sanitizeCart($cart): array
     {
         if (!is_array($cart)) {
@@ -79,7 +85,12 @@ class ProductRepository
             }
 
             $producto = $productosIndex[$idInt];
-            $subtotal = $cantidadInt * (float)$producto['PRECIO'];
+            $precio = (float)$producto['PRECIO'];
+            $descuento = (float)($producto['DESCUENTO'] ?? 0);
+            if ($descuento > 0) {
+                $precio = $precio * (1 - ($descuento / 100));
+            }
+            $subtotal = $cantidadInt * $precio;
             $total += $subtotal;
 
             $items[] = [

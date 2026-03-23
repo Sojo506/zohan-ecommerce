@@ -55,4 +55,62 @@ document.addEventListener("DOMContentLoaded", () => {
             form.classList.add("was-validated");
         });
     });
+
+    const reviewToggles = document.querySelectorAll(".rating-toggle");
+    reviewToggles.forEach((link) => {
+        link.addEventListener("click", (event) => {
+            const targetId = link.getAttribute("href")?.replace("#", "");
+            if (!targetId) return;
+            const target = document.getElementById(targetId);
+            if (!target) return;
+            event.preventDefault();
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+            if (target.focus) {
+                target.focus({ preventScroll: true });
+            }
+        });
+    });
+
+    const reviewSections = document.querySelectorAll(".rating-reviews");
+    reviewSections.forEach((section) => {
+        const chips = Array.from(section.querySelectorAll(".review-chip"));
+        const reviews = Array.from(section.querySelectorAll(".rating-review"));
+        const mediaItems = Array.from(section.querySelectorAll(".reviews-media-item"));
+
+        if (chips.length === 0) return;
+
+        const applyFilter = (filter) => {
+            reviews.forEach((item) => {
+                const tags = (item.dataset.reviewTags || "").split(/\s+/).filter(Boolean);
+                const hasPhoto = item.dataset.reviewHasPhoto === "1";
+                let visible = true;
+                if (filter === "photos") {
+                    visible = hasPhoto;
+                } else if (filter === "all") {
+                    visible = true;
+                } else {
+                    visible = tags.includes(filter);
+                }
+                item.style.display = visible ? "" : "none";
+            });
+
+            mediaItems.forEach((item) => {
+                if (filter === "photos" || filter === "all") {
+                    item.style.display = "";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        };
+
+        chips.forEach((chip) => {
+            chip.addEventListener("click", () => {
+                const filter = chip.dataset.reviewFilter || "all";
+                chips.forEach((btn) => btn.classList.remove("is-active"));
+                chip.classList.add("is-active");
+                applyFilter(filter);
+                section.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+        });
+    });
 });

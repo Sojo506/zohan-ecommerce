@@ -1,10 +1,10 @@
-﻿<main>
+<main>
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
             <h1 class="h3 mb-1">Tu carrito</h1>
             <p class="text-muted mb-0">Gestiona tus productos antes de comprar.</p>
         </div>
-        <a href="<?= App::url('/products') ?>" class="btn btn-outline-primary">Agregar m&aacute;s productos</a>
+        <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-primary">Agregar m&aacute;s productos</a>
     </div>
 
     <?php if (!empty($_SESSION['flash_success'])): ?>
@@ -17,7 +17,7 @@
 
     <?php if (empty($items)): ?>
         <div class="alert alert-info">
-            Tu carrito est&aacute; vac&iacute;o. <a href="<?= App::url('/products') ?>">Ir al cat&aacute;logo</a>
+            Tu carrito est&aacute; vac&iacute;o. <a href="<?= App::url('/tienda') ?>">Ir al cat&aacute;logo</a>
         </div>
     <?php else: ?>
         <div class="card border-0 shadow-sm">
@@ -39,6 +39,9 @@
                             $imagen = !empty($producto['URL_IMAGE'])
                                 ? $producto['URL_IMAGE']
                                 : 'https://loremflickr.com/200/150/technology?lock=' . (int)$producto['ID_PRODUCTO'];
+                            $descuento = (float)($producto['DESCUENTO'] ?? 0);
+                            $precioOriginal = (float)$producto['PRECIO'];
+                            $precioFinal = $descuento > 0 ? $precioOriginal * (1 - ($descuento / 100)) : $precioOriginal;
                             ?>
                             <tr>
                                 <td>
@@ -49,11 +52,16 @@
                                             style="object-fit: cover; border-radius: 8px;">
                                         <div>
                                             <div class="fw-semibold"><?= htmlspecialchars($producto['NOMBRE']) ?></div>
-                                            <a href="<?= App::url('/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="small">Ver detalle</a>
+                                            <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="small">Ver detalle</a>
                                         </div>
                                     </div>
                                 </td>
-                                <td>&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></td>
+                                <td>
+                                    <div class="fw-semibold">&#8353; <?= number_format($precioFinal, 0, ',', '.') ?></div>
+                                    <?php if ($descuento > 0): ?>
+                                        <div class="small text-muted text-decoration-line-through">&#8353; <?= number_format($precioOriginal, 0, ',', '.') ?></div>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
                                         <form action="<?= App::url('/cart/update') ?>" method="post" class="m-0">
@@ -92,10 +100,12 @@
                         <span class="text-muted">Total:</span>
                         <span class="fs-5 fw-bold">&#8353; <?= number_format((float)$total, 0, ',', '.') ?></span>
                     </div>
-                    <a href="<?= App::url('/products') ?>" class="btn btn-outline-primary w-100 mb-2">Agregar m&aacute;s productos</a>
+                    <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-primary w-100 mb-2">Agregar m&aacute;s productos</a>
                     <button class="btn btn-primary w-100" type="button" disabled>Proceder al pago (pr&oacute;ximo paso)</button>
                 </div>
             </div>
         </div>
     <?php endif; ?>
 </main>
+
+

@@ -32,7 +32,8 @@ class ProductController extends Controller
         $filtros = [
             'categoria' => $categoria,
             'marca' => trim($_GET['brand'] ?? ''),
-            'q' => trim($_GET['q'] ?? '')
+            'q' => trim($_GET['q'] ?? ''),
+            'promo' => (int)($_GET['promo'] ?? 0)
         ];
 
         $data = $this->repository->fetchCatalog($filtros);
@@ -54,7 +55,7 @@ class ProductController extends Controller
 
         if ($idProducto <= 0) {
             $_SESSION['flash_error'] = 'Producto no encontrado.';
-            header('Location: ' . App::url('/products'));
+            header('Location: ' . App::url('/tienda'));
             exit;
         }
 
@@ -62,7 +63,7 @@ class ProductController extends Controller
 
         if (!$producto) {
             $_SESSION['flash_error'] = 'Producto no encontrado.';
-            header('Location: ' . App::url('/products'));
+            header('Location: ' . App::url('/tienda'));
             exit;
         }
 
@@ -70,11 +71,15 @@ class ProductController extends Controller
         $this->setCart($cart);
         $imagenes = $this->repository->fetchProductImages($idProducto);
         $existencias = $this->repository->fetchProductStock($idProducto);
-
+        $similares = [];
+        if (!empty($producto['CATEGORIA'])) {
+            $similares = $this->repository->fetchSimilarProducts((string)$producto['CATEGORIA'], $idProducto, 6);
+        }
         $this->view('products/producto', [
             'producto' => $producto,
             'imagenes' => $imagenes,
             'existencias' => $existencias,
+            'similares' => $similares,
             'cartCount' => $this->repository->countCart($cart)
         ]);
     }
@@ -100,7 +105,7 @@ class ProductController extends Controller
         $producto = $this->repository->fetchProduct($idProducto);
         if (!$producto) {
             $_SESSION['flash_error'] = 'No se pudo agregar: producto invalido.';
-            header('Location: ' . App::url('/products'));
+            header('Location: ' . App::url('/tienda'));
             exit;
         }
 
@@ -250,12 +255,13 @@ class ProductController extends Controller
 
     private function redirectBack(): void
     {
-        $back = $_SERVER['HTTP_REFERER'] ?? App::url('/products');
+        $back = $_SERVER['HTTP_REFERER'] ?? App::url('/tienda');
         header('Location: ' . $back);
         exit;
     }
 }
 ?>
+
 
 
 

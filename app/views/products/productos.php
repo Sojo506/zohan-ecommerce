@@ -1,7 +1,7 @@
 <main>
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
-            <h1 class="h3 mb-1">Catalogo de productos</h1>
+            <h1 class="h3 mb-1">Tienda</h1>
             <p class="text-muted mb-0">Explora, filtra y agrega al carrito.</p>
         </div>
         <a href="<?= App::url('/cart') ?>" class="btn btn-outline-dark">
@@ -27,8 +27,8 @@
 
     <section class="card border-0 shadow-sm mb-4">
         <div class="card-body">
-            <form id="productSearchForm" action="<?= App::url('/products') ?>" method="get" class="row g-3 align-items-end">
-                <input type="hidden" name="url" value="/products">
+            <form id="productSearchForm" action="<?= App::url('/tienda') ?>" method="get" class="row g-3 align-items-end">
+                <input type="hidden" name="url" value="/tienda">
 
                 <div class="col-12 col-md-5">
                     <label for="q" class="form-label">Buscar</label>
@@ -41,10 +41,12 @@
                     <label for="category" class="form-label">Categoria</label>
                     <select id="category" name="category" class="form-select">
                         <option value="">Todas</option>
+                        <?php $categoriaSeleccionada = str_replace(' ', '', strtolower(trim((string)($filtros['categoria'] ?? '')))); ?>
                         <?php foreach (($categorias ?? []) as $categoria): ?>
                             <?php $nombreCategoria = (string)$categoria['NOMBRE']; ?>
+                            <?php $nombreKey = str_replace(' ', '', strtolower(trim($nombreCategoria))); ?>
                             <option value="<?= htmlspecialchars($nombreCategoria) ?>"
-                                <?= (($filtros['categoria'] ?? '') === $nombreCategoria) ? 'selected' : '' ?>>
+                                <?= ($categoriaSeleccionada !== '' && $categoriaSeleccionada === $nombreKey) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($nombreCategoria) ?>
                             </option>
                         <?php endforeach; ?>
@@ -100,10 +102,18 @@
                     $imagen = !empty($producto['URL_IMAGE'])
                         ? $producto['URL_IMAGE']
                         : 'https://loremflickr.com/700/450/technology?lock=' . (int)$producto['ID_PRODUCTO'];
+                    $discount = (float)($producto['DESCUENTO'] ?? 0);
+                    $precioOriginal = (float)$producto['PRECIO'];
+                    $precioPromo = $discount > 0 ? $precioOriginal * (1 - ($discount / 100)) : $precioOriginal;
+                    $ratingValue = 4.2 + ((int)$producto['ID_PRODUCTO'] % 8) * 0.1;
+                    $ratingValue = min(4.9, $ratingValue);
+                    $ratingText = number_format($ratingValue, 1);
+                    $ratingCount = number_format(2000 + ((int)$producto['ID_PRODUCTO'] * 37) % 25000);
+                    $ratingRounded = (int)round($ratingValue);
                     ?>
                     <div class="col-12 col-sm-6 col-lg-4">
                         <div class="card h-100 border-0 shadow-sm">
-                            <a href="<?= App::url('/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
+                            <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
                                 <img src="<?= htmlspecialchars($imagen) ?>"
                                     class="card-img-top"
                                     alt="<?= htmlspecialchars($producto['NOMBRE']) ?>"
@@ -114,10 +124,23 @@
                                 <div class="d-flex gap-2 mb-2 flex-wrap">
                                     <span class="badge text-bg-primary"><?= htmlspecialchars($producto['CATEGORIA']) ?></span>
                                     <span class="badge text-bg-light border"><?= htmlspecialchars($producto['MARCA']) ?></span>
+                                    <?php if ($discount > 0): ?>
+                                        <span class="badge text-bg-danger"><?= (int)$discount ?>% off</span>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="rating-row mb-2">
+                                    <span class="rating-value"><?= $ratingText ?></span>
+                                    <span class="rating-stars" aria-hidden="true">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span class="<?= $i <= $ratingRounded ? 'star-filled' : 'star-empty' ?>">&#9733;</span>
+                                        <?php endfor; ?>
+                                    </span>
+                                    <span class="rating-count">(<?= $ratingCount ?>)</span>
                                 </div>
 
                                 <h5 class="card-title">
-                                    <a href="<?= App::url('/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
+                                    <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
                                         <?= htmlspecialchars($producto['NOMBRE']) ?>
                                     </a>
                                 </h5>
@@ -125,13 +148,16 @@
                                     <?= htmlspecialchars(strlen((string)$producto['DESCRIPCION']) > 130 ? substr((string)$producto['DESCRIPCION'], 0, 127) . '...' : (string)$producto['DESCRIPCION']) ?>
                                 </p>
 
-                                <div class="d-flex justify-content-between align-items-center mt-3 mb-1">
-                                    <span class="fw-bold fs-5">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
+                                <div class="d-flex justify-content-between align-items-center mt-3 mb-1 flex-wrap gap-2">
+                                    <span class="fw-bold fs-5 text-danger">&#8353; <?= number_format($precioPromo, 0, ',', '.') ?></span>
+                                    <?php if ($discount > 0): ?>
+                                        <span class="text-muted text-decoration-line-through small">&#8353; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="text-success small fw-semibold mb-3">Existencias: <?= (int)($producto['STOCK'] ?? 0) ?></div>
 
                                 <div class="d-flex gap-2">
-                                    <a href="<?= App::url('/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-outline-dark w-50">
+                                    <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-outline-dark w-50">
                                         Ver
                                     </a>
 
@@ -148,5 +174,8 @@
         <?php endif; ?>
     </section>
 </main>
+
+
+
 
 

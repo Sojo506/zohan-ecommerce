@@ -7,10 +7,12 @@ class HomeController extends Controller
     public function index()
     {
         $productModel = new ProductModel();
-        $featuredProducts = $productModel->obtenerProductosDestacadosSemana(4);
+        $featuredProducts = $productModel->obtenerProductosDestacadosSemana(8);
+        $promoProducts = $productModel->obtenerProductosEnPromocion(8);
 
         $this->view('home/index', [
-            'featuredProducts' => $featuredProducts
+            'featuredProducts' => $featuredProducts,
+            'promoProducts' => $promoProducts
         ]);
     }
 }

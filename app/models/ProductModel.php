@@ -19,6 +19,23 @@ class ProductModel
         )";
     }
 
+    private function subconsultaPromocion(): string
+    {
+        return "(
+            SELECT
+                pp.ID_PRODUCTO,
+                pr.ID_PROMOCION,
+                pr.NOMBRE AS PROMO_NOMBRE,
+                pr.PORCENTAJE
+            FROM PROMOCION_PRODUCTO_TB pp
+            JOIN PROMOCION_TB pr ON pr.ID_PROMOCION = pp.ID_PROMOCION
+            WHERE pp.ID_ESTADO = 1
+              AND pr.ID_ESTADO = 1
+              AND (pr.FECHA_INICIO IS NULL OR pr.FECHA_INICIO <= CURDATE())
+              AND (pr.FECHA_FIN IS NULL OR pr.FECHA_FIN >= CURDATE())
+        )";
+    }
+
     public function obtenerProductos(array $filtros = []): array
     {
         $sql = "SELECT
@@ -31,11 +48,14 @@ class ProductModel
                     m.ID_MARCA,
                     m.NOMBRE AS MARCA,
                     img.URL_IMAGE,
-                    COALESCE(inv.STOCK, 0) AS STOCK
+                    COALESCE(inv.STOCK, 0) AS STOCK,
+                    promo.PORCENTAJE AS DESCUENTO,
+                    promo.PROMO_NOMBRE
                 FROM PRODUCTO_TB p
                 JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
                 JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
                 LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
                 WHERE p.ID_ESTADO = 1";
 
@@ -63,6 +83,10 @@ class ProductModel
             $params[':busquedaDescripcion'] = $busqueda;
         }
 
+        if (!empty($filtros['promo'])) {
+            $sql .= " AND promo.PORCENTAJE IS NOT NULL";
+        }
+
         $sql .= " ORDER BY p.ID_PRODUCTO DESC";
 
         $stmt = $this->db->prepare($sql);
@@ -78,9 +102,12 @@ class ProductModel
                     p.DESCRIPCION,
                     p.PRECIO,
                     img.URL_IMAGE,
-                    COALESCE(inv.STOCK, 0) AS STOCK
+                    COALESCE(inv.STOCK, 0) AS STOCK,
+                    promo.PORCENTAJE AS DESCUENTO,
+                    promo.PROMO_NOMBRE
                 FROM PRODUCTO_TB p
                 LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
                 WHERE p.ID_ESTADO = 1
                 ORDER BY p.ID_PRODUCTO DESC
@@ -101,11 +128,14 @@ class ProductModel
                     c.NOMBRE AS CATEGORIA,
                     m.NOMBRE AS MARCA,
                     img.URL_IMAGE,
-                    COALESCE(inv.STOCK, 0) AS STOCK
+                    COALESCE(inv.STOCK, 0) AS STOCK,
+                    promo.PORCENTAJE AS DESCUENTO,
+                    promo.PROMO_NOMBRE
                 FROM PRODUCTO_TB p
                 JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
                 JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
                 LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
                 WHERE p.ID_PRODUCTO = :idProducto
                   AND p.ID_ESTADO = 1
@@ -117,6 +147,50 @@ class ProductModel
 
         return $producto ?: null;
     }
+
+    public function obtenerProductosSimilares(string $categoria, int $idProducto, int $limite = 6): array
+    {
+        $categoria = trim($categoria);
+        if ($categoria === '') {
+            return [];
+        }
+
+        $sql = "SELECT
+                    p.ID_PRODUCTO,
+                    p.NOMBRE,
+                    p.DESCRIPCION,
+                    p.PRECIO,
+                    c.NOMBRE AS CATEGORIA,
+                    m.NOMBRE AS MARCA,
+                    img.URL_IMAGE,
+                    COALESCE(inv.STOCK, 0) AS STOCK,
+                    promo.PORCENTAJE AS DESCUENTO,
+                    promo.PROMO_NOMBRE
+                FROM PRODUCTO_TB p
+                JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
+                JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
+                LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
+                WHERE p.ID_ESTADO = 1
+                  AND p.ID_PRODUCTO <> :idProducto
+                  AND (
+                        LOWER(c.NOMBRE) = :categoriaExacta
+                        OR REPLACE(LOWER(c.NOMBRE), ' ', '') = :categoriaLimpia
+                  )
+                ORDER BY p.ID_PRODUCTO DESC
+                LIMIT :limite";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':idProducto', $idProducto, PDO::PARAM_INT);
+        $stmt->bindValue(':categoriaExacta', strtolower($categoria));
+        $stmt->bindValue(':categoriaLimpia', str_replace(' ', '', strtolower($categoria)));
+        $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 
     public function obtenerImagenesProducto(int $idProducto): array
     {
@@ -196,9 +270,12 @@ class ProductModel
                     p.NOMBRE,
                     p.PRECIO,
                     img.URL_IMAGE,
-                    COALESCE(inv.STOCK, 0) AS STOCK
+                    COALESCE(inv.STOCK, 0) AS STOCK,
+                    promo.PORCENTAJE AS DESCUENTO,
+                    promo.PROMO_NOMBRE
                 FROM PRODUCTO_TB p
                 LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
                 WHERE p.ID_ESTADO = 1
                   AND p.ID_PRODUCTO IN ($placeholders)
@@ -206,6 +283,36 @@ class ProductModel
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($ids);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerProductosEnPromocion(int $limite = 8): array
+    {
+        $sql = "SELECT
+                    p.ID_PRODUCTO,
+                    p.NOMBRE,
+                    p.DESCRIPCION,
+                    p.PRECIO,
+                    c.NOMBRE AS CATEGORIA,
+                    m.NOMBRE AS MARCA,
+                    img.URL_IMAGE,
+                    COALESCE(inv.STOCK, 0) AS STOCK,
+                    promo.PORCENTAJE AS DESCUENTO,
+                    promo.PROMO_NOMBRE
+                FROM PRODUCTO_TB p
+                JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
+                JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
+                LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
+                WHERE p.ID_ESTADO = 1
+                  AND promo.PORCENTAJE IS NOT NULL
+                ORDER BY promo.PORCENTAJE DESC, p.ID_PRODUCTO DESC
+                LIMIT :limite";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

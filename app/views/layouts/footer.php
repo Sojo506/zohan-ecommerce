@@ -21,20 +21,20 @@
                                 <div class="col-6 col-md-3 col-lg-2">
                                         <h6 class="fw-bold">Tienda</h6>
                                         <ul class="list-unstyled small">
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/products') ?>">Catálogo</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/products?sort=top') ?>">Top ventas</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/products?sort=new') ?>">Novedades</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/products?promo=1') ?>">Ofertas</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda') ?>">Catálogo</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?sort=top') ?>">Top ventas</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?sort=new') ?>">Novedades</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?promo=1') ?>">Ofertas</a></li>
                                         </ul>
                                 </div>
 
                                 <div class="col-6 col-md-3 col-lg-2">
                                         <h6 class="fw-bold">Categorías</h6>
                                         <ul class="list-unstyled small">
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/products?category=laptops') ?>">Laptops</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/products?category=components') ?>">Componentes</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/products?category=gaming') ?>">Gaming</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/products?category=accessories') ?>">Accesorios</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?category=laptops') ?>">Laptops</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?category=components') ?>">Componentes</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?category=gaming') ?>">Gaming</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?category=accessories') ?>">Accesorios</a></li>
                                         </ul>
                                 </div>
 
