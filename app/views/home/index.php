@@ -54,7 +54,7 @@
                             </div>
 
                             <div class="mt-3 d-grid">
-                                <a href="<?= App::url('/products') ?>" class="btn btn-outline-primary">
+                                <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-primary">
                                     Ver ofertas
                                 </a>
                             </div>
@@ -73,16 +73,28 @@
                     <h2 class="fw-bold mb-1">Compra por categoria</h2>
                     <p class="text-muted mb-0">Encuentra rapido lo que buscas.</p>
                 </div>
-                <a href="<?= App::url('/products') ?>" class="btn btn-outline-dark">Ver todo</a>
+                <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-dark">Ver todo</a>
             </div>
+
+            <?php
+            $categoryImages = [
+                'laptops' => 'https://i.rtings.com/assets/pages/6dRuEBex/best-gaming-laptops-20242028-medium.jpg?format=auto',
+                'components' => 'https://nattia.com/wp-content/uploads/2024/03/GPU-1024x683.webp',
+                'gaming' => 'https://assets2.razerzone.com/images/pnx.assets/f83991a174978c3f88c089758ea9fa3c/blackwidow-v3-tenkeyless-usp1-mobile-v2.jpg',
+                'accessories' => 'https://www.elespectador.com/resizer/v2/5CBHLZCCCJBWVC56EX7OXL5AAM.jpg?auth=53954a66e17aa8395bcf5802abc2912d4907e69cd030f61489fd10b267e42392&width=920&height=613&smart=true&quality=60',
+            ];
+            ?>
 
             <div class="row g-3 g-md-4">
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <a href="<?= App::url('/products?category=laptops') ?>" class="text-decoration-none">
+                    <a href="<?= App::url('/tienda?category=laptops') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
+                            <div class="category-card-image">
+                                <img src="<?= htmlspecialchars($categoryImages['laptops']) ?>" alt="Laptops">
+                            </div>
                             <div class="card-body p-4">
                                 <div class="fs-2 mb-2"></div>
-                                <h5 class="fw-bold mb-1">Laptops</h5>
+                                <h5 class="fw-bold mb-1">💻 Laptops</h5>
                                 <p class="text-muted mb-0">Estudio, trabajo y gaming.</p>
                             </div>
                         </div>
@@ -90,11 +102,14 @@
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <a href="<?= App::url('/products?category=components') ?>" class="text-decoration-none">
+                    <a href="<?= App::url('/tienda?category=components') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
+                            <div class="category-card-image">
+                                <img src="<?= htmlspecialchars($categoryImages['components']) ?>" alt="Componentes">
+                            </div>
                             <div class="card-body p-4">
                                 <div class="fs-2 mb-2"></div>
-                                <h5 class="fw-bold mb-1">Componentes</h5>
+                                <h5 class="fw-bold mb-1">🧩 Componentes</h5>
                                 <p class="text-muted mb-0">GPU, RAM, SSD, PSU.</p>
                             </div>
                         </div>
@@ -102,11 +117,14 @@
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <a href="<?= App::url('/products?category=gaming') ?>" class="text-decoration-none">
+                    <a href="<?= App::url('/tienda?category=gaming') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
+                            <div class="category-card-image">
+                                <img src="<?= htmlspecialchars($categoryImages['gaming']) ?>" alt="Gaming">
+                            </div>
                             <div class="card-body p-4">
                                 <div class="fs-2 mb-2"></div>
-                                <h5 class="fw-bold mb-1">Gaming</h5>
+                                <h5 class="fw-bold mb-1">🎮 Gaming</h5>
                                 <p class="text-muted mb-0">Perifricos y setups.</p>
                             </div>
                         </div>
@@ -114,11 +132,14 @@
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <a href="<?= App::url('/products?category=accessories') ?>" class="text-decoration-none">
+                    <a href="<?= App::url('/tienda?category=accessories') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
+                            <div class="category-card-image">
+                                <img src="<?= htmlspecialchars($categoryImages['accessories']) ?>" alt="Accesorios">
+                            </div>
                             <div class="card-body p-4">
                                 <div class="fs-2 mb-2"></div>
-                                <h5 class="fw-bold mb-1">Accesorios</h5>
+                                <h5 class="fw-bold mb-1">🎧 Accesorios</h5>
                                 <p class="text-muted mb-0">Audio, cables, hubs.</p>
                             </div>
                         </div>
@@ -133,18 +154,24 @@
         <div class="container">
             <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-2 mb-4">
                 <div>
-                    <h2 class="fw-bold mb-1">Destacados de la semana</h2>
+                    <h2 class="fw-bold mb-1">Productos destacados del mes</h2>
                     <p class="text-muted mb-0">Productos populares y bien valorados.</p>
                 </div>
-                <a href="<?= App::url('/products') ?>" class="btn btn-primary">Ir al catalogo</a>
+                <a href="<?= App::url('/tienda') ?>" class="btn btn-primary">Ir al catalogo</a>
             </div>
 
+            <?php $featuredList = array_slice(($featuredProducts ?? []), 0, 4); ?>
             <div class="row g-3 g-md-4">
-                <?php foreach (($featuredProducts ?? []) as $producto): ?>
+                <?php foreach ($featuredList as $producto): ?>
                     <?php
                     $imagen = !empty($producto['URL_IMAGE'])
                         ? $producto['URL_IMAGE']
                         : 'https://loremflickr.com/700/700/technology?lock=' . (int)$producto['ID_PRODUCTO'];
+                    $ratingValue = 4.2 + ((int)$producto['ID_PRODUCTO'] % 8) * 0.1;
+                    $ratingValue = min(4.9, $ratingValue);
+                    $ratingText = number_format($ratingValue, 1);
+                    $ratingCount = number_format(2000 + ((int)$producto['ID_PRODUCTO'] * 37) % 25000);
+                    $ratingRounded = (int)round($ratingValue);
                     ?>
                     <div class="col-12 col-sm-6 col-lg-3">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
@@ -154,10 +181,19 @@
                             <div class="card-body">
                                 <h6 class="fw-bold mb-1"><?= htmlspecialchars($producto['NOMBRE']) ?></h6>
                                 <p class="text-muted small mb-2"><?= htmlspecialchars(strlen((string)$producto['DESCRIPCION']) > 35 ? substr((string)$producto['DESCRIPCION'], 0, 35) . '...' : (string)$producto['DESCRIPCION']) ?></p>
-                                <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                                    <span class="fw-bold">$ <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
-                                    <a href="<?= App::url('/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark">Ver</a>
+                                <div class="rating-row mb-2">
+                                    <span class="rating-value"><?= $ratingText ?></span>
+                                    <span class="rating-stars" aria-hidden="true">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span class="<?= $i <= $ratingRounded ? 'star-filled' : 'star-empty' ?>">&#9733;</span>
+                                        <?php endfor; ?>
+                                    </span>
+                                    <span class="rating-count">(<?= $ratingCount ?>)</span>
                                 </div>
+                              <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                  <span class="fw-bold">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
+                                  <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark">Ver</a>
+                              </div>
                             </div>
                         </div>
                     </div>
@@ -165,10 +201,65 @@
             </div>
 
             <div class="mt-4 text-center">
-                <a href="<?= App::url('/products') ?>" class="btn btn-outline-secondary btn-lg px-4">
+                <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-secondary btn-lg px-4">
                     Ver mas productos
                 </a>
             </div>
+        </div>
+    </section>
+
+    <!-- PROMOS -->
+    <section class="py-4 py-md-5">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-2 mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Productos en promocion</h2>
+                    <p class="text-muted mb-0">Ofertas por tiempo limitado en tecnologia seleccionada.</p>
+                </div>
+                <a href="<?= App::url('/tienda?promo=1') ?>" class="btn btn-outline-dark">Ver mas</a>
+            </div>
+
+            <?php
+            $promoItems = $promoProducts ?? [];
+            ?>
+
+            <?php if (!empty($promoItems)): ?>
+                <div class="row g-3 g-md-4">
+                    <?php foreach ($promoItems as $index => $producto): ?>
+                        <?php
+                        $imagen = !empty($producto['URL_IMAGE'])
+                            ? $producto['URL_IMAGE']
+                            : 'https://loremflickr.com/700/700/technology?lock=' . (int)$producto['ID_PRODUCTO'];
+                        $discount = (float)($producto['DESCUENTO'] ?? 0);
+                        $precioOriginal = (float)$producto['PRECIO'];
+                        $precioPromo = $discount > 0 ? $precioOriginal * (1 - ($discount / 100)) : $precioOriginal;
+                        ?>
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card promo-card h-100 border-0 shadow-sm rounded-4">
+                                <div class="ratio ratio-1x1 bg-white border-bottom">
+                                    <img src="<?= htmlspecialchars($imagen) ?>" alt="<?= htmlspecialchars($producto['NOMBRE']) ?>" class="w-100 h-100 object-fit-cover">
+                                </div>
+                                <div class="card-body">
+                                    <?php if ($discount > 0): ?>
+                                        <span class="promo-badge"><?= (int)$discount ?>% off</span>
+                                        <div class="promo-deal">Oferta por tiempo limitado</div>
+                                    <?php endif; ?>
+                                    <div class="fw-semibold small mb-2"><?= htmlspecialchars($producto['NOMBRE']) ?></div>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <span class="fw-bold text-danger">&#8353; <?= number_format($precioPromo, 0, ',', '.') ?></span>
+                                        <?php if ($discount > 0): ?>
+                                            <span class="text-muted text-decoration-line-through small">&#8353; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark mt-2">Ver</a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="alert alert-info">No hay promociones activas por ahora.</div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -244,7 +335,7 @@
                             </div>
 
                             <div class="d-grid mt-4">
-                                <a href="<?= App::url('/products') ?>" class="btn btn-primary btn-lg">
+                                <a href="<?= App::url('/tienda') ?>" class="btn btn-primary btn-lg">
                                     Explorar ahora
                                 </a>
                             </div>
@@ -424,6 +515,8 @@
     </section>
 
 </main>
+
+
 
 
 

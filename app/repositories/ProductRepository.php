@@ -97,6 +97,11 @@ class ProductRepository
         return $this->model->obtenerStockProducto($idProducto);
     }
 
+    public function fetchSimilarProducts(string $categoria, int $idProducto, int $limite = 6): array
+    {
+        return $this->model->obtenerProductosSimilares($categoria, $idProducto, $limite);
+    }
+
     /* =========================
        CARRITO
     ========================= */
@@ -111,7 +116,6 @@ class ProductRepository
         $clean = [];
 
         foreach ($cart as $id => $cantidad) {
-
             $idInt = (int)$id;
             $cantidadInt = (int)$cantidad;
 
@@ -140,7 +144,6 @@ class ProductRepository
         $clean = [];
 
         foreach ($cart as $id => $cantidad) {
-
             $idInt = (int)$id;
             $cantidadInt = (int)$cantidad;
 
@@ -150,7 +153,14 @@ class ProductRepository
 
             $producto = $productosIndex[$idInt];
 
-            $subtotal = $cantidadInt * (float)$producto['PRECIO'];
+            $precio = (float)$producto['PRECIO'];
+            $descuento = (float)($producto['DESCUENTO'] ?? 0);
+
+            if ($descuento > 0) {
+                $precio = $precio * (1 - ($descuento / 100));
+            }
+
+            $subtotal = $cantidadInt * $precio;
             $total += $subtotal;
 
             $items[] = [
@@ -177,7 +187,6 @@ class ProductRepository
         $ids = array_keys($cart);
 
         if (!empty($ids)) {
-
             $productos = $this->model->obtenerProductosPorIds($ids);
 
             $validos = [];
@@ -188,7 +197,6 @@ class ProductRepository
 
             // El conteo ignora productos eliminados o inválidos aunque sigan en sesión.
             foreach (array_keys($cart) as $id) {
-
                 $idInt = (int)$id;
 
                 if (!isset($validos[$idInt])) {

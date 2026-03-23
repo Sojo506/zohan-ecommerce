@@ -1,10 +1,10 @@
-﻿<main>
+<main>
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
             <h1 class="h3 mb-1">Tu carrito</h1>
             <p class="text-muted mb-0">Gestiona tus productos antes de comprar.</p>
         </div>
-        <a href="<?= App::url('/products') ?>" class="btn btn-outline-primary">Agregar m&aacute;s productos</a>
+        <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-primary">Agregar m&aacute;s productos</a>
     </div>
 
     <?php if (!empty($_SESSION['flash_success'])): ?>
@@ -23,7 +23,7 @@
 
     <?php if (empty($items)): ?>
         <div class="alert alert-info">
-            Tu carrito est&aacute; vac&iacute;o. <a href="<?= App::url('/products') ?>">Ir al cat&aacute;logo</a>
+            Tu carrito est&aacute; vac&iacute;o. <a href="<?= App::url('/tienda') ?>">Ir al cat&aacute;logo</a>
         </div>
     <?php else: ?>
         <div class="card border-0 shadow-sm">
@@ -44,46 +44,60 @@
                             $producto = $item['producto'];
                             $imagen = !empty($producto['URL_IMAGE'])
                                 ? $producto['URL_IMAGE']
-                                : 'https://loremflickr.com/200/150/technology?lock=' . (int) $producto['ID_PRODUCTO'];
+                                : 'https://loremflickr.com/200/150/technology?lock=' . (int)$producto['ID_PRODUCTO'];
+
+                            $descuento = (float)($producto['DESCUENTO'] ?? 0);
+                            $precioOriginal = (float)$producto['PRECIO'];
+                            $precioFinal = $descuento > 0
+                                ? $precioOriginal * (1 - ($descuento / 100))
+                                : $precioOriginal;
                             ?>
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
                                         <img src="<?= htmlspecialchars($imagen) ?>"
-                                            alt="<?= htmlspecialchars($producto['NOMBRE']) ?>" width="72" height="56"
+                                            alt="<?= htmlspecialchars($producto['NOMBRE']) ?>"
+                                            width="72"
+                                            height="56"
                                             style="object-fit: cover; border-radius: 8px;">
                                         <div>
                                             <div class="fw-semibold"><?= htmlspecialchars($producto['NOMBRE']) ?></div>
-                                            <a href="<?= App::url('/product?id=' . (int) $producto['ID_PRODUCTO']) ?>"
+                                            <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>"
                                                 class="small">Ver detalle</a>
                                         </div>
                                     </div>
                                 </td>
-                                <td>$ <?= number_format((float) $producto['PRECIO'], 0, ',', '.') ?></td>
+                                <td>
+                                    <div class="fw-semibold">&#8353; <?= number_format($precioFinal, 0, ',', '.') ?></div>
+                                    <?php if ($descuento > 0): ?>
+                                        <div class="small text-muted text-decoration-line-through">
+                                            &#8353; <?= number_format($precioOriginal, 0, ',', '.') ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
                                         <form action="<?= App::url('/cart/update') ?>" method="post" class="m-0">
-                                            <input type="hidden" name="id_producto"
-                                                value="<?= (int) $producto['ID_PRODUCTO'] ?>">
+                                            <input type="hidden" name="id_producto" value="<?= (int)$producto['ID_PRODUCTO'] ?>">
                                             <input type="hidden" name="accion" value="restar">
                                             <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
                                         </form>
 
-                                        <span class="fw-semibold"><?= (int) $item['cantidad'] ?></span>
+                                        <span class="fw-semibold"><?= (int)$item['cantidad'] ?></span>
 
                                         <form action="<?= App::url('/cart/update') ?>" method="post" class="m-0">
-                                            <input type="hidden" name="id_producto"
-                                                value="<?= (int) $producto['ID_PRODUCTO'] ?>">
+                                            <input type="hidden" name="id_producto" value="<?= (int)$producto['ID_PRODUCTO'] ?>">
                                             <input type="hidden" name="accion" value="sumar">
                                             <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
                                         </form>
                                     </div>
                                 </td>
-                                <td class="fw-semibold">$ <?= number_format((float) $item['subtotal'], 0, ',', '.') ?>
+                                <td class="fw-semibold">
+                                    &#8353; <?= number_format((float)$item['subtotal'], 0, ',', '.') ?>
                                 </td>
                                 <td>
                                     <form action="<?= App::url('/cart/remove') ?>" method="post">
-                                        <input type="hidden" name="id_producto" value="<?= (int) $producto['ID_PRODUCTO'] ?>">
+                                        <input type="hidden" name="id_producto" value="<?= (int)$producto['ID_PRODUCTO'] ?>">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                     </form>
                                 </td>
@@ -99,27 +113,37 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted">Total:</span>
-                        <span class="fs-5 fw-bold">$ <?= number_format((float) $total, 0, ',', '.') ?></span>
+                        <span class="fs-5 fw-bold">&#8353; <?= number_format((float)$total, 0, ',', '.') ?></span>
                     </div>
-                    <a href="<?= App::url('/products') ?>" class="btn btn-outline-primary w-100 mb-2">Agregar m&aacute;s
-                        productos</a>
+
+                    <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-primary w-100 mb-2">
+                        Agregar m&aacute;s productos
+                    </a>
 
                     <?php if (isset($_SESSION['user'])): ?>
                         <div id="paypal-button-container" class="mt-3 w-100"></div>
 
-                        <script
-                            src="https://www.paypal.com/sdk/js?client-id=<?= Env::get('PAYPAL_CLIENT_ID') ?>&currency=USD"></script>
+                        <script src="https://www.paypal.com/sdk/js?client-id=<?= Env::get('PAYPAL_CLIENT_ID') ?>&currency=USD"></script>
                         <script>
-                            const totalColones = <?= (float) $total ?>;
+                            const totalColones = <?= (float)$total ?>;
                             const tipoCambio = 510;
                             const totalUSD = (totalColones / tipoCambio).toFixed(2);
 
                             paypal.Buttons({
-                                style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'pay' },
+                                style: {
+                                    layout: 'vertical',
+                                    color: 'blue',
+                                    shape: 'rect',
+                                    label: 'pay'
+                                },
 
                                 createOrder: function (data, actions) {
                                     return actions.order.create({
-                                        purchase_units: [{ amount: { value: totalUSD } }]
+                                        purchase_units: [{
+                                            amount: {
+                                                value: totalUSD
+                                            }
+                                        }]
                                     });
                                 },
 
@@ -133,47 +157,47 @@
                                             orderID: data.orderID
                                         })
                                     })
-                                        .then(function (response) {
-                                            return response.json();
-                                        })
-                                        .then(function (resultado) {
-                                            if (resultado.success) {
-                                                return Swal.fire({
-                                                    icon: 'success',
-                                                    title: 'Pago procesado',
-                                                    text: resultado.message,
-                                                    showDenyButton: true,
-                                                    confirmButtonText: 'Ir a mi perfil',
-                                                    denyButtonText: 'Seguir comprando',
-                                                    allowOutsideClick: false,
-                                                    allowEscapeKey: false
-                                                }).then(function (decision) {
-                                                    if (decision.isConfirmed) {
-                                                        window.location.href = '<?= App::url('/profile') ?>';
-                                                        return;
-                                                    }
-
-                                                    if (decision.isDenied) {
-                                                        window.location.href = '<?= App::url('/products') ?>';
-                                                    }
-                                                });
-                                            }
-
+                                    .then(function (response) {
+                                        return response.json();
+                                    })
+                                    .then(function (resultado) {
+                                        if (resultado.success) {
                                             return Swal.fire({
-                                                icon: 'error',
-                                                title: 'No se pudo procesar el pago',
-                                                text: resultado.message || 'Ocurrió un problema al confirmar la compra.',
-                                                confirmButtonText: 'Entendido'
+                                                icon: 'success',
+                                                title: 'Pago procesado',
+                                                text: resultado.message,
+                                                showDenyButton: true,
+                                                confirmButtonText: 'Ir a mi perfil',
+                                                denyButtonText: 'Seguir comprando',
+                                                allowOutsideClick: false,
+                                                allowEscapeKey: false
+                                            }).then(function (decision) {
+                                                if (decision.isConfirmed) {
+                                                    window.location.href = '<?= App::url('/profile') ?>';
+                                                    return;
+                                                }
+
+                                                if (decision.isDenied) {
+                                                    window.location.href = '<?= App::url('/tienda') ?>';
+                                                }
                                             });
-                                        })
-                                        .catch(function () {
-                                            return Swal.fire({
-                                                icon: 'error',
-                                                title: 'Error inesperado',
-                                                text: 'Ocurrió un error inesperado al procesar el pago.',
-                                                confirmButtonText: 'Entendido'
-                                            });
+                                        }
+
+                                        return Swal.fire({
+                                            icon: 'error',
+                                            title: 'No se pudo procesar el pago',
+                                            text: resultado.message || 'Ocurrió un problema al confirmar la compra.',
+                                            confirmButtonText: 'Entendido'
                                         });
+                                    })
+                                    .catch(function () {
+                                        return Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error inesperado',
+                                            text: 'Ocurrió un error inesperado al procesar el pago.',
+                                            confirmButtonText: 'Entendido'
+                                        });
+                                    });
                                 },
 
                                 onCancel: function () {
@@ -184,6 +208,7 @@
                                         confirmButtonText: 'Seguir comprando'
                                     });
                                 },
+
                                 onError: function () {
                                     Swal.fire({
                                         icon: 'error',
@@ -199,7 +224,6 @@
                             Inicia sesión para pagar
                         </a>
                     <?php endif; ?>
-
                 </div>
             </div>
         </div>

@@ -10,9 +10,11 @@ class HomeController extends Controller
 
         // La portada destaca una selección acotada de productos de la semana.
         $featuredProducts = $productModel->obtenerProductosDestacadosSemana(4);
+        $promoProducts = $productModel->obtenerProductosEnPromocion(4);
 
         $this->view('home/index', [
-            'featuredProducts' => $featuredProducts
+            'featuredProducts' => $featuredProducts,
+            'promoProducts' => $promoProducts
         ]);
     }
 }
