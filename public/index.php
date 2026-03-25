@@ -177,6 +177,11 @@ $router->post('/cart/remove', 'CartController@remove');
 $router->post('/cart/clear', 'CartController@clear');
 
 
+/* CUPONES API */
+$router->post('/api/coupon/validate', 'CouponController@validate');
+$router->post('/api/coupon/remove', 'CouponController@remove');
+
+
 /* PAGOS  */
 $router->post('/api/payment/capture', 'PaymentController@capture');
 
