@@ -191,7 +191,7 @@
                                     <span class="rating-count">(<?= $ratingCount ?>)</span>
                                 </div>
                               <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                                  <span class="fw-bold">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
+                                  <span class="fw-bold">&#36; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
                                   <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark">Ver</a>
                               </div>
                             </div>
@@ -246,9 +246,9 @@
                                     <?php endif; ?>
                                     <div class="fw-semibold small mb-2"><?= htmlspecialchars($producto['NOMBRE']) ?></div>
                                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <span class="fw-bold text-danger">&#8353; <?= number_format($precioPromo, 0, ',', '.') ?></span>
+                                        <span class="fw-bold text-danger">&#36; <?= number_format($precioPromo, 0, ',', '.') ?></span>
                                         <?php if ($discount > 0): ?>
-                                            <span class="text-muted text-decoration-line-through small">&#8353; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
+                                            <span class="text-muted text-decoration-line-through small">&#36; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
                                         <?php endif; ?>
                                     </div>
                                     <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark mt-2">Ver</a>

@@ -68,10 +68,10 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">&#8353; <?= number_format($precioFinal, 0, ',', '.') ?></div>
+                                    <div class="fw-semibold">&#36; <?= number_format($precioFinal, 0, ',', '.') ?></div>
                                     <?php if ($descuento > 0): ?>
                                         <div class="small text-muted text-decoration-line-through">
-                                            &#8353; <?= number_format($precioOriginal, 0, ',', '.') ?>
+                                            &#36; <?= number_format($precioOriginal, 0, ',', '.') ?>
                                         </div>
                                     <?php endif; ?>
                                 </td>
@@ -93,7 +93,7 @@
                                     </div>
                                 </td>
                                 <td class="fw-semibold">
-                                    &#8353; <?= number_format((float)$item['subtotal'], 0, ',', '.') ?>
+                                    &#36; <?= number_format((float)$item['subtotal'], 0, ',', '.') ?>
                                 </td>
                                 <td>
                                     <form action="<?= App::url('/cart/remove') ?>" method="post">
@@ -139,7 +139,7 @@
 
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="text-muted">Subtotal:</span>
-                        <span id="display-subtotal" class="fw-semibold">&#8353; <?= number_format((float)$total, 0, ',', '.') ?></span>
+                        <span id="display-subtotal" class="fw-semibold">&#36; <?= number_format((float)$total, 0, ',', '.') ?></span>
                     </div>
 
                     <div id="coupon-discount-row" class="d-flex justify-content-between align-items-center mb-1"
@@ -147,7 +147,7 @@
                         <span class="text-success small">Descuento (<span id="coupon-percent"><?= (float)($_SESSION['coupon']['percentage'] ?? 0) ?></span>%):</span>
                         <span id="display-discount" class="text-success fw-semibold">
                             <?php if (isset($_SESSION['coupon'])): ?>
-                                - &#8353; <?= number_format((float)$total * ($_SESSION['coupon']['percentage'] / 100), 0, ',', '.') ?>
+                                - &#36; <?= number_format((float)$total * ($_SESSION['coupon']['percentage'] / 100), 0, ',', '.') ?>
                             <?php endif; ?>
                         </span>
                     </div>
@@ -161,7 +161,7 @@
                                 $totalFinal = $totalFinal * (1 - ($_SESSION['coupon']['percentage'] / 100));
                             }
                             ?>
-                            &#8353; <?= number_format($totalFinal, 0, ',', '.') ?>
+                            &#36; <?= number_format($totalFinal, 0, ',', '.') ?>
                         </span>
                     </div>
 
