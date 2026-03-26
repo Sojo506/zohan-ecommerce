@@ -36,7 +36,16 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= App::url('/cart') ?>">Carrito</a>
+                        <a class="nav-link cart-link" href="<?= App::url('/cart') ?>" aria-label="Carrito">
+                            <span class="cart-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" role="img" focusable="false">
+                                    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.2 6l.94 4.5h8.28l1.26-5.5H6.21L5.27 2H2v2h2l2.1 9.9c.1.5.55.85 1.06.85h10.4c.5 0 .94-.35 1.05-.83L21 6H7.2z"/>
+                                </svg>
+                            </span>
+                            <?php if (!empty($cartCount)): ?>
+                                <span class="cart-badge"><?= (int)$cartCount ?></span>
+                            <?php endif; ?>
+                        </a>
                     </li>
 
                     <?php if (isset($_SESSION['user'])): ?>
