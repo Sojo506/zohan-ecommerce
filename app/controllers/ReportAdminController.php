@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../repositories/ReportRepository.php';
+require_once __DIR__ . '/../models/ReportModel.php';
 require_once __DIR__ . '/../services/SimplePdfService.php';
 
 class ReportAdminController extends Controller
@@ -24,7 +24,7 @@ class ReportAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new ReportRepository();
+        $repo = new ReportModel();
 
         $this->adminView('admin/reports/index', [
             'pageTitle' => 'Reportes',
@@ -40,7 +40,7 @@ class ReportAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new ReportRepository();
+        $repo = new ReportModel();
         $pdf = new SimplePdfService();
         $report = $this->buildReport($repo, $type);
 
@@ -54,7 +54,7 @@ class ReportAdminController extends Controller
         $pdf->download($report['filename'], $report['title'], $report['sections']);
     }
 
-    private function buildReport(ReportRepository $repo, string $type): ?array
+    private function buildReport(ReportModel $repo, string $type): ?array
     {
         // Mapea el slug de la ruta al generador de contenido correspondiente.
         switch ($type) {
@@ -69,7 +69,7 @@ class ReportAdminController extends Controller
         }
     }
 
-    private function executiveSummaryReport(ReportRepository $repo): array
+    private function executiveSummaryReport(ReportModel $repo): array
     {
         $overview = $repo->salesOverview();
         $monthlyRevenue = $repo->monthlyRevenue();
@@ -119,7 +119,7 @@ class ReportAdminController extends Controller
         ];
     }
 
-    private function topProductsReport(ReportRepository $repo): array
+    private function topProductsReport(ReportModel $repo): array
     {
         $topProducts = $repo->topSellingProducts(12);
         $lines = [];
@@ -144,7 +144,7 @@ class ReportAdminController extends Controller
         ];
     }
 
-    private function criticalInventoryReport(ReportRepository $repo): array
+    private function criticalInventoryReport(ReportModel $repo): array
     {
         $criticalInventory = $repo->criticalInventory(15);
         $lines = [];

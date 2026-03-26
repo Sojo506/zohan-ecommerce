@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../repositories/SaleRepository.php';
-require_once __DIR__ . '/../repositories/InvoiceRepository.php';
+require_once __DIR__ . '/../models/SaleModel.php';
+require_once __DIR__ . '/../models/InvoiceModel.php';
 
 class SaleAdminController extends Controller
 {
@@ -25,7 +25,7 @@ class SaleAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new SaleRepository();
+        $repo = new SaleModel();
 
         $sales = $repo->all();
 
@@ -40,8 +40,8 @@ class SaleAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new SaleRepository();
-        $invoiceRepo = new InvoiceRepository();
+        $repo = new SaleModel();
+        $invoiceRepo = new InvoiceModel();
 
         // Une la venta con sus productos y la factura relacionada para la vista de detalle.
         $sale = $repo->find($id);

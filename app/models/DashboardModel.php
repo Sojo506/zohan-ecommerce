@@ -1,6 +1,6 @@
 <?php
 
-class DashboardRepository
+class DashboardModel
 {
     private PDO $db;
 

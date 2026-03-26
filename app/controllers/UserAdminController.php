@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../models/UserModel.php';
 
 class UserAdminController extends Controller
 {
@@ -24,7 +24,7 @@ class UserAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new UserRepository();
+        $repo = new UserModel();
 
         $users = $repo->all();
 
@@ -39,7 +39,7 @@ class UserAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new UserRepository();
+        $repo = new UserModel();
 
         // El detalle reúne datos base del usuario y sus medios de contacto asociados.
         $user = $repo->find($id);
@@ -59,7 +59,7 @@ class UserAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new UserRepository();
+        $repo = new UserModel();
 
         $repo->changeStatus($id, $status);
 
@@ -70,7 +70,7 @@ class UserAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new UserRepository();
+        $repo = new UserModel();
 
         // El valor del rol llega desde la ruta para simplificar acciones rápidas desde la tabla.
         $repo->changeRole($id, $role);

@@ -1,6 +1,6 @@
 <?php
 
-class CategoryRepository
+class CategoryModel
 {
     private PDO $db;
 

@@ -1,14 +1,14 @@
 <?php
 
-require_once __DIR__ . '/ProductRepository.php';
+require_once __DIR__ . '/ProductModel.php';
 
-class CartRepository
+class CartModel
 {
-    private ProductRepository $products;
+    private ProductModel $products;
 
-    public function __construct(?ProductRepository $products = null)
+    public function __construct(?ProductModel $products = null)
     {
-        $this->products = $products ?? new ProductRepository();
+        $this->products = $products ?? new ProductModel();
     }
 
     public function syncSessionCart(): array

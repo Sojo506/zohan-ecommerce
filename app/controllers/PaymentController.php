@@ -1,15 +1,15 @@
 <?php
 
-require_once __DIR__ . '/../repositories/PaymentRepository.php';
-require_once __DIR__ . '/../repositories/CouponRepository.php';
+require_once __DIR__ . '/../models/PaymentModel.php';
+require_once __DIR__ . '/../models/CouponModel.php';
 
 class PaymentController extends Controller
 {
-    private PaymentRepository $repository;
+    private PaymentModel $paymentModel;
 
     public function __construct()
     {
-        $this->repository = new PaymentRepository();
+        $this->paymentModel = new PaymentModel();
     }
 
     public function capture()
@@ -35,13 +35,13 @@ class PaymentController extends Controller
             return;
         }
 
-        $accessToken = $this->repository->getPayPalAccessToken();
+        $accessToken = $this->paymentModel->getPayPalAccessToken();
         if (!$accessToken) {
             echo json_encode(['success' => false, 'message' => 'Fallo la autenticacion con PayPal. Revisa tus credenciales o conexión cURL.']);
             return;
         }
 
-        $captureResult = $this->repository->capturePayPalOrder($orderId, $accessToken);
+        $captureResult = $this->paymentModel->capturePayPalOrder($orderId, $accessToken);
 
         if (($captureResult['status'] ?? null) !== 'COMPLETED') {
             $errorMsg = $captureResult['message'] ?? 'El pago no fue completado por PayPal';
@@ -57,7 +57,7 @@ class PaymentController extends Controller
         $couponId = null;
 
         if ($coupon) {
-            $couponRepo = new CouponRepository();
+            $couponRepo = new CouponModel();
             $validCoupon = $couponRepo->findValidByCode($coupon['code']);
 
             if ($validCoupon) {
@@ -66,11 +66,11 @@ class PaymentController extends Controller
         }
 
         // Solo después de una captura confirmada se registra la venta en la BD local.
-        $result = $this->repository->registerCapturedPayment($orderId, $paypalCaptureId, $amountUsd, $couponId);
+        $result = $this->paymentModel->registerCapturedPayment($orderId, $paypalCaptureId, $amountUsd, $couponId);
 
         if (($result['success'] ?? false) === true) {
             // El carrito se vacía únicamente cuando el registro local terminó bien.
-            $this->repository->clearCart();
+            $this->paymentModel->clearCart();
 
             // Decrementar uso del cupón y limpiar sesión.
             if ($couponId && isset($couponRepo)) {

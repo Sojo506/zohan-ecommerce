@@ -1,1 +1,0 @@
-Modelos que manejan la lógica y consultas a la base de datos.

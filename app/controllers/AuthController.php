@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../helpers/Security.php';
 require_once __DIR__ . '/../services/Mailer.php';
-require_once __DIR__ . '/../repositories/ProductRepository.php';
+require_once __DIR__ . '/../models/ProductModel.php';
 
 class AuthController extends Controller
 {
@@ -99,7 +99,7 @@ class AuthController extends Controller
 
         try {
             // Sincroniza el carrito entre sesión y BD para no perder productos tras iniciar sesión.
-            $repo = new ProductRepository();
+            $repo = new ProductModel();
             $sessionCart = $repo->sanitizeCart($_SESSION['cart'] ?? []);
             $idCuenta = (int)$cuenta['ID_CUENTA'];
 

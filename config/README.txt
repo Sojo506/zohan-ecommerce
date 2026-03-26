@@ -1,1 +1,0 @@
-Archivos de configuración (database.php, mail.php, cloudinary.php).

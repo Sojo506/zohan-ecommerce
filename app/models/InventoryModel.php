@@ -1,6 +1,6 @@
 <?php
 
-class InventoryRepository
+class InventoryModel
 {
     private PDO $db;
 

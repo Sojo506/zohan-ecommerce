@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../repositories/PromotionRepository.php';
-require_once __DIR__ . '/../repositories/ProductRepository.php';
+require_once __DIR__ . '/../models/PromotionModel.php';
+require_once __DIR__ . '/../models/ProductModel.php';
 
 class PromotionAdminController extends Controller
 {
@@ -25,7 +25,7 @@ class PromotionAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new PromotionRepository();
+        $repo = new PromotionModel();
 
         $promotions = $repo->all();
 
@@ -50,7 +50,7 @@ class PromotionAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new PromotionRepository();
+        $repo = new PromotionModel();
 
         $repo->create($_POST);
 
@@ -61,8 +61,8 @@ class PromotionAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new PromotionRepository();
-        $productRepo = new ProductRepository();
+        $repo = new PromotionModel();
+        $productRepo = new ProductModel();
 
         $promotion = $repo->find($id);
         $products = $productRepo->all();
@@ -83,7 +83,7 @@ class PromotionAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new PromotionRepository();
+        $repo = new PromotionModel();
 
         $repo->update($_POST['id'], $_POST);
 
@@ -94,7 +94,7 @@ class PromotionAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new PromotionRepository();
+        $repo = new PromotionModel();
 
         $repo->delete($id);
 
@@ -105,7 +105,7 @@ class PromotionAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new PromotionRepository();
+        $repo = new PromotionModel();
 
         // Asocia un producto existente a la promoción seleccionada desde el formulario.
         $repo->assignProduct(
@@ -120,7 +120,7 @@ class PromotionAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new PromotionRepository();
+        $repo = new PromotionModel();
 
         $repo->removeProduct($promoId, $productId);
 

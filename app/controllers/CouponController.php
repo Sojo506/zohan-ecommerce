@@ -1,14 +1,14 @@
 <?php
 
-require_once __DIR__ . '/../repositories/CouponRepository.php';
+require_once __DIR__ . '/../models/CouponModel.php';
 
 class CouponController extends Controller
 {
-    private CouponRepository $repository;
+    private CouponModel $couponModel;
 
     public function __construct()
     {
-        $this->repository = new CouponRepository();
+        $this->couponModel = new CouponModel();
     }
 
     public function validate()
@@ -33,7 +33,7 @@ class CouponController extends Controller
             return;
         }
 
-        $coupon = $this->repository->findValidByCode($code);
+        $coupon = $this->couponModel->findValidByCode($code);
 
         if (!$coupon) {
             unset($_SESSION['coupon']);

@@ -1,6 +1,6 @@
 <?php
 
-class InvoiceRepository
+class InvoiceModel
 {
     private PDO $db;
 

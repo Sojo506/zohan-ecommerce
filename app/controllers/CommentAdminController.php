@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../repositories/CommentRepository.php';
+require_once __DIR__ . '/../models/CommentModel.php';
 
 class CommentAdminController extends Controller
 {
@@ -24,7 +24,7 @@ class CommentAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CommentRepository();
+        $repo = new CommentModel();
 
         $comments = $repo->all();
 
@@ -39,7 +39,7 @@ class CommentAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CommentRepository();
+        $repo = new CommentModel();
 
         // El estado 1 representa un comentario visible/aprobado.
         $repo->changeStatus($id, 1);
@@ -51,7 +51,7 @@ class CommentAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CommentRepository();
+        $repo = new CommentModel();
 
         // El estado 2 permite ocultarlo sin eliminar su registro histórico.
         $repo->changeStatus($id, 2);
@@ -63,7 +63,7 @@ class CommentAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CommentRepository();
+        $repo = new CommentModel();
 
         $repo->delete($id);
 

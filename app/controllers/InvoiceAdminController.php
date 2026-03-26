@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../repositories/InvoiceRepository.php';
-require_once __DIR__ . '/../repositories/AuditRepository.php';
+require_once __DIR__ . '/../models/InvoiceModel.php';
+require_once __DIR__ . '/../models/AuditModel.php';
 
 class InvoiceAdminController extends Controller
 {
@@ -24,7 +24,7 @@ class InvoiceAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new InvoiceRepository();
+        $repo = new InvoiceModel();
         $invoices = $repo->all();
 
         $this->adminView('admin/invoices/index', [
@@ -38,7 +38,7 @@ class InvoiceAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new InvoiceRepository();
+        $repo = new InvoiceModel();
 
         // Reúne cabecera, detalle de productos y rastro del pago para la pantalla de detalle.
         $invoice = $repo->find($id);
@@ -63,12 +63,12 @@ class InvoiceAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new InvoiceRepository();
+        $repo = new InvoiceModel();
         $repo->changeStatus($id, $status);
 
         // Si la auditoría está disponible, deja evidencia del cambio administrativo.
-        if (class_exists('AuditRepository')) {
-            $audit = new AuditRepository();
+        if (class_exists('AuditModel')) {
+            $audit = new AuditModel();
             $audit->log('CAMBIO ESTADO', 'FACTURA_TB');
         }
 

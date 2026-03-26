@@ -1,6 +1,6 @@
 <?php
 
-class CouponRepository
+class CouponModel
 {
     private PDO $db;
 

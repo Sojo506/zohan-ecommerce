@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../repositories/AuditRepository.php';
+require_once __DIR__ . '/../models/AuditModel.php';
 
 class AuditAdminController extends Controller
 {
@@ -24,7 +24,7 @@ class AuditAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new AuditRepository();
+        $repo = new AuditModel();
 
         // Recupera el histórico completo para revisión en la vista de auditoría.
         $logs = $repo->all();

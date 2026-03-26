@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../repositories/ProductRepository.php';
-require_once __DIR__ . '/../repositories/DashboardRepository.php';
+require_once __DIR__ . '/../models/ProductModel.php';
+require_once __DIR__ . '/../models/DashboardModel.php';
 
 
 class AdminController extends Controller
@@ -24,7 +24,7 @@ class AdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new DashboardRepository();
+        $repo = new DashboardModel();
 
         // El dashboard combina métricas agregadas con las ventas más recientes.
         $stats = $repo->stats();
@@ -43,7 +43,7 @@ class AdminController extends Controller
         $this->checkAdmin();
 
         // Reutiliza el listado completo para mostrar la tabla principal de productos en admin.
-        $repo = new ProductRepository();
+        $repo = new ProductModel();
         $products = $repo->all();
 
         $this->adminView('admin/products/index', [

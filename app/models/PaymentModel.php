@@ -1,17 +1,17 @@
 <?php
 
 require_once __DIR__ . '/../services/Mailer.php';
-require_once __DIR__ . '/CartRepository.php';
+require_once __DIR__ . '/CartModel.php';
 
-class PaymentRepository
+class PaymentModel
 {
     private PDO $db;
-    private CartRepository $cartRepository;
+    private CartModel $cartModel;
 
-    public function __construct(?PDO $db = null, ?CartRepository $cartRepository = null)
+    public function __construct(?PDO $db = null, ?CartModel $cartModel = null)
     {
         $this->db = $db ?? Database::connection();
-        $this->cartRepository = $cartRepository ?? new CartRepository();
+        $this->cartModel = $cartModel ?? new CartModel();
     }
 
     public function getPayPalAccessToken(): ?string
@@ -68,7 +68,7 @@ class PaymentRepository
     {
         $idCuenta = (int)($_SESSION['user']['id_cuenta'] ?? 0);
         $estadoCompletado = 4;
-        $cart = $this->cartRepository->syncSessionCart();
+        $cart = $this->cartModel->syncSessionCart();
 
         if ($idCuenta <= 0) {
             return [
@@ -156,7 +156,7 @@ class PaymentRepository
 
     public function clearCart(): void
     {
-        $this->cartRepository->clear();
+        $this->cartModel->clear();
     }
 
     private function fetchProductForSale(int $productId)

@@ -1,34 +1,34 @@
 <?php
 
-require_once __DIR__ . '/../repositories/CartRepository.php';
+require_once __DIR__ . '/../models/CartModel.php';
 
 class CartController extends Controller
 {
-    private CartRepository $repository;
+    private CartModel $cartModel;
 
     public function __construct()
     {
-        $this->repository = new CartRepository();
+        $this->cartModel = new CartModel();
 
         // Sincroniza el carrito persistido con la sesión antes de atender cualquier acción.
-        $this->repository->syncSessionCart();
+        $this->cartModel->syncSessionCart();
     }
 
     public function index()
     {
         // El resumen devuelve solo productos válidos y recalcula subtotales y total general.
-        $summary = $this->repository->buildSummary();
+        $summary = $this->cartModel->buildSummary();
 
         $this->view('cart/index', [
             'items' => $summary['items'],
             'total' => $summary['total'],
-            'cartCount' => $this->repository->countCurrentCart()
+            'cartCount' => $this->cartModel->countCurrentCart()
         ]);
     }
 
     public function add()
     {
-        $result = $this->repository->addProduct(
+        $result = $this->cartModel->addProduct(
             (int)($_POST['id_producto'] ?? 0),
             (int)($_POST['cantidad'] ?? 1)
         );
@@ -39,7 +39,7 @@ class CartController extends Controller
 
     public function update()
     {
-        $result = $this->repository->updateProduct(
+        $result = $this->cartModel->updateProduct(
             (int)($_POST['id_producto'] ?? 0),
             trim((string)($_POST['accion'] ?? '')),
             isset($_POST['cantidad']) ? (int)$_POST['cantidad'] : null
@@ -51,14 +51,14 @@ class CartController extends Controller
 
     public function remove()
     {
-        $result = $this->repository->removeProduct((int)($_POST['id_producto'] ?? 0));
+        $result = $this->cartModel->removeProduct((int)($_POST['id_producto'] ?? 0));
         $this->flash($result);
         $this->redirect(App::url('/cart'));
     }
 
     public function clear()
     {
-        $this->repository->clear();
+        $this->cartModel->clear();
         $_SESSION['flash_success'] = 'Carrito vaciado.';
         $this->redirect(App::url('/cart'));
     }

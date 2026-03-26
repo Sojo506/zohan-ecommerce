@@ -1,6 +1,6 @@
 <?php
 
-class SaleRepository
+class SaleModel
 {
     private PDO $db;
 
