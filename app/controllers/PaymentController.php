@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../repositories/PaymentRepository.php';
+require_once __DIR__ . '/../repositories/CouponRepository.php';
 
 class PaymentController extends Controller
 {
@@ -51,12 +52,31 @@ class PaymentController extends Controller
         $paypalCaptureId = $captureResult['purchase_units'][0]['payments']['captures'][0]['id'] ?? '';
         $amountUsd = $captureResult['purchase_units'][0]['payments']['captures'][0]['amount']['value'] ?? 0;
 
+        // Validar y aplicar cupón si existe en la sesión.
+        $coupon = $_SESSION['coupon'] ?? null;
+        $couponId = null;
+
+        if ($coupon) {
+            $couponRepo = new CouponRepository();
+            $validCoupon = $couponRepo->findValidByCode($coupon['code']);
+
+            if ($validCoupon) {
+                $couponId = (int)$validCoupon['ID_CUPON'];
+            }
+        }
+
         // Solo después de una captura confirmada se registra la venta en la BD local.
-        $result = $this->repository->registerCapturedPayment($orderId, $paypalCaptureId, $amountUsd);
+        $result = $this->repository->registerCapturedPayment($orderId, $paypalCaptureId, $amountUsd, $couponId);
 
         if (($result['success'] ?? false) === true) {
             // El carrito se vacía únicamente cuando el registro local terminó bien.
             $this->repository->clearCart();
+
+            // Decrementar uso del cupón y limpiar sesión.
+            if ($couponId && isset($couponRepo)) {
+                $couponRepo->decrementUsage($couponId);
+            }
+            unset($_SESSION['coupon']);
 
             $message = 'Pago y registro completados';
             if (($result['email_sent'] ?? true) === false) {

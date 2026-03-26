@@ -64,7 +64,7 @@ class PaymentRepository
         return json_decode((string)$response, true) ?? [];
     }
 
-    public function registerCapturedPayment(string $paypalOrderId, string $paypalCaptureId, $totalUSD): array
+    public function registerCapturedPayment(string $paypalOrderId, string $paypalCaptureId, $totalUSD, ?int $couponId = null): array
     {
         $idCuenta = (int)($_SESSION['user']['id_cuenta'] ?? 0);
         $estadoCompletado = 4;
