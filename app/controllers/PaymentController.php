@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../models/PaymentModel.php';
 require_once __DIR__ . '/../models/CouponModel.php';
 
+// Endpoint del checkout: valida la captura con PayPal y luego delega el registro interno de la compra.
 class PaymentController extends Controller
 {
     private PaymentModel $paymentModel;
@@ -41,6 +42,7 @@ class PaymentController extends Controller
             return;
         }
 
+        // La respuesta de PayPal se toma como fuente de verdad para el capture ID y el monto final cobrado.
         $captureResult = $this->paymentModel->capturePayPalOrder($orderId, $accessToken);
 
         if (($captureResult['status'] ?? null) !== 'COMPLETED') {

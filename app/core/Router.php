@@ -1,7 +1,9 @@
 <?php
 
+// Router HTTP mínimo del proyecto: registra rutas manuales y resuelve "Clase@metodo" en tiempo de ejecución.
 class Router
 {
+    // La tabla se agrupa por método HTTP para que GET y POST puedan compartir la misma URI sin conflicto.
     private array $routes = [];
 
     public function get(string $uri, string $controller): void
@@ -16,6 +18,7 @@ class Router
 
     public function dispatch(): void
     {
+        // Normaliza la petición actual, busca la primera ruta compatible y ejecuta el controlador asociado.
         $method = $_SERVER['REQUEST_METHOD'];
 
         // Acepta tanto la ruta amigable guardada en ?url= como la URI nativa del servidor.
@@ -43,6 +46,7 @@ class Router
 
             if (preg_match($pattern, $uri, $matches)) {
 
+                // El router se queda con la primera coincidencia; por eso el orden de registro sí importa.
                 $routeFound = true;
 
                 array_shift($matches); // quitar coincidencia completa
@@ -60,6 +64,7 @@ class Router
             return;
         }
 
+        // La convención del proyecto asume que cada controlador vive en app/controllers/<Clase>.php.
         $path = __DIR__ . '/../controllers/' . $controllerName . '.php';
 
         if (!file_exists($path)) {
@@ -79,6 +84,7 @@ class Router
             return;
         }
 
+        // Los valores capturados por la ruta dinámica se inyectan al método en el mismo orden en que aparecen.
         call_user_func_array([$controllerInstance, $methodName], $params);
     }
 }

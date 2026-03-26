@@ -1,1 +1,0 @@
-Vistas del carrito de compras.

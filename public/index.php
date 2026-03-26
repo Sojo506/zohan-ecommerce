@@ -1,5 +1,6 @@
 <?php
 
+// Front controller: toda petición web entra aquí, se inicializa el entorno y se registra el mapa de rutas.
 require_once __DIR__ . '/../vendor/autoload.php';
 
 /*  CARGA DE CLASES CORE  */
@@ -33,6 +34,7 @@ session_start();
 /*  CREAR ROUTER  */
 $router = new Router();
 
+// Este archivo funciona como tabla central de rutas: cada entrada apunta a "Controlador@metodo".
 
 /*  RUTAS PRINCIPALES  */
 $router->get('/', 'HomeController@index');
@@ -186,4 +188,5 @@ $router->post('/api/coupon/remove', 'CouponController@remove');
 $router->post('/api/payment/capture', 'PaymentController@capture');
 
 
+// Con todas las rutas declaradas, se resuelve la petición actual y se ejecuta su controlador.
 $router->dispatch();

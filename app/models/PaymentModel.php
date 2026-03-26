@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../services/Mailer.php';
 require_once __DIR__ . '/CartModel.php';
 
+// Coordina el paso de "pago externo capturado" a registros internos: venta, inventario, factura y correo.
 class PaymentModel
 {
     private PDO $db;
@@ -16,6 +17,7 @@ class PaymentModel
 
     public function getPayPalAccessToken(): ?string
     {
+        // El token es de uso inmediato para el capture; no se guarda ni se reutiliza entre requests.
         $clientId = Env::get('PAYPAL_CLIENT_ID');
         $secret = Env::get('PAYPAL_SECRET');
         $url = Env::get('PAYPAL_URL') . '/v1/oauth2/token';
@@ -42,6 +44,7 @@ class PaymentModel
 
     public function capturePayPalOrder(string $orderId, string $accessToken): array
     {
+        // Primero se confirma la orden en PayPal; la BD local solo se toca cuando esa captura ya fue aceptada.
         $url = Env::get('PAYPAL_URL') . "/v2/checkout/orders/{$orderId}/capture";
 
         $ch = curl_init();
@@ -85,6 +88,7 @@ class PaymentModel
         }
 
         try {
+            // Venta, líneas, inventario, factura y pago deben confirmarse juntos para no dejar la compra partida.
             $this->db->beginTransaction();
 
             $stmt = $this->db->prepare('INSERT INTO VENTA_TB (ID_CUENTA, FECHA_VENTA, ID_ESTADO) VALUES (?, NOW(), ?)');
@@ -93,6 +97,7 @@ class PaymentModel
 
             $items = [];
 
+            // Cada producto se lee con bloqueo para evitar que dos compras descuenten el mismo stock a la vez.
             foreach ($cart as $productId => $quantity) {
                 $product = $this->fetchProductForSale((int)$productId);
                 if (!$product) {
@@ -125,6 +130,7 @@ class PaymentModel
 
             $this->db->commit();
 
+            // El correo se envía después del commit: si falla, la compra sigue siendo válida y ya quedó registrada.
             $emailSent = $this->sendPurchaseEmail([
                 'customer_name' => trim((string)(($_SESSION['user']['nombre'] ?? '') . ' ' . ($_SESSION['user']['apellido'] ?? ''))),
                 'sale_id' => $saleId,
@@ -161,6 +167,7 @@ class PaymentModel
 
     private function fetchProductForSale(int $productId)
     {
+        // FOR UPDATE mantiene bloqueada la fila consultada hasta el commit/rollback de la transacción actual.
         $stmt = $this->db->prepare("
             SELECT P.NOMBRE, P.PRECIO, I.STOCK
             FROM PRODUCTO_TB P
@@ -187,6 +194,7 @@ class PaymentModel
 
     private function registerInventoryMovement(int $productId, int $quantity, int $saleId): void
     {
+        // Deja trazabilidad del rebajo de stock para auditoría y reportes de inventario.
         $stmt = $this->db->prepare('
             INSERT INTO MOVIMIENTO_INVENTARIO_TB (ID_PRODUCTO, ID_TIPO_MOVIMIENTO, CANTIDAD, MOTIVO, ID_ESTADO)
             VALUES (?, ?, ?, ?, 1)
@@ -228,6 +236,7 @@ class PaymentModel
             ORDER BY ID_TIPO_MOVIMIENTO ASC
         ");
 
+        // El catálogo puede variar según el ambiente, así que primero busca nombres "equivalentes" a una salida por venta.
         $types = $stmt->fetchAll();
         foreach ($types as $type) {
             $name = trim((string)$type['NOMBRE']);
@@ -255,6 +264,7 @@ class PaymentModel
 
     private function sendPurchaseEmail(array $data): bool
     {
+        // La ausencia de correo no invalida la compra; solo se le avisa al controller para ajustar el mensaje final.
         $email = $this->findCustomerEmail((string)($_SESSION['user']['identificacion'] ?? ''));
         if ($email === null) {
             return false;

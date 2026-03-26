@@ -1,5 +1,6 @@
 <?php
 
+// Clase base de controladores: centraliza cómo se renderizan vistas públicas y del panel administrativo.
 class Controller
 {
     protected function view(string $view, array $data = []): void

@@ -4,6 +4,7 @@ require_once __DIR__ . '/../helpers/Security.php';
 require_once __DIR__ . '/../services/Mailer.php';
 require_once __DIR__ . '/../models/ProductModel.php';
 
+// Maneja autenticación y verificación OTP; ProfileController reutiliza parte de este flujo para correo/password.
 class AuthController extends Controller
 {
     // Estos IDs reflejan catálogos existentes en la base de datos.
@@ -34,6 +35,7 @@ class AuthController extends Controller
 
         $pdo = Database::connection();
 
+        // La sesión necesita cuenta, identidad y rol, por eso se resuelven juntos desde la primera consulta.
         $sql = "SELECT 
             c.ID_CUENTA,
             c.USERNAME,
@@ -88,6 +90,7 @@ class AuthController extends Controller
         $pdo->prepare("UPDATE CUENTA_TB SET INTENTOS_FALLIDOS = 0, ULTIMO_LOGIN = NOW() WHERE ID_CUENTA = :id")
             ->execute([':id' => $cuenta['ID_CUENTA']]);
 
+        // Se guarda solo el contexto mínimo para autorización y personalización; el resto se relee de la BD.
         // crear sesión
         $_SESSION['user'] = [
             'id_cuenta' => $cuenta['ID_CUENTA'],
@@ -242,6 +245,7 @@ class AuthController extends Controller
 
             $pdo->commit();
 
+            // El correo se envía después del commit para no mandar OTP de una cuenta que no quedó persistida.
             //Enviar correo
             Mailer::verifyEmail($correo, $otp);
 
@@ -330,6 +334,7 @@ class AuthController extends Controller
 
         try {
 
+            // La verificación consume el OTP y aplica su efecto de negocio en la misma transacción.
             $pdo->beginTransaction();
 
             // Desactivar OTP usado
@@ -437,6 +442,7 @@ class AuthController extends Controller
             // ===== OTP PARA CAMBIAR CONTRASEÑA =====
             if ($row['ID_TIPO_OTP'] == $this->OTP_CAMBIAR_PASSWORD) {
 
+                // El cambio real de contraseña ocurre luego en ProfileController, no en esta validación.
                 // marcar que el usuario ya verificó OTP
                 $_SESSION['password_otp_verified'] = true;
 

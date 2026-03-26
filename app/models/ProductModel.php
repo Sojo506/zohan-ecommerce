@@ -1,5 +1,6 @@
 <?php
 
+// Repositorio principal del catálogo: concentra consultas de tienda, admin y apoyo al carrito.
 class ProductModel
 {
     private $db;
@@ -11,6 +12,7 @@ class ProductModel
 
     private function subconsultaImagen(): string
     {
+        // Se reutiliza para exponer una sola imagen representativa sin duplicar productos por cada foto.
         return "(
             SELECT ID_PRODUCTO, MIN(URL_IMAGE) AS URL_IMAGE
             FROM PRODUCTO_IMAGE_TB
@@ -21,6 +23,7 @@ class ProductModel
 
     private function subconsultaPromocion(): string
     {
+        // Devuelve solo promociones vigentes para que el catálogo no tenga que recalcular fechas en PHP.
         return "(
             SELECT
                 pp.ID_PRODUCTO,
@@ -38,6 +41,7 @@ class ProductModel
 
     public function obtenerProductos(array $filtros = []): array
     {
+        // Consulta base del catálogo con joins comunes; luego se van agregando filtros opcionales.
         $sql = "SELECT
                     p.ID_PRODUCTO,
                     p.NOMBRE,
@@ -369,6 +373,7 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
 
     public function guardarCarritoCuenta(int $idCuenta, array $cart): void
     {
+        // La estrategia es "replace all": el detalle persistido queda exactamente igual al carrito en memoria.
         $this->db->beginTransaction();
 
         try {
@@ -629,6 +634,7 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
 
     public function fetchCatalog(array $filtros): array
     {
+        // Entrega a la vista todo lo necesario para pintar catálogo y filtros laterales en una sola llamada.
         return [
             'productos' => $this->obtenerProductos($filtros),
             'categorias' => $this->obtenerCategoriasConProductos(),
@@ -658,6 +664,7 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
 
     public function sanitizeCart($cart): array
     {
+        // Normaliza el carrito al formato [idProducto => cantidad] con enteros positivos.
         if (!is_array($cart)) {
             return [];
         }
@@ -678,6 +685,7 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
 
     public function buildCartSummary(array $cart): array
     {
+        // Solo sobreviven productos vigentes; cualquier ID inválido se elimina del carrito limpio retornado.
         $ids = array_keys($cart);
         $productos = $this->obtenerProductosPorIds($ids);
         $productosIndex = [];
@@ -702,6 +710,7 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
             $precio = (float)$producto['PRECIO'];
             $descuento = (float)($producto['DESCUENTO'] ?? 0);
 
+            // El subtotal se calcula con precio promocional si existe descuento activo.
             if ($descuento > 0) {
                 $precio = $precio * (1 - ($descuento / 100));
             }
@@ -727,6 +736,7 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
 
     public function countCart(array $cart): int
     {
+        // El contador ignora productos ya inactivos o inexistentes para no inflar el badge del carrito.
         $cart = $this->sanitizeCart($cart);
         $ids = array_keys($cart);
 

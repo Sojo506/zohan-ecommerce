@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/ProductModel.php';
 
+// Orquesta el carrito entre sesión, validación de productos y persistencia opcional en base de datos.
 class CartModel
 {
     private ProductModel $products;
@@ -15,6 +16,7 @@ class CartModel
     {
         $cart = $this->products->sanitizeCart($_SESSION['cart'] ?? []);
 
+        // Si ya había carrito válido en sesión se respeta; si no, se hidrata desde la cuenta autenticada.
         if (empty($cart) && isset($_SESSION['user']['id_cuenta'])) {
             $cart = $this->products->fetchCartForAccount((int)$_SESSION['user']['id_cuenta']);
         }
@@ -31,6 +33,7 @@ class CartModel
 
     public function setCart(array $cart, bool $persist = true): void
     {
+        // Toda escritura al carrito pasa por un formato canónico para evitar IDs o cantidades corruptas.
         $cleanCart = $this->products->sanitizeCart($cart);
         $_SESSION['cart'] = $cleanCart;
 
@@ -46,6 +49,7 @@ class CartModel
 
     public function buildSummary(): array
     {
+        // El resumen también limpia productos huérfanos o inválidos y persiste ese carrito depurado.
         $summary = $this->products->buildCartSummary($this->getCart());
         $this->setCart($summary['cart']);
 
@@ -119,6 +123,7 @@ class CartModel
             ];
         }
 
+        // El stock se vuelve a consultar en cada modificación porque pudo cambiar desde que se agregó al carrito.
         $stock = $this->products->fetchProductStock($productId);
         if ($stock <= 0) {
             unset($cart[$productId]);

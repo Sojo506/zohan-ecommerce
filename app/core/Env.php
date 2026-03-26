@@ -1,5 +1,6 @@
 <?php
 
+// Cargador .env sencillo para este proyecto; evita depender de librerías externas solo para variables de entorno.
 class Env
 {
     public static function load(string $path): void
