@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/BrandModel.php';
-
 class BrandAdminController extends Controller
 {
 

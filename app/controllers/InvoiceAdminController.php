@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/InvoiceModel.php';
-require_once __DIR__ . '/../models/AuditModel.php';
-
 class InvoiceAdminController extends Controller
 {
     private function checkAdmin()

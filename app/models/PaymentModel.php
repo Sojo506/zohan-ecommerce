@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../services/Mailer.php';
-require_once __DIR__ . '/CartModel.php';
-
 // Coordina el paso de "pago externo capturado" a registros internos: venta, inventario, factura y correo.
 class PaymentModel
 {

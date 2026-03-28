@@ -1,11 +1,4 @@
 <?php
-require_once __DIR__ . '/../helpers/Security.php';
-require_once __DIR__ . '/../services/Mailer.php';
-require_once __DIR__ . '/../models/UserModel.php';
-require_once __DIR__ . '/../models/ProductModel.php';
-require_once __DIR__ . '/../models/InvoiceModel.php';
-require_once __DIR__ . '/../models/CommentModel.php';
-
 
 class ProfileController extends Controller
 {

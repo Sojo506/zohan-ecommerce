@@ -64,16 +64,12 @@ class Router
             return;
         }
 
-        // La convención del proyecto asume que cada controlador vive en app/controllers/<Clase>.php.
-        $path = __DIR__ . '/../controllers/' . $controllerName . '.php';
-
-        if (!file_exists($path)) {
+        // El autoload resuelve el archivo del controlador usando su nombre de clase.
+        if (!class_exists($controllerName)) {
             http_response_code(500);
             echo "Controlador no existe: {$controllerName}";
             return;
         }
-
-        require_once $path;
 
         // La ruta define controlador y método como "Clase@metodo", y aquí se resuelven dinámicamente.
         $controllerInstance = new $controllerName();

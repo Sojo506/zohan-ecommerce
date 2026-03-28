@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/CartModel.php';
-
 class CartController extends Controller
 {
     private CartModel $cartModel;

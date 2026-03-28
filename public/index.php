@@ -1,15 +1,7 @@
 <?php
 
-// Front controller: toda petición web entra aquí, se inicializa el entorno y se registra el mapa de rutas.
-require_once __DIR__ . '/../vendor/autoload.php';
-
-/*  CARGA DE CLASES CORE  */
-require_once __DIR__ . '/../app/core/Env.php';
-require_once __DIR__ . '/../app/core/Database.php';
-require_once __DIR__ . '/../app/core/Controller.php';
-require_once __DIR__ . '/../app/core/Router.php';
-require_once __DIR__ . '/../app/core/App.php';
-
+// Front controller: toda petición web entra aquí y desde aquí se registra el autoload del proyecto.
+require_once __DIR__ . '/../autoload.php';
 
 /*  CONFIGURACIÓN DE ERRORES  */
 error_reporting(E_ALL);
