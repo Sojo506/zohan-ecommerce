@@ -1,9 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../helpers/Security.php';
-require_once __DIR__ . '/../services/Mailer.php';
-require_once __DIR__ . '/../models/ProductModel.php';
-
 // Maneja autenticación y verificación OTP; ProfileController reutiliza parte de este flujo para correo/password.
 class AuthController extends Controller
 {

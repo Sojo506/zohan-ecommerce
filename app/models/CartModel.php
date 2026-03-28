@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/ProductModel.php';
-
 // Orquesta el carrito entre sesión, validación de productos y persistencia opcional en base de datos.
 class CartModel
 {

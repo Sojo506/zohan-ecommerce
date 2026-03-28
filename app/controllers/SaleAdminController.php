@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/SaleModel.php';
-require_once __DIR__ . '/../models/InvoiceModel.php';
-
 class SaleAdminController extends Controller
 {
 

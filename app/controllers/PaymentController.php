@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/PaymentModel.php';
-require_once __DIR__ . '/../models/CouponModel.php';
-
 // Endpoint del checkout: valida la captura con PayPal y luego delega el registro interno de la compra.
 class PaymentController extends Controller
 {

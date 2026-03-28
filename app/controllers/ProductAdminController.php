@@ -1,10 +1,5 @@
 <?php
 
-use Cloudinary\Cloudinary;
-
-require_once __DIR__ . '/../models/ProductModel.php';
-require_once __DIR__ . '/../services/CloudinaryService.php';
-
 class ProductAdminController extends Controller
 {
     private function checkAdmin()

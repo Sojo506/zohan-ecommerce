@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/PromotionModel.php';
-require_once __DIR__ . '/../models/ProductModel.php';
-
 class PromotionAdminController extends Controller
 {
 

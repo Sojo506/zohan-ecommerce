@@ -1,7 +1,4 @@
 <?php
-require_once __DIR__ . '/../models/ProductModel.php';
-require_once __DIR__ . '/../models/DashboardModel.php';
-
 
 class AdminController extends Controller
 {

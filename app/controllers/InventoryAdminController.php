@@ -1,9 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/InventoryModel.php';
-require_once __DIR__ . '/../models/InventoryMovementModel.php';
-require_once __DIR__ . '/../models/ProductModel.php';
-
 class InventoryAdminController extends Controller
 {
     private function checkAdmin()

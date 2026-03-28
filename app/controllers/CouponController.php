@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/CouponModel.php';
-
 class CouponController extends Controller
 {
     private CouponModel $couponModel;

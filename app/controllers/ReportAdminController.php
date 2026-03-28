@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/ReportModel.php';
-require_once __DIR__ . '/../services/SimplePdfService.php';
-
 class ReportAdminController extends Controller
 {
     private function checkAdmin()

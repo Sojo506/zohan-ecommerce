@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../models/AuditModel.php';
-
 class AuditAdminController extends Controller
 {
 
