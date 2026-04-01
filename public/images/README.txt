@@ -1,1 +1,0 @@
-Imágenes públicas del sistema.

@@ -123,12 +123,6 @@
                     <span>Promociones</span>
                 </a>
 
-                <a href="<?= App::url('/admin/audit') ?>"
-                    class="admin-sidebar-link <?= ($currentSection ?? '') === 'audit' ? 'active' : '' ?>">
-                    <i class="bi bi-shield-check"></i>
-                    <span>Auditoría</span>
-                </a>
-
             </nav>
 
 

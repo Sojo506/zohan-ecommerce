@@ -22,13 +22,7 @@ class AuditAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new AuditModel();
-
-        // Recupera el histórico completo para revisión en la vista de auditoría.
-        $logs = $repo->all();
-
         $this->adminView('admin/audit/index', [
-            'logs' => $logs,
             'pageTitle' => 'Auditoría',
             'currentSection' => 'audit'
         ]);

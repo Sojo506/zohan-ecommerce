@@ -63,12 +63,6 @@ class InvoiceAdminController extends Controller
         $repo = new InvoiceModel();
         $repo->changeStatus($id, $status);
 
-        // Si la auditoría está disponible, deja evidencia del cambio administrativo.
-        if (class_exists('AuditModel')) {
-            $audit = new AuditModel();
-            $audit->log('CAMBIO ESTADO', 'FACTURA_TB');
-        }
-
         header("Location: " . App::url('/admin/invoices/' . $id));
         exit;
     }
