@@ -6,7 +6,8 @@ START TRANSACTION;
 -- Nota: el flujo actual de registro/OTP en PHP referencia un estado pendiente con ID 3.
 INSERT INTO ESTADO_TB (ID_ESTADO, NOMBRE) VALUES
 (1, 'Activo'),
-(2, 'Inactivo');
+(2, 'Inactivo'),
+(3, 'Pendiente');
 
 -- Direcciones
 INSERT INTO PAIS_TB (ID_PAIS, NOMBRE_PAIS, ID_ESTADO) VALUES
@@ -235,17 +236,5 @@ INSERT INTO CODIGO_OTP_TB (
 ) VALUES
 ('123456', 2, 1, '$2y$12$HFGkFLvY/GFhggD5/vdsVenO82R9dohNXsLa7GbThufisUm7ER3RS', '2026-03-02 10:40:00', 0, '2026-03-02 10:30:00', 0, 1),
 ('654321', 1, 2, '$2y$12$LuP5vywhtjwhOJwQPdCW..fTOwI/5NUlel0lQuG6VQ6pOG93PFENy', '2026-03-31 08:10:00', 0, '2026-03-31 08:00:00', 0, 1);
-
--- Auditoria
-INSERT INTO AUDITORIA_TB (
-    ID_AUDITORIA,
-    ACCION,
-    TABLA_AFECTADA,
-    FECHA,
-    IDENTIFICACION,
-    ID_ESTADO
-) VALUES
-(1, 'LOGIN', 'CUENTA_TB', '2026-03-31 08:00:00', '101110111', 1),
-(2, 'COMPRA', 'VENTA_TB', '2026-03-20 14:30:00', '202220222', 1);
 
 COMMIT;
