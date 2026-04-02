@@ -171,17 +171,17 @@ $router->post('/verify-otp', 'AuthController@verifyOtp');
 
 /* RUTAS CATÁLOGO TIENDA */
 $router->get('/products', 'ProductController@index');
-$router->get('/tienda', 'ProductController@index');
+$router->get('/shop', 'ProductController@index');
 $router->get('/product', 'ProductController@show');
-$router->get('/tienda/product', 'ProductController@show');
+$router->get('/shop/product', 'ProductController@show');
 
 
 /* RUTAS CARRITO */
-$router->get('/cart', 'CartController@index');
-$router->post('/cart/add', 'CartController@add');
-$router->post('/cart/update', 'CartController@update');
-$router->post('/cart/remove', 'CartController@remove');
-$router->post('/cart/clear', 'CartController@clear');
+$router->get('/cart', 'ProductController@cart');
+$router->post('/cart/add', 'ProductController@addToCart');
+$router->post('/cart/update', 'ProductController@updateCart');
+$router->post('/cart/remove', 'ProductController@removeFromCart');
+$router->post('/cart/clear', 'ProductController@clearCart');
 
 
 /* CUPONES API */

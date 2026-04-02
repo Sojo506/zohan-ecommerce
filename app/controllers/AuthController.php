@@ -168,6 +168,7 @@ class AuthController extends Controller
         }
 
         $pdo = Database::connection();
+        $estadoPendiente = $this->resolveEstadoId($pdo, 'PENDIENTE', $this->ESTADO_PENDIENTE);
 
         // La sesión necesita cuenta, identidad y rol, por eso se resuelven juntos desde la primera consulta.
         $sql = "SELECT 
@@ -323,7 +324,7 @@ class AuthController extends Controller
                 ':ap1' => $ap1,
                 ':ap2' => ($ap2 === '' ? null : $ap2),
                 ':tipoUsuario' => 2, // cliente
-                ':estado' => $this->ESTADO_PENDIENTE,
+                ':estado' => $estadoPendiente,
             ]);
 
             //Insertar correo en CORREO_TB
@@ -336,7 +337,7 @@ class AuthController extends Controller
             $stmtCorreo->execute([
                 ':ident' => $identificacion,
                 ':correo' => $correo,
-                ':estado' => $this->ESTADO_PENDIENTE,
+                ':estado' => $estadoPendiente,
             ]);
 
             //Insertar cuenta en CUENTA_TB
@@ -352,7 +353,7 @@ class AuthController extends Controller
                 ':ident' => $identificacion,
                 ':user' => $username,
                 ':pass' => $hash,
-                ':estado' => $this->ESTADO_PENDIENTE,
+                ':estado' => $estadoPendiente,
             ]);
 
             $idCuenta = (int)$pdo->lastInsertId();
@@ -636,5 +637,21 @@ class AuthController extends Controller
             header("Location: " . App::url('/verify-otp'));
             exit;
         }
+    }
+
+    private function resolveEstadoId(PDO $pdo, string $nombre, int $fallbackId): int
+    {
+        $stmt = $pdo->prepare("SELECT ID_ESTADO FROM ESTADO_TB WHERE UPPER(NOMBRE) = :nombre LIMIT 1");
+        $stmt->execute([':nombre' => strtoupper($nombre)]);
+        $id = $stmt->fetchColumn();
+        if ($id) {
+            return (int)$id;
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO ESTADO_TB (NOMBRE) VALUES (:nombre)");
+        $stmt->execute([':nombre' => ucfirst(strtolower($nombre))]);
+        $id = (int)$pdo->lastInsertId();
+
+        return $id > 0 ? $id : $fallbackId;
     }
 }

@@ -1,7 +1,7 @@
 <main>
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
-            <h1 class="h3 mb-1">Tienda</h1>
+            <h1 class="h3 mb-1">Shop</h1>
             <p class="text-muted mb-0">Explora, filtra y agrega al carrito.</p>
         </div>
         <a href="<?= App::url('/cart') ?>" class="btn btn-outline-dark">
@@ -27,8 +27,8 @@
 
     <section class="card border-0 shadow-sm mb-4">
         <div class="card-body">
-            <form id="productSearchForm" action="<?= App::url('/tienda') ?>" method="get" class="row g-3 align-items-end">
-                <input type="hidden" name="url" value="/tienda">
+            <form id="productSearchForm" action="<?= App::url('/shop') ?>" method="get" class="row g-3 align-items-end">
+                <input type="hidden" name="url" value="/shop">
 
                 <div class="col-12 col-md-5">
                     <label for="q" class="form-label">Buscar</label>
@@ -113,7 +113,7 @@
                     ?>
                     <div class="col-12 col-sm-6 col-lg-4">
                         <div class="card h-100 border-0 shadow-sm">
-                            <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
+                            <a href="<?= App::url('/shop/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
                                 <img src="<?= htmlspecialchars($imagen) ?>"
                                     class="card-img-top"
                                     alt="<?= htmlspecialchars($producto['NOMBRE']) ?>"
@@ -140,7 +140,7 @@
                                 </div>
 
                                 <h5 class="card-title">
-                                    <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
+                                    <a href="<?= App::url('/shop/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
                                         <?= htmlspecialchars($producto['NOMBRE']) ?>
                                     </a>
                                 </h5>
@@ -159,7 +159,7 @@
                                 <div class="text-success small fw-semibold mb-3">Existencias: <?= (int)($producto['STOCK'] ?? 0) ?></div>
 
                                 <div class="d-flex gap-2">
-                                    <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-outline-dark w-50">
+                                    <a href="<?= App::url('/shop/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-outline-dark w-50">
                                         Ver
                                     </a>
 
@@ -176,6 +176,7 @@
         <?php endif; ?>
     </section>
 </main>
+
 
 
 
