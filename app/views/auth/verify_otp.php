@@ -1,4 +1,15 @@
-<h2 class="mb-3">Verificar cuenta</h2>
+<?php $otpFlow = $otpFlow ?? null; ?>
+
+<h2 class="mb-3">
+    <?= $otpFlow === 'guest' || $otpFlow === 'profile' ? 'Verificar código' : 'Verificar cuenta' ?>
+</h2>
+
+<?php if (!empty($_SESSION['flash_success'])): ?>
+    <div class="alert alert-success">
+        <?= htmlspecialchars($_SESSION['flash_success']) ?>
+    </div>
+    <?php unset($_SESSION['flash_success']); ?>
+<?php endif; ?>
 
 <?php if (!empty($_SESSION['flash_error'])): ?>
     <div class="alert alert-danger">

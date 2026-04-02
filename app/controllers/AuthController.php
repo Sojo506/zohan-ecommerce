@@ -18,6 +18,144 @@ class AuthController extends Controller
         $this->view('auth/login');
     }
 
+    public function forgotPasswordForm()
+    {
+        $this->view('auth/forgot_password');
+    }
+
+    public function forgotPassword()
+    {
+        $user = trim($_POST['user'] ?? '');
+        $_SESSION['password_reset_flow'] = 'guest';
+        $_SESSION['password_reset_requested'] = true;
+        $_SESSION['pending_account_id'] = 0;
+        unset($_SESSION['password_otp_verified'], $_SESSION['password_reset_verified_account_id']);
+
+        if ($user !== '') {
+            $pdo = Database::connection();
+
+            $sql = "SELECT 
+                c.ID_CUENTA,
+                c.ID_ESTADO,
+                co.CORREO
+            FROM CUENTA_TB c
+                LEFT JOIN CORREO_TB co ON co.IDENTIFICACION = c.IDENTIFICACION
+            WHERE c.USERNAME = :username OR co.CORREO = :correo
+            LIMIT 1";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':username' => $user,
+                ':correo' => $user
+            ]);
+
+            $cuenta = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($cuenta && (int)$cuenta['ID_ESTADO'] === $this->ESTADO_ACTIVO && !empty($cuenta['CORREO'])) {
+                $otp = Security::generateOtp(6);
+                $otpHash = password_hash($otp, PASSWORD_BCRYPT);
+                $expiresAt = (new DateTime('+10 minutes'))->format('Y-m-d H:i:s');
+
+                $sqlOtp = "INSERT INTO CODIGO_OTP_TB
+                (OTP_CODE, ID_CUENTA, ID_TIPO_OTP, HASH, EXPIRES_AT, INTENTOS, ACTIVE_FLAG, ID_ESTADO)
+                VALUES
+                (:otp, :idCuenta, :tipo, :hash, :exp, 0, 1, :estado)";
+
+                $stmtOtp = $pdo->prepare($sqlOtp);
+                $stmtOtp->execute([
+                    ':otp' => $otp,
+                    ':idCuenta' => (int)$cuenta['ID_CUENTA'],
+                    ':tipo' => $this->OTP_CAMBIAR_PASSWORD,
+                    ':hash' => $otpHash,
+                    ':exp' => $expiresAt,
+                    ':estado' => $this->ESTADO_ACTIVO,
+                ]);
+
+                $_SESSION['pending_account_id'] = (int)$cuenta['ID_CUENTA'];
+
+                Mailer::verifyEmail((string)$cuenta['CORREO'], $otp);
+            }
+        }
+
+        $_SESSION['flash_success'] = "Si encontramos una cuenta asociada, te enviaremos un código de verificación a tu correo.";
+        header("Location: " . App::url('/verify-otp'));
+        exit;
+    }
+
+    public function resetPasswordForm()
+    {
+        if (!isset($_SESSION['password_reset_verified_account_id'])) {
+            $_SESSION['flash_error'] = "Primero debes verificar el código de recuperación.";
+            header("Location: " . App::url('/forgot-password'));
+            exit;
+        }
+
+        $this->view('auth/reset_password');
+    }
+
+    public function resetPassword()
+    {
+        $idCuenta = (int)($_SESSION['password_reset_verified_account_id'] ?? 0);
+
+        if ($idCuenta <= 0) {
+            $_SESSION['flash_error'] = "Primero debes verificar el código de recuperación.";
+            header("Location: " . App::url('/forgot-password'));
+            exit;
+        }
+
+        $pass1 = trim($_POST['password'] ?? '');
+        $pass2 = trim($_POST['password2'] ?? '');
+
+        if ($pass1 === '' || $pass2 === '') {
+            $_SESSION['flash_error'] = "Debes completar ambos campos.";
+            header("Location: " . App::url('/reset-password'));
+            exit;
+        }
+
+        if ($pass1 !== $pass2) {
+            $_SESSION['flash_error'] = "Las contraseñas no coinciden.";
+            header("Location: " . App::url('/reset-password'));
+            exit;
+        }
+
+        if (strlen($pass1) < 6) {
+            $_SESSION['flash_error'] = "La contraseña debe tener mínimo 6 caracteres.";
+            header("Location: " . App::url('/reset-password'));
+            exit;
+        }
+
+        $pdo = Database::connection();
+        $hash = password_hash($pass1, PASSWORD_BCRYPT);
+
+        try {
+            $stmt = $pdo->prepare("
+            UPDATE CUENTA_TB
+            SET PASSWORD = :pass
+            WHERE ID_CUENTA = :id
+            ");
+
+            $stmt->execute([
+                ':pass' => $hash,
+                ':id' => $idCuenta
+            ]);
+
+            unset(
+                $_SESSION['password_reset_verified_account_id'],
+                $_SESSION['password_reset_flow'],
+                $_SESSION['pending_account_id'],
+                $_SESSION['password_otp_verified']
+            );
+
+            $_SESSION['flash_success'] = "Contraseña actualizada correctamente. Ya puedes iniciar sesión.";
+            header("Location: " . App::url('/login'));
+            exit;
+        } catch (PDOException $e) {
+            $_SESSION['flash_error'] = "Error actualizando contraseña.";
+            header("Location: " . App::url('/reset-password'));
+            exit;
+        }
+    }
+
     public function login()
     {
         $user = trim($_POST['user'] ?? '');
@@ -264,20 +402,38 @@ class AuthController extends Controller
 
     public function verifyOtpForm()
     {
-        if (!isset($_SESSION['pending_account_id'])) {
+        $isGuestResetFlow = ($_SESSION['password_reset_flow'] ?? null) === 'guest'
+            && !empty($_SESSION['password_reset_requested']);
+
+        if (!isset($_SESSION['pending_account_id']) && !$isGuestResetFlow) {
             header("Location: " . App::url('/login'));
             exit;
         }
 
-        $this->view('auth/verify_otp');
+        $this->view('auth/verify_otp', [
+            'otpFlow' => $_SESSION['password_reset_flow'] ?? null
+        ]);
     }
 
     public function verifyOtp()
     {
         $otp = trim($_POST['otp'] ?? '');
         $idCuenta = (int)($_SESSION['pending_account_id'] ?? 0);
+        $passwordResetFlow = $_SESSION['password_reset_flow'] ?? null;
 
-        if ($idCuenta <= 0 || $otp === '') {
+        if ($otp === '') {
+            $_SESSION['flash_error'] = "OTP inválido.";
+            header("Location: " . App::url('/verify-otp'));
+            exit;
+        }
+
+        if ($passwordResetFlow === 'guest' && $idCuenta <= 0) {
+            $_SESSION['flash_error'] = "Código incorrecto o expirado.";
+            header("Location: " . App::url('/verify-otp'));
+            exit;
+        }
+
+        if ($idCuenta <= 0) {
             $_SESSION['flash_error'] = "OTP inválido.";
             header("Location: " . App::url('/verify-otp'));
             exit;
@@ -438,14 +594,32 @@ class AuthController extends Controller
 
             // ===== OTP PARA CAMBIAR CONTRASEÑA =====
             if ($row['ID_TIPO_OTP'] == $this->OTP_CAMBIAR_PASSWORD) {
-
-                // El cambio real de contraseña ocurre luego en ProfileController, no en esta validación.
-                // marcar que el usuario ya verificó OTP
-                $_SESSION['password_otp_verified'] = true;
+                $passwordResetFlow = $_SESSION['password_reset_flow'] ?? 'profile';
 
                 unset($_SESSION['pending_account_id']);
 
                 $pdo->commit();
+
+                if ($passwordResetFlow === 'guest') {
+                    $_SESSION['password_reset_verified_account_id'] = $idCuenta;
+                    unset(
+                        $_SESSION['password_reset_flow'],
+                        $_SESSION['password_reset_requested'],
+                        $_SESSION['password_otp_verified']
+                    );
+
+                    $_SESSION['flash_success'] = "Código verificado. Ahora puedes restablecer tu contraseña.";
+                    header("Location: " . App::url('/reset-password'));
+                    exit;
+                }
+
+                // El cambio real de contraseña ocurre luego en ProfileController, no en esta validación.
+                $_SESSION['password_otp_verified'] = true;
+                unset(
+                    $_SESSION['password_reset_flow'],
+                    $_SESSION['password_reset_requested'],
+                    $_SESSION['password_reset_verified_account_id']
+                );
 
                 $_SESSION['flash_success'] = "Código verificado. Ahora puedes cambiar tu contraseña.";
                 header("Location: " . App::url('/changePassword'));

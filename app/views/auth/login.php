@@ -93,8 +93,8 @@
 
                                 </div>
 
-                                <a href="#" class="small text-decoration-none">
-                                    &iquest;Olvidaste tu contrase&ntilde;a?
+                                <a href="<?= App::url('/forgot-password') ?>" class="small text-decoration-none">
+                                    ¿Olvidaste tu contraseña?
                                 </a>
 
                             </div>
