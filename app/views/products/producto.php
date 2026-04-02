@@ -1,6 +1,6 @@
 <main>
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-secondary">Volver a la tienda</a>
+        <a href="<?= App::url('/shop') ?>" class="btn btn-outline-secondary">Volver al shop</a>
         <a href="<?= App::url('/cart') ?>" class="btn btn-outline-dark">Carrito (<?= (int)($cartCount ?? 0) ?>)</a>
     </div>
 
@@ -370,7 +370,7 @@ $reviewChips = [
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <h2 class="h4 fw-bold mb-0">Art&iacute;culos similares</h2>
             <?php if (!empty($producto['CATEGORIA'])): ?>
-                <a href="<?= App::url('/tienda?category=' . urlencode((string)$producto['CATEGORIA'])) ?>"
+                <a href="<?= App::url('/shop?category=' . urlencode((string)$producto['CATEGORIA'])) ?>"
                     class="btn btn-outline-dark btn-sm">Ver m&aacute;s</a>
             <?php endif; ?>
         </div>
@@ -386,7 +386,7 @@ $reviewChips = [
                 ?>
                 <div class="col-12 col-sm-6 col-lg-4">
                     <div class="card h-100 border-0 shadow-sm">
-                        <a href="<?= App::url('/tienda/product?id=' . (int)$item['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
+                        <a href="<?= App::url('/shop/product?id=' . (int)$item['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
                             <img src="<?= htmlspecialchars($imagenSimilar) ?>"
                                 class="card-img-top"
                                 alt="<?= htmlspecialchars($item['NOMBRE']) ?>"
@@ -401,7 +401,7 @@ $reviewChips = [
                                 <?php endif; ?>
                             </div>
                             <h5 class="card-title">
-                                <a href="<?= App::url('/tienda/product?id=' . (int)$item['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
+                                <a href="<?= App::url('/shop/product?id=' . (int)$item['ID_PRODUCTO']) ?>" class="text-decoration-none text-dark">
                                     <?= htmlspecialchars($item['NOMBRE']) ?>
                                 </a>
                             </h5>
@@ -416,7 +416,7 @@ $reviewChips = [
                             </div>
                             <div class="text-success small fw-semibold mb-3">Existencias: <?= (int)($item['STOCK'] ?? 0) ?></div>
                             <div class="d-flex gap-2">
-                                <a href="<?= App::url('/tienda/product?id=' . (int)$item['ID_PRODUCTO']) ?>" class="btn btn-outline-dark w-50">
+                                <a href="<?= App::url('/shop/product?id=' . (int)$item['ID_PRODUCTO']) ?>" class="btn btn-outline-dark w-50">
                                     Ver
                                 </a>
                                 <form action="<?= App::url('/cart/add') ?>" method="post" class="w-50">

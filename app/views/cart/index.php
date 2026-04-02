@@ -4,7 +4,7 @@
             <h1 class="h3 mb-1">Tu carrito</h1>
             <p class="text-muted mb-0">Gestiona tus productos antes de comprar.</p>
         </div>
-        <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-primary">Agregar m&aacute;s productos</a>
+        <a href="<?= App::url('/shop') ?>" class="btn btn-outline-primary">Agregar m&aacute;s productos</a>
     </div>
 
     <?php if (!empty($_SESSION['flash_success'])): ?>
@@ -23,7 +23,7 @@
 
     <?php if (empty($items)): ?>
         <div class="alert alert-info">
-            Tu carrito est&aacute; vac&iacute;o. <a href="<?= App::url('/tienda') ?>">Ir al cat&aacute;logo</a>
+            Tu carrito est&aacute; vac&iacute;o. <a href="<?= App::url('/shop') ?>">Ir al cat&aacute;logo</a>
         </div>
     <?php else: ?>
         <div class="card border-0 shadow-sm">
@@ -62,7 +62,7 @@
                                             style="object-fit: cover; border-radius: 8px;">
                                         <div>
                                             <div class="fw-semibold"><?= htmlspecialchars($producto['NOMBRE']) ?></div>
-                                            <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>"
+                                            <a href="<?= App::url('/shop/product?id=' . (int)$producto['ID_PRODUCTO']) ?>"
                                                 class="small">Ver detalle</a>
                                         </div>
                                     </div>
@@ -116,7 +116,7 @@
                         <span class="fs-5 fw-bold">&#8353; <?= number_format((float)$total, 0, ',', '.') ?></span>
                     </div>
 
-                    <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-primary w-100 mb-2">
+                    <a href="<?= App::url('/shop') ?>" class="btn btn-outline-primary w-100 mb-2">
                         Agregar m&aacute;s productos
                     </a>
 
@@ -178,7 +178,7 @@
                                                 }
 
                                                 if (decision.isDenied) {
-                                                    window.location.href = '<?= App::url('/tienda') ?>';
+                                                    window.location.href = '<?= App::url('/shop') ?>';
                                                 }
                                             });
                                         }

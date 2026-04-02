@@ -7,7 +7,7 @@
                                 <div class="col-12 col-lg-4">
                                         <h5 class="fw-bold mb-2">Zohan Tech Store</h5>
                                         <p class="text-white-50 mb-3">
-                                                Tu tienda de tecnología con compra rápida, pagos seguros y soporte real.
+                                                Tu shop de tecnología con compra rápida, pagos seguros y soporte real.
                                         </p>
 
                                         <div class="d-flex flex-wrap gap-2">
@@ -19,22 +19,22 @@
                                 </div>
 
                                 <div class="col-6 col-md-3 col-lg-2">
-                                        <h6 class="fw-bold">Tienda</h6>
+                                        <h6 class="fw-bold">Shop</h6>
                                         <ul class="list-unstyled small">
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda') ?>">Catálogo</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?sort=top') ?>">Top ventas</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?sort=new') ?>">Novedades</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?promo=1') ?>">Ofertas</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/shop') ?>">Catálogo</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/shop?sort=top') ?>">Top ventas</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/shop?sort=new') ?>">Novedades</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/shop?promo=1') ?>">Ofertas</a></li>
                                         </ul>
                                 </div>
 
                                 <div class="col-6 col-md-3 col-lg-2">
                                         <h6 class="fw-bold">Categorías</h6>
                                         <ul class="list-unstyled small">
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?category=laptops') ?>">Laptops</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?category=components') ?>">Componentes</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?category=gaming') ?>">Gaming</a></li>
-                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/tienda?category=accessories') ?>">Accesorios</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/shop?category=laptops') ?>">Laptops</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/shop?category=components') ?>">Componentes</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/shop?category=gaming') ?>">Gaming</a></li>
+                                                <li class="mb-2"><a class="link-light text-decoration-none" href="<?= App::url('/shop?category=accessories') ?>">Accesorios</a></li>
                                         </ul>
                                 </div>
 
@@ -114,3 +114,4 @@
 </body>
         
 </html>
+

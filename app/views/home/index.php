@@ -54,7 +54,7 @@
                             </div>
 
                             <div class="mt-3 d-grid">
-                                <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-primary">
+                                <a href="<?= App::url('/shop') ?>" class="btn btn-outline-primary">
                                     Ver ofertas
                                 </a>
                             </div>
@@ -73,7 +73,7 @@
                     <h2 class="fw-bold mb-1">Compra por categoria</h2>
                     <p class="text-muted mb-0">Encuentra rapido lo que buscas.</p>
                 </div>
-                <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-dark">Ver todo</a>
+                <a href="<?= App::url('/shop') ?>" class="btn btn-outline-dark">Ver todo</a>
             </div>
 
             <?php
@@ -87,7 +87,7 @@
 
             <div class="row g-3 g-md-4">
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <a href="<?= App::url('/tienda?category=laptops') ?>" class="text-decoration-none">
+                    <a href="<?= App::url('/shop?category=laptops') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
                             <div class="category-card-image">
                                 <img src="<?= htmlspecialchars($categoryImages['laptops']) ?>" alt="Laptops">
@@ -102,7 +102,7 @@
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <a href="<?= App::url('/tienda?category=components') ?>" class="text-decoration-none">
+                    <a href="<?= App::url('/shop?category=components') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
                             <div class="category-card-image">
                                 <img src="<?= htmlspecialchars($categoryImages['components']) ?>" alt="Componentes">
@@ -117,7 +117,7 @@
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <a href="<?= App::url('/tienda?category=gaming') ?>" class="text-decoration-none">
+                    <a href="<?= App::url('/shop?category=gaming') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
                             <div class="category-card-image">
                                 <img src="<?= htmlspecialchars($categoryImages['gaming']) ?>" alt="Gaming">
@@ -132,7 +132,7 @@
                 </div>
 
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <a href="<?= App::url('/tienda?category=accessories') ?>" class="text-decoration-none">
+                    <a href="<?= App::url('/shop?category=accessories') ?>" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm rounded-4">
                             <div class="category-card-image">
                                 <img src="<?= htmlspecialchars($categoryImages['accessories']) ?>" alt="Accesorios">
@@ -157,7 +157,7 @@
                     <h2 class="fw-bold mb-1">Productos destacados del mes</h2>
                     <p class="text-muted mb-0">Productos populares y bien valorados.</p>
                 </div>
-                <a href="<?= App::url('/tienda') ?>" class="btn btn-primary">Ir al catalogo</a>
+                <a href="<?= App::url('/shop') ?>" class="btn btn-primary">Ir al catalogo</a>
             </div>
 
             <?php $featuredList = array_slice(($featuredProducts ?? []), 0, 4); ?>
@@ -192,7 +192,7 @@
                                 </div>
                               <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
                                   <span class="fw-bold">&#8353; <?= number_format((float)$producto['PRECIO'], 0, ',', '.') ?></span>
-                                  <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark">Ver</a>
+                                  <a href="<?= App::url('/shop/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark">Ver</a>
                               </div>
                             </div>
                         </div>
@@ -201,7 +201,7 @@
             </div>
 
             <div class="mt-4 text-center">
-                <a href="<?= App::url('/tienda') ?>" class="btn btn-outline-secondary btn-lg px-4">
+                <a href="<?= App::url('/shop') ?>" class="btn btn-outline-secondary btn-lg px-4">
                     Ver mas productos
                 </a>
             </div>
@@ -216,7 +216,7 @@
                     <h2 class="fw-bold mb-1">Productos en promocion</h2>
                     <p class="text-muted mb-0">Ofertas por tiempo limitado en tecnologia seleccionada.</p>
                 </div>
-                <a href="<?= App::url('/tienda?promo=1') ?>" class="btn btn-outline-dark">Ver mas</a>
+                <a href="<?= App::url('/shop?promo=1') ?>" class="btn btn-outline-dark">Ver mas</a>
             </div>
 
             <?php
@@ -251,7 +251,7 @@
                                             <span class="text-muted text-decoration-line-through small">&#8353; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
                                         <?php endif; ?>
                                     </div>
-                                    <a href="<?= App::url('/tienda/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark mt-2">Ver</a>
+                                    <a href="<?= App::url('/shop/product?id=' . (int)$producto['ID_PRODUCTO']) ?>" class="btn btn-sm btn-outline-dark mt-2">Ver</a>
                                 </div>
                             </div>
                         </div>
@@ -335,7 +335,7 @@
                             </div>
 
                             <div class="d-grid mt-4">
-                                <a href="<?= App::url('/tienda') ?>" class="btn btn-primary btn-lg">
+                                <a href="<?= App::url('/shop') ?>" class="btn btn-primary btn-lg">
                                     Explorar ahora
                                 </a>
                             </div>
@@ -515,6 +515,7 @@
     </section>
 
 </main>
+
 
 
 

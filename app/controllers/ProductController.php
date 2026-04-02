@@ -56,7 +56,7 @@ class ProductController extends Controller
 
         if ($idProducto <= 0) {
             $_SESSION['flash_error'] = 'Producto no encontrado.';
-            header('Location: ' . App::url('/tienda'));
+            header('Location: ' . App::url('/shop'));
             exit;
         }
 
@@ -64,7 +64,7 @@ class ProductController extends Controller
 
         if (!$producto) {
             $_SESSION['flash_error'] = 'Producto no encontrado.';
-            header('Location: ' . App::url('/tienda'));
+            header('Location: ' . App::url('/shop'));
             exit;
         }
 
@@ -127,7 +127,7 @@ class ProductController extends Controller
         $producto = $this->repository->fetchProduct($idProducto);
         if (!$producto) {
             $_SESSION['flash_error'] = 'No se pudo agregar: producto invalido.';
-            header('Location: ' . App::url('/tienda'));
+            header('Location: ' . App::url('/shop'));
             exit;
         }
 
@@ -225,9 +225,41 @@ class ProductController extends Controller
         exit;
     }
 
+    public function removeFromCart()
+    {
+        $idProducto = (int)($_POST['id_producto'] ?? 0);
+
+        if ($idProducto <= 0) {
+            $_SESSION['flash_error'] = 'Producto invalido.';
+            header('Location: ' . App::url('/cart'));
+            exit;
+        }
+
+        $result = $this->cartRepository->removeProduct($idProducto);
+        if (!empty($result['message'])) {
+            $_SESSION['flash_success'] = $result['message'];
+        }
+
+        header('Location: ' . App::url('/cart'));
+        exit;
+    }
+
+    public function clearCart()
+    {
+        $this->cartRepository->clear();
+        $_SESSION['flash_success'] = 'Carrito vaciado.';
+        header('Location: ' . App::url('/cart'));
+        exit;
+    }
+
+    private function setCart(array $cart): void
+    {
+        $this->cartRepository->setCart($cart);
+    }
+
     private function redirectBack(): void
     {
-        $back = $_SERVER['HTTP_REFERER'] ?? App::url('/tienda');
+        $back = $_SERVER['HTTP_REFERER'] ?? App::url('/shop');
         header('Location: ' . $back);
         exit;
     }

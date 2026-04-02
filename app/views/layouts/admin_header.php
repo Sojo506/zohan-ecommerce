@@ -137,7 +137,7 @@
             <div class="admin-sidebar-footer">
 
                 <a href="<?= App::url('/') ?>" class="btn btn-outline-light btn-sm w-100 mb-2">
-                    <i class="bi bi-globe"></i> Ver tienda
+                    <i class="bi bi-globe"></i> Ver shop
                 </a>
 
                 <a href="<?= App::url('/logout') ?>" class="btn btn-danger btn-sm w-100">
