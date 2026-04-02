@@ -1,1 +1,0 @@
-Vistas del sistema organizadas por módulos.

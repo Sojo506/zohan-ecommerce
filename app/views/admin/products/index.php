@@ -22,7 +22,6 @@
                 <thead class="table-light">
 
                     <tr>
-                        <th>ID</th>
                         <th>SKU</th>
                         <th>Nombre</th>
                         <th>Precio</th>
@@ -38,13 +37,6 @@
                     <?php foreach ($products as $p): ?>
 
                         <tr>
-
-                            <td>
-                                <span class="badge bg-dark">
-                                    #<?= $p['ID_PRODUCTO'] ?>
-                                </span>
-                            </td>
-
                             <td><?= htmlspecialchars($p['SKU']) ?></td>
 
                             <td class="fw-semibold">

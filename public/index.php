@@ -1,14 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-/*  CARGA DE CLASES CORE  */
-require_once __DIR__ . '/../app/core/Env.php';
-require_once __DIR__ . '/../app/core/Database.php';
-require_once __DIR__ . '/../app/core/Controller.php';
-require_once __DIR__ . '/../app/core/Router.php';
-require_once __DIR__ . '/../app/core/App.php';
-
+// Front controller: toda petición web entra aquí y desde aquí se registra el autoload del proyecto.
+require_once __DIR__ . '/../autoload.php';
 
 /*  CONFIGURACIÓN DE ERRORES  */
 error_reporting(E_ALL);
@@ -33,6 +26,7 @@ session_start();
 /*  CREAR ROUTER  */
 $router = new Router();
 
+// Este archivo funciona como tabla central de rutas: cada entrada apunta a "Controlador@metodo".
 
 /*  RUTAS PRINCIPALES  */
 $router->get('/', 'HomeController@index');
@@ -102,6 +96,15 @@ $router->get('/admin/users', 'UserAdminController@index');
 $router->get('/admin/users/{id}', 'UserAdminController@detail');
 $router->get('/admin/users/{id}/status/{status}', 'UserAdminController@changeStatus');
 $router->get('/admin/users/{id}/role/{role}', 'UserAdminController@changeRole');
+
+
+/* RUTAS CUENTAS ADMIN */
+$router->get('/admin/accounts', 'AccountAdminController@index');
+$router->get('/admin/accounts/create', 'AccountAdminController@createForm');
+$router->post('/admin/accounts/create', 'AccountAdminController@create');
+$router->get('/admin/accounts/edit/{id}', 'AccountAdminController@editForm');
+$router->post('/admin/accounts/update', 'AccountAdminController@update');
+$router->get('/admin/accounts/delete/{id}', 'AccountAdminController@delete');
 
 
 /* RUTAS CUPONES ADMIN */
@@ -177,8 +180,14 @@ $router->post('/cart/remove', 'ProductController@removeFromCart');
 $router->post('/cart/clear', 'ProductController@clearCart');
 
 
+/* CUPONES API */
+$router->post('/api/coupon/validate', 'CouponController@validate');
+$router->post('/api/coupon/remove', 'CouponController@remove');
+
+
 /* PAGOS  */
 $router->post('/api/payment/capture', 'PaymentController@capture');
 
 
+// Con todas las rutas declaradas, se resuelve la petición actual y se ejecuta su controlador.
 $router->dispatch();

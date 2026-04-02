@@ -1,21 +1,20 @@
 <?php
 
-require_once __DIR__ . '/../services/Mailer.php';
-require_once __DIR__ . '/CartRepository.php';
-
-class PaymentRepository
+// Coordina el paso de "pago externo capturado" a registros internos: venta, inventario, factura y correo.
+class PaymentModel
 {
     private PDO $db;
-    private CartRepository $cartRepository;
+    private CartModel $cartModel;
 
-    public function __construct(?PDO $db = null, ?CartRepository $cartRepository = null)
+    public function __construct(?PDO $db = null, ?CartModel $cartModel = null)
     {
         $this->db = $db ?? Database::connection();
-        $this->cartRepository = $cartRepository ?? new CartRepository();
+        $this->cartModel = $cartModel ?? new CartModel();
     }
 
     public function getPayPalAccessToken(): ?string
     {
+        // El token es de uso inmediato para el capture; no se guarda ni se reutiliza entre requests.
         $clientId = Env::get('PAYPAL_CLIENT_ID');
         $secret = Env::get('PAYPAL_SECRET');
         $url = Env::get('PAYPAL_URL') . '/v1/oauth2/token';
@@ -42,6 +41,7 @@ class PaymentRepository
 
     public function capturePayPalOrder(string $orderId, string $accessToken): array
     {
+        // Primero se confirma la orden en PayPal; la BD local solo se toca cuando esa captura ya fue aceptada.
         $url = Env::get('PAYPAL_URL') . "/v2/checkout/orders/{$orderId}/capture";
 
         $ch = curl_init();
@@ -64,11 +64,11 @@ class PaymentRepository
         return json_decode((string)$response, true) ?? [];
     }
 
-    public function registerCapturedPayment(string $paypalOrderId, string $paypalCaptureId, $totalUSD): array
+    public function registerCapturedPayment(string $paypalOrderId, string $paypalCaptureId, $totalUSD, ?int $couponId = null): array
     {
         $idCuenta = (int)($_SESSION['user']['id_cuenta'] ?? 0);
         $estadoCompletado = 4;
-        $cart = $this->cartRepository->syncSessionCart();
+        $cart = $this->cartModel->syncSessionCart();
 
         if ($idCuenta <= 0) {
             return [
@@ -85,6 +85,7 @@ class PaymentRepository
         }
 
         try {
+            // Venta, líneas, inventario, factura y pago deben confirmarse juntos para no dejar la compra partida.
             $this->db->beginTransaction();
 
             $stmt = $this->db->prepare('INSERT INTO VENTA_TB (ID_CUENTA, FECHA_VENTA, ID_ESTADO) VALUES (?, NOW(), ?)');
@@ -93,6 +94,7 @@ class PaymentRepository
 
             $items = [];
 
+            // Cada producto se lee con bloqueo para evitar que dos compras descuenten el mismo stock a la vez.
             foreach ($cart as $productId => $quantity) {
                 $product = $this->fetchProductForSale((int)$productId);
                 if (!$product) {
@@ -125,6 +127,7 @@ class PaymentRepository
 
             $this->db->commit();
 
+            // El correo se envía después del commit: si falla, la compra sigue siendo válida y ya quedó registrada.
             $emailSent = $this->sendPurchaseEmail([
                 'customer_name' => trim((string)(($_SESSION['user']['nombre'] ?? '') . ' ' . ($_SESSION['user']['apellido'] ?? ''))),
                 'sale_id' => $saleId,
@@ -156,11 +159,12 @@ class PaymentRepository
 
     public function clearCart(): void
     {
-        $this->cartRepository->clear();
+        $this->cartModel->clear();
     }
 
     private function fetchProductForSale(int $productId)
     {
+        // FOR UPDATE mantiene bloqueada la fila consultada hasta el commit/rollback de la transacción actual.
         $stmt = $this->db->prepare("
             SELECT P.NOMBRE, P.PRECIO, I.STOCK
             FROM PRODUCTO_TB P
@@ -187,6 +191,7 @@ class PaymentRepository
 
     private function registerInventoryMovement(int $productId, int $quantity, int $saleId): void
     {
+        // Deja trazabilidad del rebajo de stock para auditoría y reportes de inventario.
         $stmt = $this->db->prepare('
             INSERT INTO MOVIMIENTO_INVENTARIO_TB (ID_PRODUCTO, ID_TIPO_MOVIMIENTO, CANTIDAD, MOTIVO, ID_ESTADO)
             VALUES (?, ?, ?, ?, 1)
@@ -228,6 +233,7 @@ class PaymentRepository
             ORDER BY ID_TIPO_MOVIMIENTO ASC
         ");
 
+        // El catálogo puede variar según el ambiente, así que primero busca nombres "equivalentes" a una salida por venta.
         $types = $stmt->fetchAll();
         foreach ($types as $type) {
             $name = trim((string)$type['NOMBRE']);
@@ -255,6 +261,7 @@ class PaymentRepository
 
     private function sendPurchaseEmail(array $data): bool
     {
+        // La ausencia de correo no invalida la compra; solo se le avisa al controller para ajustar el mensaje final.
         $email = $this->findCustomerEmail((string)($_SESSION['user']['identificacion'] ?? ''));
         if ($email === null) {
             return false;

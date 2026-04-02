@@ -1,14 +1,13 @@
 <?php
 
-require_once __DIR__ . '/../repositories/PaymentRepository.php';
-
+// Endpoint del checkout: valida la captura con PayPal y luego delega el registro interno de la compra.
 class PaymentController extends Controller
 {
-    private PaymentRepository $repository;
+    private PaymentModel $paymentModel;
 
     public function __construct()
     {
-        $this->repository = new PaymentRepository();
+        $this->paymentModel = new PaymentModel();
     }
 
     public function capture()
@@ -34,13 +33,14 @@ class PaymentController extends Controller
             return;
         }
 
-        $accessToken = $this->repository->getPayPalAccessToken();
+        $accessToken = $this->paymentModel->getPayPalAccessToken();
         if (!$accessToken) {
             echo json_encode(['success' => false, 'message' => 'Fallo la autenticacion con PayPal. Revisa tus credenciales o conexión cURL.']);
             return;
         }
 
-        $captureResult = $this->repository->capturePayPalOrder($orderId, $accessToken);
+        // La respuesta de PayPal se toma como fuente de verdad para el capture ID y el monto final cobrado.
+        $captureResult = $this->paymentModel->capturePayPalOrder($orderId, $accessToken);
 
         if (($captureResult['status'] ?? null) !== 'COMPLETED') {
             $errorMsg = $captureResult['message'] ?? 'El pago no fue completado por PayPal';
@@ -51,12 +51,31 @@ class PaymentController extends Controller
         $paypalCaptureId = $captureResult['purchase_units'][0]['payments']['captures'][0]['id'] ?? '';
         $amountUsd = $captureResult['purchase_units'][0]['payments']['captures'][0]['amount']['value'] ?? 0;
 
+        // Validar y aplicar cupón si existe en la sesión.
+        $coupon = $_SESSION['coupon'] ?? null;
+        $couponId = null;
+
+        if ($coupon) {
+            $couponRepo = new CouponModel();
+            $validCoupon = $couponRepo->findValidByCode($coupon['code']);
+
+            if ($validCoupon) {
+                $couponId = (int)$validCoupon['ID_CUPON'];
+            }
+        }
+
         // Solo después de una captura confirmada se registra la venta en la BD local.
-        $result = $this->repository->registerCapturedPayment($orderId, $paypalCaptureId, $amountUsd);
+        $result = $this->paymentModel->registerCapturedPayment($orderId, $paypalCaptureId, $amountUsd, $couponId);
 
         if (($result['success'] ?? false) === true) {
             // El carrito se vacía únicamente cuando el registro local terminó bien.
-            $this->repository->clearCart();
+            $this->paymentModel->clearCart();
+
+            // Decrementar uso del cupón y limpiar sesión.
+            if ($couponId && isset($couponRepo)) {
+                $couponRepo->decrementUsage($couponId);
+            }
+            unset($_SESSION['coupon']);
 
             $message = 'Pago y registro completados';
             if (($result['email_sent'] ?? true) === false) {

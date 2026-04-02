@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../repositories/CategoryRepository.php';
-
 class CategoryAdminController extends Controller
 {
 
@@ -24,7 +22,7 @@ class CategoryAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CategoryRepository();
+        $repo = new CategoryModel();
 
         $categories = $repo->all();
 
@@ -49,9 +47,9 @@ class CategoryAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CategoryRepository();
+        $repo = new CategoryModel();
 
-        // La creación es directa porque el repositorio recibe únicamente el nombre saneado desde el form.
+        // La creación es directa porque el modelo recibe únicamente el nombre saneado desde el form.
         $repo->create($_POST['name']);
 
         header("Location: " . App::url('/admin/categories'));
@@ -62,7 +60,7 @@ class CategoryAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CategoryRepository();
+        $repo = new CategoryModel();
 
         // Se obtiene la categoría puntual para poblar el formulario de edición.
         $category = $repo->find($id);
@@ -78,7 +76,7 @@ class CategoryAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CategoryRepository();
+        $repo = new CategoryModel();
 
         $repo->update($_POST['id'], $_POST['name']);
 
@@ -89,7 +87,7 @@ class CategoryAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CategoryRepository();
+        $repo = new CategoryModel();
 
         $repo->delete($id);
 

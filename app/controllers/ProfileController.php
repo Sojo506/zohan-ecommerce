@@ -1,11 +1,4 @@
 <?php
-require_once __DIR__ . '/../helpers/Security.php';
-require_once __DIR__ . '/../services/Mailer.php';
-require_once __DIR__ . '/../models/UserModel.php';
-require_once __DIR__ . '/../models/ProductModel.php';
-require_once __DIR__ . '/../repositories/InvoiceRepository.php';
-require_once __DIR__ . '/../repositories/CommentRepository.php';
-
 
 class ProfileController extends Controller
 {
@@ -382,7 +375,7 @@ class ProfileController extends Controller
         $invoiceId = $id;
         $identificacion = $_SESSION['user']['identificacion'];
 
-        $invoiceRepo = new InvoiceRepository();
+        $invoiceRepo = new InvoiceModel();
 
         // Valida que la factura realmente pertenezca al usuario autenticado.
         $invoice = $invoiceRepo->findForUser($invoiceId, $identificacion);
@@ -445,7 +438,7 @@ class ProfileController extends Controller
 
         $identificacion = $_SESSION['user']['identificacion'];
 
-        $commentRepo = new CommentRepository();
+        $commentRepo = new CommentModel();
         $saved = $commentRepo->createForProduct($productId, $identificacion, $comment, $rating);
         if ($saved) {
             echo json_encode(['success' => true, 'message' => 'Comentario enviado.']);

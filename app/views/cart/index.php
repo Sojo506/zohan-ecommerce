@@ -68,10 +68,10 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">&#8353; <?= number_format($precioFinal, 0, ',', '.') ?></div>
+                                    <div class="fw-semibold">&#36; <?= number_format($precioFinal, 0, ',', '.') ?></div>
                                     <?php if ($descuento > 0): ?>
                                         <div class="small text-muted text-decoration-line-through">
-                                            &#8353; <?= number_format($precioOriginal, 0, ',', '.') ?>
+                                            &#36; <?= number_format($precioOriginal, 0, ',', '.') ?>
                                         </div>
                                     <?php endif; ?>
                                 </td>
@@ -93,7 +93,7 @@
                                     </div>
                                 </td>
                                 <td class="fw-semibold">
-                                    &#8353; <?= number_format((float)$item['subtotal'], 0, ',', '.') ?>
+                                    &#36; <?= number_format((float)$item['subtotal'], 0, ',', '.') ?>
                                 </td>
                                 <td>
                                     <form action="<?= App::url('/cart/remove') ?>" method="post">
@@ -109,11 +109,60 @@
         </div>
 
         <div class="d-flex justify-content-end mt-4">
-            <div class="card border-0 shadow-sm" style="min-width: 280px;">
+            <div class="card border-0 shadow-sm" style="min-width: 320px;">
                 <div class="card-body">
+
+                    <?php if (isset($_SESSION['user'])): ?>
+                        <div class="mb-3">
+                            <label for="coupon-code" class="form-label fw-semibold small text-muted">Cupón de descuento</label>
+                            <div class="input-group">
+                                <input type="text" id="coupon-code" class="form-control" placeholder="Ej: DESCUENTO10"
+                                    maxlength="50" <?= isset($_SESSION['coupon']) ? 'disabled' : '' ?>
+                                    value="<?= htmlspecialchars($_SESSION['coupon']['code'] ?? '') ?>">
+                                <button type="button" id="btn-apply-coupon" class="btn btn-outline-secondary"
+                                    <?= isset($_SESSION['coupon']) ? 'style="display:none"' : '' ?>>
+                                    Aplicar
+                                </button>
+                                <button type="button" id="btn-remove-coupon" class="btn btn-outline-danger"
+                                    <?= !isset($_SESSION['coupon']) ? 'style="display:none"' : '' ?>>
+                                    Quitar
+                                </button>
+                            </div>
+                            <div id="coupon-message" class="small mt-1
+                                <?= isset($_SESSION['coupon']) ? 'text-success' : '' ?>">
+                                <?php if (isset($_SESSION['coupon'])): ?>
+                                    Cupón aplicado: <?= (float)$_SESSION['coupon']['percentage'] ?>% de descuento
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted">Subtotal:</span>
+                        <span id="display-subtotal" class="fw-semibold">&#36; <?= number_format((float)$total, 0, ',', '.') ?></span>
+                    </div>
+
+                    <div id="coupon-discount-row" class="d-flex justify-content-between align-items-center mb-1"
+                        <?= !isset($_SESSION['coupon']) ? 'style="display:none"' : '' ?>>
+                        <span class="text-success small">Descuento (<span id="coupon-percent"><?= (float)($_SESSION['coupon']['percentage'] ?? 0) ?></span>%):</span>
+                        <span id="display-discount" class="text-success fw-semibold">
+                            <?php if (isset($_SESSION['coupon'])): ?>
+                                - &#36; <?= number_format((float)$total * ($_SESSION['coupon']['percentage'] / 100), 0, ',', '.') ?>
+                            <?php endif; ?>
+                        </span>
+                    </div>
+
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted">Total:</span>
-                        <span class="fs-5 fw-bold">&#8353; <?= number_format((float)$total, 0, ',', '.') ?></span>
+                        <span id="display-total" class="fs-5 fw-bold">
+                            <?php
+                            $totalFinal = (float)$total;
+                            if (isset($_SESSION['coupon'])) {
+                                $totalFinal = $totalFinal * (1 - ($_SESSION['coupon']['percentage'] / 100));
+                            }
+                            ?>
+                            &#36; <?= number_format($totalFinal, 0, ',', '.') ?>
+                        </span>
                     </div>
 
                     <a href="<?= App::url('/shop') ?>" class="btn btn-outline-primary w-100 mb-2">
@@ -127,7 +176,91 @@
                         <script>
                             const totalColones = <?= (float)$total ?>;
                             const tipoCambio = 510;
-                            const totalUSD = (totalColones / tipoCambio).toFixed(2);
+                            let couponPercent = <?= (float)($_SESSION['coupon']['percentage'] ?? 0) ?>;
+
+                            function getDiscountedTotalUSD() {
+                                const discounted = totalColones * (1 - (couponPercent / 100));
+                                return (discounted / tipoCambio).toFixed(2);
+                            }
+
+                            function formatColones(value) {
+                                return '\u20A1 ' + Math.round(value).toLocaleString('es-CR');
+                            }
+
+                            function updateDisplayTotals() {
+                                const discount = totalColones * (couponPercent / 100);
+                                const final_ = totalColones - discount;
+
+                                document.getElementById('display-subtotal').textContent = formatColones(totalColones);
+                                document.getElementById('display-total').textContent = formatColones(final_);
+
+                                if (couponPercent > 0) {
+                                    document.getElementById('coupon-discount-row').style.display = 'flex';
+                                    document.getElementById('coupon-percent').textContent = couponPercent;
+                                    document.getElementById('display-discount').textContent = '- ' + formatColones(discount);
+                                } else {
+                                    document.getElementById('coupon-discount-row').style.display = 'none';
+                                }
+                            }
+
+                            // Aplicar cupón
+                            document.getElementById('btn-apply-coupon').addEventListener('click', function () {
+                                const code = document.getElementById('coupon-code').value.trim();
+                                if (!code) return;
+
+                                this.disabled = true;
+                                this.textContent = '...';
+
+                                fetch('<?= App::url('/api/coupon/validate') ?>', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ code: code })
+                                })
+                                .then(function (r) { return r.json(); })
+                                .then(function (res) {
+                                    const msgEl = document.getElementById('coupon-message');
+
+                                    if (res.success) {
+                                        couponPercent = res.percentage;
+                                        msgEl.className = 'small mt-1 text-success';
+                                        msgEl.textContent = res.message;
+                                        document.getElementById('coupon-code').disabled = true;
+                                        document.getElementById('btn-apply-coupon').style.display = 'none';
+                                        document.getElementById('btn-remove-coupon').style.display = '';
+                                        updateDisplayTotals();
+                                    } else {
+                                        couponPercent = 0;
+                                        msgEl.className = 'small mt-1 text-danger';
+                                        msgEl.textContent = res.message;
+                                        updateDisplayTotals();
+                                        document.getElementById('btn-apply-coupon').disabled = false;
+                                        document.getElementById('btn-apply-coupon').textContent = 'Aplicar';
+                                    }
+                                })
+                                .catch(function () {
+                                    document.getElementById('btn-apply-coupon').disabled = false;
+                                    document.getElementById('btn-apply-coupon').textContent = 'Aplicar';
+                                });
+                            });
+
+                            // Quitar cupón
+                            document.getElementById('btn-remove-coupon').addEventListener('click', function () {
+                                fetch('<?= App::url('/api/coupon/remove') ?>', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' }
+                                });
+
+                                couponPercent = 0;
+                                document.getElementById('coupon-code').value = '';
+                                document.getElementById('coupon-code').disabled = false;
+                                document.getElementById('coupon-message').textContent = '';
+                                document.getElementById('coupon-message').className = 'small mt-1';
+                                document.getElementById('btn-apply-coupon').style.display = '';
+                                document.getElementById('btn-apply-coupon').disabled = false;
+                                document.getElementById('btn-apply-coupon').textContent = 'Aplicar';
+                                document.getElementById('btn-remove-coupon').style.display = 'none';
+                                updateDisplayTotals();
+                            });
 
                             paypal.Buttons({
                                 style: {
@@ -141,7 +274,7 @@
                                     return actions.order.create({
                                         purchase_units: [{
                                             amount: {
-                                                value: totalUSD
+                                                value: getDiscountedTotalUSD()
                                             }
                                         }]
                                     });

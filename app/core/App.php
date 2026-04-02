@@ -1,5 +1,6 @@
 <?php
 
+// Helper estático para acceder a configuración global y construir URLs compatibles con el front controller.
 class App
 {
     public static function config(string $key)
@@ -16,6 +17,7 @@ class App
 
     public static function url(string $path): string
     {
+        // Todos los redirects y links deberían pasar por aquí para respetar BASE_URL y subcarpetas.
         $base = self::config('BASE_URL');
 
         if ($path === '') {

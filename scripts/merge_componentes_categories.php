@@ -1,6 +1,5 @@
 <?php
-require_once __DIR__ . '/../app/core/Env.php';
-require_once __DIR__ . '/../app/core/Database.php';
+require_once __DIR__ . '/../autoload.php';
 
 Env::load(__DIR__ . '/../.env');
 $pdo = Database::connection();
@@ -45,4 +44,3 @@ $stmt = $pdo->prepare($sqlUpdate);
 $stmt->execute($params);
 
 echo 'Productos actualizados a Componentes: ' . $stmt->rowCount() . PHP_EOL;
-

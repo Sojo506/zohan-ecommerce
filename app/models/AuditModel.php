@@ -1,6 +1,6 @@
 <?php
 
-class AuditRepository
+class AuditModel
 {
     private PDO $db;
 

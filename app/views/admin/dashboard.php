@@ -160,7 +160,6 @@
                     <thead class="table-light">
 
                         <tr>
-                            <th>ID</th>
                             <th>Cliente</th>
                             <th>Total</th>
                             <th>Fecha</th>
@@ -175,12 +174,6 @@
                             <?php foreach ($recentSales as $sale): ?>
 
                                 <tr>
-
-                                    <td>
-                                        <span class="badge bg-dark">
-                                            #<?= $sale['id'] ?>
-                                        </span>
-                                    </td>
 
                                     <td>
                                         <?= htmlspecialchars($sale['user']) ?>
@@ -256,6 +249,11 @@
                 <a href="<?= App::url('/admin/users') ?>" class="btn btn-outline-dark">
                     <i class="bi bi-people"></i>
                     Administrar usuarios
+                </a>
+
+                <a href="<?= App::url('/admin/accounts') ?>" class="btn btn-outline-dark">
+                    <i class="bi bi-person-vcard"></i>
+                    Administrar cuentas
                 </a>
 
                 <a href="<?= App::url('/admin/reports') ?>" class="btn btn-outline-dark">

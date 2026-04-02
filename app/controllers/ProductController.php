@@ -1,20 +1,17 @@
 <?php
 
-require_once __DIR__ . '/../repositories/ProductRepository.php';
-require_once __DIR__ . '/../repositories/CartRepository.php';
-
 class ProductController extends Controller
 {
-    private ProductRepository $repository;
-    private CartRepository $cartRepository;
+    private ProductModel $productModel;
+    private CartModel $cartModel;
 
     public function __construct()
     {
-        $this->repository = new ProductRepository();
-        $this->cartRepository = new CartRepository($this->repository);
+        $this->productModel = new ProductModel();
+        $this->cartModel = new CartModel($this->productModel);
 
         // Mantiene la sesión del carrito alineada con el estado persistido del usuario.
-        $this->cartRepository->syncSessionCart();
+        $this->cartModel->syncSessionCart();
     }
 
     public function index()
@@ -39,14 +36,14 @@ class ProductController extends Controller
             'promo' => (int)($_GET['promo'] ?? 0)
         ];
 
-        $data = $this->repository->fetchCatalog($filtros);
+        $data = $this->productModel->fetchCatalog($filtros);
 
         $this->view('products/productos', [
             'productos' => $data['productos'],
             'categorias' => $data['categorias'],
             'marcas' => $data['marcas'],
             'filtros' => $filtros,
-            'cartCount' => $this->cartRepository->countCurrentCart()
+            'cartCount' => $this->cartModel->countCurrentCart()
         ]);
     }
 
@@ -60,7 +57,7 @@ class ProductController extends Controller
             exit;
         }
 
-        $producto = $this->repository->fetchProduct($idProducto);
+        $producto = $this->productModel->fetchProduct($idProducto);
 
         if (!$producto) {
             $_SESSION['flash_error'] = 'Producto no encontrado.';
@@ -68,7 +65,7 @@ class ProductController extends Controller
             exit;
         }
 
-        $imagenes = $this->repository->fetchProductImages($idProducto);
+        $imagenes = $this->productModel->fetchProductImages($idProducto);
 
         // Normaliza la lista porque algunas consultas devuelven filas completas y otras solo URLs.
         $imagenes = array_values(array_filter(array_map(static function ($imagen) {
@@ -86,11 +83,11 @@ class ProductController extends Controller
             $producto['URL_IMAGE'] = $imagenes[0];
         }
 
-        $existencias = $this->repository->fetchProductStock($idProducto);
+        $existencias = $this->productModel->fetchProductStock($idProducto);
 
         $similares = [];
         if (!empty($producto['CATEGORIA'])) {
-            $similares = $this->repository->fetchSimilarProducts(
+            $similares = $this->productModel->fetchSimilarProducts(
                 (string)$producto['CATEGORIA'],
                 $idProducto,
                 6
@@ -102,20 +99,20 @@ class ProductController extends Controller
             'imagenes' => $imagenes,
             'existencias' => $existencias,
             'similares' => $similares,
-            'cartCount' => $this->cartRepository->countCurrentCart()
+            'cartCount' => $this->cartModel->countCurrentCart()
         ]);
     }
 
     public function cart()
     {
-        $cart = $this->repository->sanitizeCart($_SESSION['cart'] ?? []);
-        $summary = $this->repository->buildCartSummary($cart);
+        $cart = $this->productModel->sanitizeCart($_SESSION['cart'] ?? []);
+        $summary = $this->productModel->buildCartSummary($cart);
         $this->setCart($summary['cart']);
 
         $this->view('cart/index', [
             'items' => $summary['items'],
             'total' => $summary['total'],
-            'cartCount' => $this->repository->countCart($summary['cart'])
+            'cartCount' => $this->productModel->countCart($summary['cart'])
         ]);
     }
 
@@ -124,20 +121,20 @@ class ProductController extends Controller
         $idProducto = (int)($_POST['id_producto'] ?? 0);
         $cantidad = max(1, (int)($_POST['cantidad'] ?? 1));
 
-        $producto = $this->repository->fetchProduct($idProducto);
+        $producto = $this->productModel->fetchProduct($idProducto);
         if (!$producto) {
             $_SESSION['flash_error'] = 'No se pudo agregar: producto invalido.';
             header('Location: ' . App::url('/shop'));
             exit;
         }
 
-        $stock = $this->repository->fetchProductStock($idProducto);
+        $stock = $this->productModel->fetchProductStock($idProducto);
         if ($stock <= 0) {
             $_SESSION['flash_error'] = 'Producto sin existencias.';
             $this->redirectBack();
         }
 
-        $cart = $this->repository->sanitizeCart($_SESSION['cart'] ?? []);
+        $cart = $this->productModel->sanitizeCart($_SESSION['cart'] ?? []);
         $actual = (int)($cart[$idProducto] ?? 0);
         $maxAgregar = $stock - $actual;
 
@@ -170,7 +167,7 @@ class ProductController extends Controller
             exit;
         }
 
-        $cart = $this->repository->sanitizeCart($_SESSION['cart'] ?? []);
+        $cart = $this->productModel->sanitizeCart($_SESSION['cart'] ?? []);
 
         if (!isset($cart[$idProducto])) {
             $_SESSION['flash_error'] = 'El producto no esta en el carrito.';
@@ -178,7 +175,7 @@ class ProductController extends Controller
             exit;
         }
 
-        $stock = $this->repository->fetchProductStock($idProducto);
+        $stock = $this->productModel->fetchProductStock($idProducto);
         if ($stock <= 0) {
             unset($cart[$idProducto]);
             $_SESSION['flash_error'] = 'Producto sin existencias.';
@@ -235,7 +232,7 @@ class ProductController extends Controller
             exit;
         }
 
-        $result = $this->cartRepository->removeProduct($idProducto);
+        $result = $this->cartModel->removeProduct($idProducto);
         if (!empty($result['message'])) {
             $_SESSION['flash_success'] = $result['message'];
         }
@@ -246,7 +243,7 @@ class ProductController extends Controller
 
     public function clearCart()
     {
-        $this->cartRepository->clear();
+        $this->cartModel->clear();
         $_SESSION['flash_success'] = 'Carrito vaciado.';
         header('Location: ' . App::url('/cart'));
         exit;
@@ -254,7 +251,7 @@ class ProductController extends Controller
 
     private function setCart(array $cart): void
     {
-        $this->cartRepository->setCart($cart);
+        $this->cartModel->setCart($cart);
     }
 
     private function redirectBack(): void

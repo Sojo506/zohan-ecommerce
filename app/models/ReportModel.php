@@ -1,6 +1,6 @@
 <?php
 
-class ReportRepository
+class ReportModel
 {
     private PDO $db;
 

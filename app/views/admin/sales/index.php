@@ -18,7 +18,6 @@
                 <thead class="table-light">
 
                     <tr>
-                        <th>ID</th>
                         <th>Cliente</th>
                         <th>Fecha</th>
                         <th>Estado</th>
@@ -32,14 +31,6 @@
                     <?php foreach ($sales as $sale): ?>
 
                         <tr>
-
-                            <td>
-
-                                <span class="badge bg-dark">
-                                    #<?= $sale['ID_VENTA'] ?>
-                                </span>
-
-                            </td>
 
                             <td class="fw-semibold">
 

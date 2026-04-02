@@ -1,9 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../repositories/InventoryRepository.php';
-require_once __DIR__ . '/../repositories/InventoryMovementRepository.php';
-require_once __DIR__ . '/../repositories/ProductRepository.php';
-
 class InventoryAdminController extends Controller
 {
     private function checkAdmin()
@@ -25,7 +21,7 @@ class InventoryAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new InventoryRepository();
+        $repo = new InventoryModel();
         $inventory = $repo->all();
 
         $this->adminView('admin/inventory/index', [
@@ -39,8 +35,8 @@ class InventoryAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $productRepo = new ProductRepository();
-        $movementRepo = new InventoryMovementRepository();
+        $productRepo = new ProductModel();
+        $movementRepo = new InventoryMovementModel();
 
         // El formulario necesita catálogo de productos y tipos de movimiento disponibles.
         $products = $productRepo->all();
@@ -58,8 +54,8 @@ class InventoryAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $movementRepo = new InventoryMovementRepository();
-        $inventoryRepo = new InventoryRepository();
+        $movementRepo = new InventoryMovementModel();
+        $inventoryRepo = new InventoryModel();
 
         $product = $_POST['product'];
         $quantity = $_POST['quantity'];
@@ -88,7 +84,7 @@ class InventoryAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new InventoryMovementRepository();
+        $repo = new InventoryMovementModel();
         $movements = $repo->all();
 
         $this->adminView('admin/inventory/movements', [

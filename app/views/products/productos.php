@@ -150,9 +150,9 @@
                                 </p>
 
                                 <div class="d-flex justify-content-between align-items-center mt-3 mb-1 flex-wrap gap-2">
-                                    <span class="fw-bold fs-5 text-danger">&#8353; <?= number_format($precioPromo, 0, ',', '.') ?></span>
+                                    <span class="fw-bold fs-5 text-danger">&#36; <?= number_format($precioPromo, 0, ',', '.') ?></span>
                                     <?php if ($discount > 0): ?>
-                                        <span class="text-muted text-decoration-line-through small">&#8353; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
+                                        <span class="text-muted text-decoration-line-through small">&#36; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
                                     <?php endif; ?>
                                 </div>
 

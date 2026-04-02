@@ -1,5 +1,6 @@
 <?php
 
+// Repositorio principal del catálogo: concentra consultas de tienda, admin y apoyo al carrito.
 class ProductModel
 {
     private $db;
@@ -11,6 +12,7 @@ class ProductModel
 
     private function subconsultaImagen(): string
     {
+        // Se reutiliza para exponer una sola imagen representativa sin duplicar productos por cada foto.
         return "(
             SELECT ID_PRODUCTO, MIN(URL_IMAGE) AS URL_IMAGE
             FROM PRODUCTO_IMAGE_TB
@@ -21,6 +23,7 @@ class ProductModel
 
     private function subconsultaPromocion(): string
     {
+        // Devuelve solo promociones vigentes para que el catálogo no tenga que recalcular fechas en PHP.
         return "(
             SELECT
                 pp.ID_PRODUCTO,
@@ -38,6 +41,7 @@ class ProductModel
 
     public function obtenerProductos(array $filtros = []): array
     {
+        // Consulta base del catálogo con joins comunes; luego se van agregando filtros opcionales.
         $sql = "SELECT
                     p.ID_PRODUCTO,
                     p.NOMBRE,
@@ -369,6 +373,7 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
 
     public function guardarCarritoCuenta(int $idCuenta, array $cart): void
     {
+        // La estrategia es "replace all": el detalle persistido queda exactamente igual al carrito en memoria.
         $this->db->beginTransaction();
 
         try {
@@ -571,5 +576,197 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $imageId]);
+    }
+
+    /* =========================
+       API COMPATIBLE CON CONTROLADORES
+    ========================= */
+
+    public function getCategories(): array
+    {
+        return $this->obtenerCategorias();
+    }
+
+    public function getBrands(): array
+    {
+        return $this->obtenerMarcas();
+    }
+
+    public function all(): array
+    {
+        return $this->obtenerTodosProductos();
+    }
+
+    public function create(array $data)
+    {
+        return $this->crearProducto($data);
+    }
+
+    public function find(int $id): ?array
+    {
+        return $this->obtenerProductoPorId($id);
+    }
+
+    public function update(int $id, array $data): void
+    {
+        $this->actualizarProducto($id, $data);
+    }
+
+    public function delete(int $id): void
+    {
+        $this->eliminarProducto($id);
+    }
+
+    public function addImage(int $productId, string $url): void
+    {
+        $this->agregarImagenProducto($productId, $url);
+    }
+
+    public function getImages(int $productId): array
+    {
+        return $this->obtenerImagenesProducto($productId);
+    }
+
+    public function deleteImage(int $imageId): void
+    {
+        $this->eliminarImagenProducto($imageId);
+    }
+
+    public function fetchCatalog(array $filtros): array
+    {
+        // Entrega a la vista todo lo necesario para pintar catálogo y filtros laterales en una sola llamada.
+        return [
+            'productos' => $this->obtenerProductos($filtros),
+            'categorias' => $this->obtenerCategoriasConProductos(),
+            'marcas' => $this->obtenerMarcasConProductos(),
+        ];
+    }
+
+    public function fetchProduct(int $idProducto): ?array
+    {
+        return $this->obtenerProductoPorId($idProducto);
+    }
+
+    public function fetchProductImages(int $idProducto): array
+    {
+        return $this->obtenerImagenesProducto($idProducto);
+    }
+
+    public function fetchProductStock(int $idProducto): int
+    {
+        return $this->obtenerStockProducto($idProducto);
+    }
+
+    public function fetchSimilarProducts(string $categoria, int $idProducto, int $limite = 6): array
+    {
+        return $this->obtenerProductosSimilares($categoria, $idProducto, $limite);
+    }
+
+    public function sanitizeCart($cart): array
+    {
+        // Normaliza el carrito al formato [idProducto => cantidad] con enteros positivos.
+        if (!is_array($cart)) {
+            return [];
+        }
+
+        $clean = [];
+
+        foreach ($cart as $id => $cantidad) {
+            $idInt = (int)$id;
+            $cantidadInt = (int)$cantidad;
+
+            if ($idInt > 0 && $cantidadInt > 0) {
+                $clean[$idInt] = $cantidadInt;
+            }
+        }
+
+        return $clean;
+    }
+
+    public function buildCartSummary(array $cart): array
+    {
+        // Solo sobreviven productos vigentes; cualquier ID inválido se elimina del carrito limpio retornado.
+        $ids = array_keys($cart);
+        $productos = $this->obtenerProductosPorIds($ids);
+        $productosIndex = [];
+
+        foreach ($productos as $producto) {
+            $productosIndex[(int)$producto['ID_PRODUCTO']] = $producto;
+        }
+
+        $items = [];
+        $total = 0;
+        $clean = [];
+
+        foreach ($cart as $id => $cantidad) {
+            $idInt = (int)$id;
+            $cantidadInt = (int)$cantidad;
+
+            if ($cantidadInt <= 0 || !isset($productosIndex[$idInt])) {
+                continue;
+            }
+
+            $producto = $productosIndex[$idInt];
+            $precio = (float)$producto['PRECIO'];
+            $descuento = (float)($producto['DESCUENTO'] ?? 0);
+
+            // El subtotal se calcula con precio promocional si existe descuento activo.
+            if ($descuento > 0) {
+                $precio = $precio * (1 - ($descuento / 100));
+            }
+
+            $subtotal = $cantidadInt * $precio;
+            $total += $subtotal;
+
+            $items[] = [
+                'producto' => $producto,
+                'cantidad' => $cantidadInt,
+                'subtotal' => $subtotal,
+            ];
+
+            $clean[$idInt] = $cantidadInt;
+        }
+
+        return [
+            'items' => $items,
+            'total' => $total,
+            'cart' => $clean,
+        ];
+    }
+
+    public function countCart(array $cart): int
+    {
+        // El contador ignora productos ya inactivos o inexistentes para no inflar el badge del carrito.
+        $cart = $this->sanitizeCart($cart);
+        $ids = array_keys($cart);
+
+        if (!empty($ids)) {
+            $productos = $this->obtenerProductosPorIds($ids);
+            $validos = [];
+
+            foreach ($productos as $producto) {
+                $validos[(int)$producto['ID_PRODUCTO']] = true;
+            }
+
+            foreach (array_keys($cart) as $id) {
+                $idInt = (int)$id;
+
+                if (!isset($validos[$idInt])) {
+                    unset($cart[$id]);
+                }
+            }
+        }
+
+        return array_sum($cart);
+    }
+
+    public function fetchCartForAccount(int $idCuenta): array
+    {
+        return $this->sanitizeCart($this->obtenerCarritoCuenta($idCuenta));
+    }
+
+    public function saveCartForAccount(int $idCuenta, array $cart): void
+    {
+        $this->guardarCarritoCuenta($idCuenta, $this->sanitizeCart($cart));
     }
 }

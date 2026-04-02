@@ -1,1 +1,0 @@
-Middleware para proteger rutas (Auth, Admin, etc).

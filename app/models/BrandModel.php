@@ -1,6 +1,6 @@
 <?php
 
-class BrandRepository
+class BrandModel
 {
     private PDO $db;
 

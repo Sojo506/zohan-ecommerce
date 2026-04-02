@@ -1,6 +1,6 @@
 <?php
 
-class CommentRepository
+class CommentModel
 {
     private PDO $db;
 

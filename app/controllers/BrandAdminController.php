@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../repositories/BrandRepository.php';
-
 class BrandAdminController extends Controller
 {
 
@@ -24,7 +22,7 @@ class BrandAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new BrandRepository();
+        $repo = new BrandModel();
 
         $brands = $repo->all();
 
@@ -49,9 +47,9 @@ class BrandAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new BrandRepository();
+        $repo = new BrandModel();
 
-        // El formulario envía solo el nombre, y el repositorio resuelve la persistencia.
+        // El formulario envía solo el nombre, y el modelo resuelve la persistencia.
         $repo->create($_POST['name']);
 
         header("Location: " . App::url('/admin/brands'));
@@ -61,7 +59,7 @@ class BrandAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new BrandRepository();
+        $repo = new BrandModel();
 
         // Carga la marca actual para reutilizar el mismo dato como estado inicial del formulario.
         $brand = $repo->find($id);
@@ -77,7 +75,7 @@ class BrandAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new BrandRepository();
+        $repo = new BrandModel();
 
         $repo->update($_POST['id'], $_POST['name']);
 
@@ -88,7 +86,7 @@ class BrandAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new BrandRepository();
+        $repo = new BrandModel();
 
         $repo->delete($id);
 

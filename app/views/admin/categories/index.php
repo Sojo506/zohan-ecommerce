@@ -22,7 +22,6 @@
                 <thead class="table-light">
 
                     <tr>
-                        <th>ID</th>
                         <th>Nombre</th>
                         <th class="text-end">Acciones</th>
                     </tr>
@@ -34,12 +33,6 @@
                     <?php foreach ($categories as $c): ?>
 
                         <tr>
-
-                            <td>
-                                <span class="badge bg-dark">
-                                    #<?= $c['ID_CATEGORIA'] ?>
-                                </span>
-                            </td>
 
                             <td class="fw-semibold">
                                 <?= htmlspecialchars($c['NOMBRE']) ?>

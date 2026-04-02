@@ -1,6 +1,6 @@
 <?php
 
-class CouponRepository
+class CouponModel
 {
     private PDO $db;
 
@@ -78,6 +78,36 @@ class CouponRepository
             UPDATE CUPON_DESCUENTO_TB
             SET ID_ESTADO = 2
             WHERE ID_CUPON = :id
+        ");
+
+        $stmt->execute([':id' => $id]);
+    }
+
+    public function findValidByCode(string $code): ?array
+    {
+        $stmt = $this->db->prepare("
+            SELECT *
+            FROM CUPON_DESCUENTO_TB
+            WHERE CODIGO = :code
+              AND ID_ESTADO = 1
+              AND FECHA_INICIO <= CURDATE()
+              AND FECHA_FIN >= CURDATE()
+              AND USO_MAXIMO > 0
+            LIMIT 1
+        ");
+
+        $stmt->execute([':code' => strtoupper(trim($code))]);
+        $coupon = $stmt->fetch();
+
+        return $coupon ?: null;
+    }
+
+    public function decrementUsage(int $id): void
+    {
+        $stmt = $this->db->prepare("
+            UPDATE CUPON_DESCUENTO_TB
+            SET USO_MAXIMO = USO_MAXIMO - 1
+            WHERE ID_CUPON = :id AND USO_MAXIMO > 0
         ");
 
         $stmt->execute([':id' => $id]);

@@ -3,8 +3,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
+// Encapsula los correos transaccionales del sistema para no repetir PHPMailer en varios controladores.
 class Mailer
 {
     public static function verifyEmail(string $toEmail, string $otp): bool
@@ -76,6 +75,7 @@ class Mailer
             $mail->isHTML(true);
             $mail->Subject = "Confirmacion de compra - Zohan Tech Store";
 
+            // El correo usa el snapshot de la compra recién registrada, sin volver a consultar la BD.
             $customerName = htmlspecialchars((string)($data['customer_name'] ?? 'Cliente'));
             $saleId = (int)($data['sale_id'] ?? 0);
             $invoiceId = (int)($data['invoice_id'] ?? 0);

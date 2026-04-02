@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../repositories/AuditRepository.php';
-
 class AuditAdminController extends Controller
 {
 
@@ -24,13 +22,7 @@ class AuditAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new AuditRepository();
-
-        // Recupera el histórico completo para revisión en la vista de auditoría.
-        $logs = $repo->all();
-
         $this->adminView('admin/audit/index', [
-            'logs' => $logs,
             'pageTitle' => 'Auditoría',
             'currentSection' => 'audit'
         ]);

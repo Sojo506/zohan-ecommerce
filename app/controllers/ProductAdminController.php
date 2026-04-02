@@ -1,10 +1,5 @@
 <?php
 
-use Cloudinary\Cloudinary;
-
-require_once __DIR__ . '/../repositories/ProductRepository.php';
-require_once __DIR__ . '/../services/CloudinaryService.php';
-
 class ProductAdminController extends Controller
 {
     private function checkAdmin()
@@ -26,7 +21,7 @@ class ProductAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new ProductRepository();
+        $repo = new ProductModel();
         $products = $repo->all();
 
         $this->adminView('admin/products/index', [
@@ -40,7 +35,7 @@ class ProductAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new ProductRepository();
+        $repo = new ProductModel();
 
         $categories = $repo->getCategories();
         $brands = $repo->getBrands();
@@ -57,7 +52,7 @@ class ProductAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new ProductRepository();
+        $repo = new ProductModel();
         $repo->create($_POST);
 
         header("Location: " . App::url('/admin/products'));
@@ -68,7 +63,7 @@ class ProductAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new ProductRepository();
+        $repo = new ProductModel();
 
         // Para editar se cargan tanto el producto base como catálogos e imágenes asociadas.
         $product = $repo->find($id);
@@ -99,7 +94,7 @@ class ProductAdminController extends Controller
 
         $id = $_POST['id'];
 
-        $repo = new ProductRepository();
+        $repo = new ProductModel();
 
         $repo->update($id, $_POST);
 
@@ -110,7 +105,7 @@ class ProductAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new ProductRepository();
+        $repo = new ProductModel();
 
         $repo->delete($id);
 
@@ -128,7 +123,7 @@ class ProductAdminController extends Controller
         // Se sube el archivo temporal y luego se persiste solo la URL devuelta por Cloudinary.
         $url = $cloudinary->upload($_FILES['image']['tmp_name']);
 
-        $repo = new ProductRepository();
+        $repo = new ProductModel();
         $repo->addImage($productId, $url);
 
         header("Location: " . App::url('/admin/products/edit/' . $productId));
@@ -138,7 +133,7 @@ class ProductAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new ProductRepository();
+        $repo = new ProductModel();
         $repo->deleteImage($id);
 
         header("Location: " . $_SERVER['HTTP_REFERER']);

@@ -104,9 +104,9 @@
                     <!-- Seccion de calificacion eliminada por requerimiento -->
 
                     <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
-                        <div class="fs-2 fw-bold text-danger">&#8353; <?= htmlspecialchars($precio) ?></div>
+                        <div class="fs-2 fw-bold text-danger">&#36; <?= htmlspecialchars($precio) ?></div>
                         <?php if ($discount > 0): ?>
-                            <div class="text-muted text-decoration-line-through">&#8353; <?= number_format($precioOriginal, 0, ',', '.') ?></div>
+                            <div class="text-muted text-decoration-line-through">&#36; <?= number_format($precioOriginal, 0, ',', '.') ?></div>
                             <span class="badge text-bg-danger"><?= (int)$discount ?>% off</span>
                         <?php endif; ?>
                         <div class="text-success fw-semibold">Existencias: <?= (int)$existencias ?></div>
@@ -409,9 +409,9 @@ $reviewChips = [
                                 <?= htmlspecialchars(strlen((string)$item['DESCRIPCION']) > 130 ? substr((string)$item['DESCRIPCION'], 0, 127) . '...' : (string)$item['DESCRIPCION']) ?>
                             </p>
                             <div class="d-flex justify-content-between align-items-center mt-3 mb-1 flex-wrap gap-2">
-                                <span class="fw-bold fs-5 text-danger">&#8353; <?= number_format($precioPromo, 0, ',', '.') ?></span>
+                                <span class="fw-bold fs-5 text-danger">&#36; <?= number_format($precioPromo, 0, ',', '.') ?></span>
                                 <?php if ($discount > 0): ?>
-                                    <span class="text-muted text-decoration-line-through small">&#8353; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
+                                    <span class="text-muted text-decoration-line-through small">&#36; <?= number_format($precioOriginal, 0, ',', '.') ?></span>
                                 <?php endif; ?>
                             </div>
                             <div class="text-success small fw-semibold mb-3">Existencias: <?= (int)($item['STOCK'] ?? 0) ?></div>

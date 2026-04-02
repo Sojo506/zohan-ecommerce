@@ -1,6 +1,6 @@
 <?php
 
-class PromotionRepository
+class PromotionModel
 {
     private PDO $db;
 

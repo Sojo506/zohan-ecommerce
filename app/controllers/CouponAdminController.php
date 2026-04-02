@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../repositories/CouponRepository.php';
-
 class CouponAdminController extends Controller
 {
 
@@ -24,7 +22,7 @@ class CouponAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CouponRepository();
+        $repo = new CouponModel();
 
         $coupons = $repo->all();
 
@@ -49,9 +47,9 @@ class CouponAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CouponRepository();
+        $repo = new CouponModel();
 
-        // Se delega al repositorio el parseo de fechas, montos y reglas del cupón.
+        // Se delega al modelo el parseo de fechas, montos y reglas del cupón.
         $repo->create($_POST);
 
         header("Location: " . App::url('/admin/coupons'));
@@ -61,7 +59,7 @@ class CouponAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CouponRepository();
+        $repo = new CouponModel();
 
         // La edición parte del cupón persistido para mostrar el estado real en el formulario.
         $coupon = $repo->find($id);
@@ -77,7 +75,7 @@ class CouponAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CouponRepository();
+        $repo = new CouponModel();
 
         $repo->update($_POST['id'], $_POST);
 
@@ -88,7 +86,7 @@ class CouponAdminController extends Controller
     {
         $this->checkAdmin();
 
-        $repo = new CouponRepository();
+        $repo = new CouponModel();
 
         $repo->delete($id);
 

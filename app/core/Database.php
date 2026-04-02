@@ -1,5 +1,6 @@
 <?php
 
+// Punto único de acceso a PDO: modelos y controladores comparten la misma conexión durante el request.
 class Database
 {
     private static ?PDO $pdo = null;
