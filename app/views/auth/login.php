@@ -84,7 +84,7 @@
 
                                 </div>
 
-                                <a href="#" class="small text-decoration-none">
+                                <a href="<?= App::url('/forgot-password') ?>" class="small text-decoration-none">
                                     ¿Olvidaste tu contraseña?
                                 </a>
 

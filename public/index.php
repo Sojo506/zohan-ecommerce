@@ -152,6 +152,10 @@ $router->post('/invoiceDetail/comment', 'ProfileController@commentProduct');
 /* RUTAS AUTENTICACIÓN  */
 $router->get('/login', 'AuthController@loginForm');
 $router->post('/login', 'AuthController@login');
+$router->get('/forgot-password', 'AuthController@forgotPasswordForm');
+$router->post('/forgot-password', 'AuthController@forgotPassword');
+$router->get('/reset-password', 'AuthController@resetPasswordForm');
+$router->post('/reset-password', 'AuthController@resetPassword');
 $router->get('/logout', 'AuthController@logout');
 
 
