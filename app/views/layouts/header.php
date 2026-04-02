@@ -32,9 +32,15 @@
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= App::url('/tienda') ?>">Tienda</a>
+                        <a class="nav-link" href="<?= App::url('/shop') ?>">Shop</a>
                     </li>
 
+                    <?php
+                    $cartCountValue = (int)($cartCount ?? 0);
+                    if ($cartCountValue <= 0 && !empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+                        $cartCountValue = array_sum(array_map('intval', $_SESSION['cart']));
+                    }
+                    ?>
                     <li class="nav-item">
                         <a class="nav-link cart-link" href="<?= App::url('/cart') ?>" aria-label="Carrito">
                             <span class="cart-icon" aria-hidden="true">
@@ -42,8 +48,8 @@
                                     <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.2 6l.94 4.5h8.28l1.26-5.5H6.21L5.27 2H2v2h2l2.1 9.9c.1.5.55.85 1.06.85h10.4c.5 0 .94-.35 1.05-.83L21 6H7.2z"/>
                                 </svg>
                             </span>
-                            <?php if (!empty($cartCount)): ?>
-                                <span class="cart-badge"><?= (int)$cartCount ?></span>
+                            <?php if ($cartCountValue > 0): ?>
+                                <span class="cart-badge"><?= (int)$cartCountValue ?></span>
                             <?php endif; ?>
                         </a>
                     </li>
@@ -57,14 +63,6 @@
                                 </a>
                             </span>
                         </li>
-
-                        <?php if ($_SESSION['user']['tipo'] === 'ADMIN'): ?>
-                            <li class="nav-item">
-                                <a class="nav-link text-warning fw-semibold" href="<?= App::url('/admin') ?>">
-                                    ADMIN
-                                </a>
-                            </li>
-                        <?php endif; ?>
 
                         <li class="nav-item">
                             <a class="nav-link" href="<?= App::url('/logout') ?>">
@@ -95,4 +93,5 @@
     </nav>
 
     <div class="container mt-4">
+
 

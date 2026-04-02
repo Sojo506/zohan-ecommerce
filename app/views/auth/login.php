@@ -1,4 +1,4 @@
-<?php if (!empty($_SESSION['flash_error'])): ?>
+﻿<?php if (!empty($_SESSION['flash_error'])): ?>
     <div class="alert alert-danger">
         <?= htmlspecialchars($_SESSION['flash_error']) ?>
     </div>
@@ -26,7 +26,7 @@
 
                         <div class="text-center mb-4">
 
-                            <h3 class="fw-bold">Iniciar sesión</h3>
+                            <h3 class="fw-bold">Iniciar sesi&oacute;n</h3>
 
                             <p class="text-muted">
                                 Accede a tu cuenta de Zohan Tech Store
@@ -34,7 +34,10 @@
 
                         </div>
 
-                        <form method="POST" action="<?= App::url('/login') ?>">
+                        <form method="POST" action="<?= App::url('/login') ?>" autocomplete="off">
+                            <!-- Campos fantasma para evitar autocompletado del navegador -->
+                            <input type="text" name="fakeusernameremembered" style="display:none" autocomplete="off">
+                            <input type="password" name="fakepasswordremembered" style="display:none" autocomplete="new-password">
 
                             <!-- usuario -->
                             <div class="mb-3">
@@ -48,15 +51,19 @@
                                     name="user"
                                     class="form-control form-control-lg"
                                     placeholder="usuario o correo"
+                                    value=""
+                                    autocomplete="off"
+                                    autocapitalize="off"
+                                    autocorrect="off"
                                     required>
 
                             </div>
 
-                            <!-- contraseña -->
+                            <!-- contrase&ntilde;a -->
                             <div class="mb-3">
 
                                 <label class="form-label">
-                                    Contraseña
+                                    Contrase&ntilde;a
                                 </label>
 
                                 <input
@@ -64,6 +71,8 @@
                                     name="password"
                                     class="form-control form-control-lg"
                                     placeholder="••••••••"
+                                    value=""
+                                    autocomplete="new-password"
                                     required>
 
                             </div>
@@ -85,7 +94,7 @@
                                 </div>
 
                                 <a href="#" class="small text-decoration-none">
-                                    ¿Olvidaste tu contraseña?
+                                    &iquest;Olvidaste tu contrase&ntilde;a?
                                 </a>
 
                             </div>
@@ -94,7 +103,7 @@
                             <div class="d-grid mb-3">
 
                                 <button class="btn btn-dark btn-lg">
-                                    Iniciar sesión
+                                    Iniciar sesi&oacute;n
                                 </button>
 
                             </div>
@@ -107,7 +116,7 @@
                         <div class="text-center">
 
                             <p class="small text-muted mb-0">
-                                ¿No tienes una cuenta?
+                                &iquest;No tienes una cuenta?
                             </p>
 
                             <a href="<?= App::url('/register') ?>" class="fw-semibold text-decoration-none">
