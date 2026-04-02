@@ -252,6 +252,8 @@ class ProfileController extends Controller
 
         // Este ID de cuenta luego lo reutiliza AuthController al validar el OTP ingresado.
         $_SESSION['pending_account_id'] = $idCuenta;
+        $_SESSION['password_reset_flow'] = 'profile';
+        unset($_SESSION['password_reset_verified_account_id']);
 
         $stmtCorreo = $pdo->prepare("
             SELECT CORREO
