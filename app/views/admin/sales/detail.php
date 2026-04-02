@@ -25,6 +25,11 @@
 
             <?php
             $estado = strtolower((string) ($sale['ID_ESTADO'] ?? ''));
+            $cliente = trim(implode(' ', array_filter([
+                $sale['NOMBRE'] ?? '',
+                $sale['APELLIDO_PATERNO'] ?? '',
+                $sale['APELLIDO_MATERNO'] ?? ''
+            ])));
             $badge = 'secondary';
 
             if (in_array($estado, ['4', 'pagada', 'pagado', 'completada', 'completado'], true)) {
@@ -39,16 +44,9 @@
             <div class="row g-3 mb-4">
 
                 <div class="col-md-3">
-                    <strong>ID de venta</strong>
+                    <strong>Cliente</strong>
                     <p class="mb-0">
-                        <span class="badge bg-dark">#<?= (int) $sale['ID_VENTA'] ?></span>
-                    </p>
-                </div>
-
-                <div class="col-md-3">
-                    <strong>Cuenta</strong>
-                    <p class="mb-0">
-                        #<?= htmlspecialchars((string) ($sale['ID_CUENTA'] ?? 'N/D')) ?>
+                        <?= htmlspecialchars($cliente !== '' ? $cliente : 'N/D') ?>
                     </p>
                 </div>
 
@@ -63,7 +61,9 @@
                     <strong>Estado</strong>
                     <p class="mb-0">
                         <span class="badge bg-<?= $badge ?>">
-                            <?= htmlspecialchars((string) ($sale['ID_ESTADO'] ?? 'N/D')) ?>
+                            <?= htmlspecialchars((string) (
+                                $sale['ESTADO_NOMBRE'] ?? ($sale['ID_ESTADO'] == 1 ? 'Activo' : ($sale['ID_ESTADO'] == 2 ? 'Inactivo' : ($sale['ID_ESTADO'] == 3 ? 'Pendiente' : 'Desconocido')))
+                            )) ?>
                         </span>
                     </p>
                 </div>
@@ -77,7 +77,7 @@
                 <?php if (!empty($invoice)): ?>
 
                     <a href="<?= App::url('/admin/invoices/' . $invoice['ID_FACTURA']) ?>" class="btn btn-outline-primary">
-                        <i class="bi bi-receipt"></i> Ver factura #<?= (int) $invoice['ID_FACTURA'] ?>
+                        <i class="bi bi-receipt"></i> Ver factura
                     </a>
 
                 <?php else: ?>

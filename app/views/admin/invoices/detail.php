@@ -17,6 +17,11 @@
 
         <?php
         $estado = strtolower((string) ($invoice['ESTADO'] ?? ''));
+        $cliente = trim(implode(' ', array_filter([
+            $invoice['NOMBRE'] ?? '',
+            $invoice['APELLIDO_PATERNO'] ?? '',
+            $invoice['APELLIDO_MATERNO'] ?? ''
+        ])));
         $badge = 'secondary';
 
         if (in_array($estado, ['pagado', 'pagada', 'completado', 'completada'], true)) {
@@ -31,17 +36,10 @@
         <div class="row g-3 mb-4">
 
             <div class="col-md-3">
-                <strong>ID factura</strong>
-                <p class="mb-0">
-                    <span class="badge bg-dark">#<?= (int) $invoice['ID_FACTURA'] ?></span>
-                </p>
-            </div>
-
-            <div class="col-md-3">
-                <strong>Venta asociada</strong>
+                <strong>Cliente</strong>
                 <p class="mb-0">
                     <a href="<?= App::url('/admin/sales/' . $invoice['ID_VENTA']) ?>" class="text-decoration-none">
-                        #<?= (int) $invoice['ID_VENTA'] ?>
+                        <?= htmlspecialchars($cliente !== '' ? $cliente : 'Ver venta') ?>
                     </a>
                 </p>
             </div>
@@ -140,11 +138,6 @@
         <?php if (!empty($payment)): ?>
 
             <div class="row g-3">
-
-                <div class="col-md-4">
-                    <strong>ID pago</strong>
-                    <p class="mb-0">#<?= (int) $payment['ID_PAGO'] ?></p>
-                </div>
 
                 <div class="col-md-4">
                     <strong>Order ID</strong>

@@ -18,8 +18,6 @@
                 <thead class="table-light">
 
                     <tr>
-                        <th>ID</th>
-                        <th>Venta</th>
                         <th>Cliente</th>
                         <th>Subtotal</th>
                         <th>Impuesto</th>
@@ -36,18 +34,6 @@
                     <?php foreach ($invoices as $f): ?>
 
                         <tr>
-
-                            <td>
-                                <span class="badge bg-dark">
-                                    #<?= $f['ID_FACTURA'] ?>
-                                </span>
-                            </td>
-
-                            <td>
-                                <span class="badge bg-secondary">
-                                    #<?= $f['ID_VENTA'] ?>
-                                </span>
-                            </td>
 
                             <td class="fw-semibold">
 

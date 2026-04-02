@@ -93,6 +93,12 @@
                     <span>Usuarios</span>
                 </a>
 
+                <a href="<?= App::url('/admin/accounts') ?>"
+                    class="admin-sidebar-link <?= ($currentSection ?? '') === 'accounts' ? 'active' : '' ?>">
+                    <i class="bi bi-person-vcard"></i>
+                    <span>Cuentas</span>
+                </a>
+
                 <a href="<?= App::url('/admin/sales') ?>"
                     class="admin-sidebar-link <?= ($currentSection ?? '') === 'sales' ? 'active' : '' ?>">
                     <i class="bi bi-cart-check"></i>

@@ -21,7 +21,6 @@
 
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
                         <th>Nombre</th>
                         <th class="text-end">Acciones</th>
                     </tr>
@@ -32,12 +31,6 @@
                     <?php foreach ($brands as $b): ?>
 
                         <tr>
-
-                            <td>
-                                <span class="badge bg-dark">
-                                    #<?= $b['ID_MARCA'] ?>
-                                </span>
-                            </td>
 
                             <td class="fw-semibold">
                                 <?= htmlspecialchars($b['NOMBRE']) ?>
