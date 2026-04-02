@@ -18,7 +18,6 @@
                 <thead class="table-light">
 
                     <tr>
-                        <th>ID</th>
                         <th>Nombre</th>
                         <th>Tipo</th>
                         <th>Estado</th>
@@ -32,14 +31,6 @@
                     <?php foreach ($users as $u): ?>
 
                         <tr>
-
-                            <td>
-
-                                <span class="badge bg-dark">
-                                    <?= $u['IDENTIFICACION'] ?>
-                                </span>
-
-                            </td>
 
                             <td class="fw-semibold">
 

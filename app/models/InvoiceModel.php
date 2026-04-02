@@ -39,8 +39,17 @@ class InvoiceModel
     {
         $sql = "SELECT 
                     F.*,
-                    E.NOMBRE AS ESTADO
+                    E.NOMBRE AS ESTADO,
+                    U.NOMBRE,
+                    U.APELLIDO_PATERNO,
+                    U.APELLIDO_MATERNO
                 FROM FACTURA_TB F
+                JOIN VENTA_TB V
+                    ON V.ID_VENTA = F.ID_VENTA
+                JOIN CUENTA_TB C
+                    ON C.ID_CUENTA = V.ID_CUENTA
+                JOIN USUARIO_TB U
+                    ON U.IDENTIFICACION = C.IDENTIFICACION
                 JOIN ESTADO_TB E
                     ON E.ID_ESTADO = F.ID_ESTADO
                 WHERE F.ID_FACTURA = :id
@@ -113,9 +122,13 @@ class InvoiceModel
 
     public function findBySale($saleId)
     {
-        $sql = "SELECT * 
-                FROM FACTURA_TB
-                WHERE ID_VENTA = :sale";
+        $sql = "SELECT
+                    F.*,
+                    E.NOMBRE AS ESTADO
+                FROM FACTURA_TB F
+                LEFT JOIN ESTADO_TB E
+                    ON E.ID_ESTADO = F.ID_ESTADO
+                WHERE F.ID_VENTA = :sale";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':sale' => $saleId]);

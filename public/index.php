@@ -98,6 +98,15 @@ $router->get('/admin/users/{id}/status/{status}', 'UserAdminController@changeSta
 $router->get('/admin/users/{id}/role/{role}', 'UserAdminController@changeRole');
 
 
+/* RUTAS CUENTAS ADMIN */
+$router->get('/admin/accounts', 'AccountAdminController@index');
+$router->get('/admin/accounts/create', 'AccountAdminController@createForm');
+$router->post('/admin/accounts/create', 'AccountAdminController@create');
+$router->get('/admin/accounts/edit/{id}', 'AccountAdminController@editForm');
+$router->post('/admin/accounts/update', 'AccountAdminController@update');
+$router->get('/admin/accounts/delete/{id}', 'AccountAdminController@delete');
+
+
 /* RUTAS CUPONES ADMIN */
 $router->get('/admin/coupons', 'CouponAdminController@index');
 $router->get('/admin/coupons/create', 'CouponAdminController@createForm');

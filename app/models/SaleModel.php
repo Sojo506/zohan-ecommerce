@@ -28,8 +28,21 @@ class SaleModel
 
     public function find($id)
     {
-        $sql = "SELECT * FROM VENTA_TB
-                WHERE ID_VENTA = :id";
+        $sql = "SELECT
+                    V.*,
+                    U.NOMBRE,
+                    U.APELLIDO_PATERNO,
+                    U.APELLIDO_MATERNO,
+                    E.NOMBRE AS ESTADO_NOMBRE
+                FROM VENTA_TB V
+                JOIN CUENTA_TB C
+                    ON C.ID_CUENTA = V.ID_CUENTA
+                JOIN USUARIO_TB U
+                    ON U.IDENTIFICACION = C.IDENTIFICACION
+                LEFT JOIN ESTADO_TB E
+                    ON E.ID_ESTADO = V.ID_ESTADO
+                WHERE V.ID_VENTA = :id
+                LIMIT 1";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
