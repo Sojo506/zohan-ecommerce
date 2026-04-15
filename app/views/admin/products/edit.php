@@ -86,6 +86,7 @@
                             <div class="card-body p-2 text-center">
 
                                 <a href="<?= App::url('/admin/products/delete-image/' . $img['ID_IMAGEN']) ?>"
+                                    data-url="<?= App::url('/admin/products/delete-image/' . $img['ID_IMAGEN']) ?>"
                                     class="btn btn-sm btn-outline-danger btn-delete-image">
 
                                     <i class="bi bi-trash"></i>

@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="/zohan-ecommerce/public/css/style.css">
 </head>
 
-<body>
+<body class="site-shell">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -34,6 +34,16 @@
                     <li class="nav-item">
                         <a class="nav-link" href="<?= App::url('/shop') ?>">Shop</a>
                     </li>
+
+                    <?php $isAdminUser = isset($_SESSION['user']) && (($_SESSION['user']['tipo'] ?? '') === 'ADMIN'); ?>
+
+                    <?php if ($isAdminUser): ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning fw-semibold" href="<?= App::url('/admin') ?>">
+                                Admin
+                            </a>
+                        </li>
+                    <?php endif; ?>
 
                     <?php
                     $cartCountValue = (int)($cartCount ?? 0);
@@ -92,6 +102,5 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
-
-
+    <main class="site-main">
+        <div class="container mt-4">

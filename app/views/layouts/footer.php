@@ -1,4 +1,5 @@
         </div>
+        </main>
 
         <footer class="bg-dark text-white mt-0">
                 <div class="container py-5">
@@ -114,4 +115,3 @@
 </body>
         
 </html>
-

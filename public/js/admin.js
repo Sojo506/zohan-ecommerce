@@ -73,12 +73,18 @@ document.addEventListener("DOMContentLoaded", () => {
             button.addEventListener('click', function (e) {
                 e.preventDefault();
 
+                const targetUrl = this.dataset.url || this.getAttribute('href');
+
+                if (!targetUrl) {
+                    return;
+                }
+
                 confirmAction({
                     title: title,
                     text: "Esta acción no se puede deshacer",
                     confirmText: "Sí, eliminar",
                     confirmColor: "#dc3545",
-                    url: this.dataset.url
+                    url: targetUrl
                 });
             });
         });
