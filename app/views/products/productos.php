@@ -105,11 +105,11 @@
                     $discount = (float)($producto['DESCUENTO'] ?? 0);
                     $precioOriginal = (float)$producto['PRECIO'];
                     $precioPromo = $discount > 0 ? $precioOriginal * (1 - ($discount / 100)) : $precioOriginal;
-                    $ratingValue = 4.2 + ((int)$producto['ID_PRODUCTO'] % 8) * 0.1;
-                    $ratingValue = min(4.9, $ratingValue);
+                    $ratingCountValue = (int)($producto['TOTAL_COMENTARIOS'] ?? 0);
+                    $ratingValue = $ratingCountValue > 0 ? (float)($producto['CALIFICACION_PROMEDIO'] ?? 0) : 0.0;
                     $ratingText = number_format($ratingValue, 1);
-                    $ratingCount = number_format(2000 + ((int)$producto['ID_PRODUCTO'] * 37) % 25000);
-                    $ratingRounded = (int)round($ratingValue);
+                    $ratingCount = number_format($ratingCountValue);
+                    $ratingRounded = max(0, min(5, (int)round($ratingValue)));
                     ?>
                     <div class="col-12 col-sm-6 col-lg-4">
                         <div class="card h-100 border-0 shadow-sm">
@@ -176,7 +176,6 @@
         <?php endif; ?>
     </section>
 </main>
-
 
 
 
