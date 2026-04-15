@@ -4,6 +4,68 @@ body {
     background-color: #f8f9fa;
 }
 
+.site-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-main {
+    flex: 1 0 auto;
+}
+
+.not-found-page {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+}
+
+.not-found-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    padding: clamp(2rem, 5vw, 4rem);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+}
+
+.not-found-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 96px;
+    min-height: 96px;
+    border-radius: 999px;
+    background: #111827;
+    color: #ffffff;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.not-found-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    color: #111827;
+}
+
+.not-found-text {
+    max-width: 38rem;
+    margin: 0 auto;
+    color: #4b5563;
+    font-size: 1.05rem;
+}
+
+.not-found-path {
+    color: #6b7280;
+}
+
+.not-found-path code {
+    background: #e5e7eb;
+    color: #111827;
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+}
+
 .navbar-brand {
     font-size: 1.1rem;
 }

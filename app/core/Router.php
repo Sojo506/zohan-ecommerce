@@ -16,6 +16,15 @@ class Router
         $this->routes['POST'][$uri] = $controller;
     }
 
+    private function renderPublicView(string $view, array $data = []): void
+    {
+        extract($data);
+
+        require __DIR__ . '/../views/layouts/header.php';
+        require __DIR__ . '/../views/' . $view . '.php';
+        require __DIR__ . '/../views/layouts/footer.php';
+    }
+
     public function dispatch(): void
     {
         // Normaliza la petición actual, busca la primera ruta compatible y ejecuta el controlador asociado.
@@ -60,7 +69,9 @@ class Router
 
         if (!$routeFound) {
             http_response_code(404);
-            echo "404 - Pagina no encontrada (ruta: {$uri})";
+            $this->renderPublicView('errors/404', [
+                'requestedPath' => $uri
+            ]);
             return;
         }
 
