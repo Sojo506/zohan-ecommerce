@@ -1,3 +1,4 @@
+<?php $assetBase = rtrim(str_replace('/index.php?url=', '', App::config('BASE_URL')), '/'); ?>
 <main>
 
     <!-- HERO -->
@@ -31,9 +32,9 @@
 
                 <div class="col-12 col-lg-6">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden hero-card">
-                        <div class="ratio ratio-16x9 bg-dark hero-banner">
-                            <img src="<?= App::url('/public/images/banner_zohan.png') ?>"
-                                alt="Banner Zohan Tech Store"
+                        <div class="ratio ratio-16x9 bg-dark hero-banner hero-banner--brand">
+                            <img src="<?= $assetBase ?>/images/logo-zohan.png"
+                                alt="Logo Zohan Tech Store"
                                 class="w-100 h-100 object-fit-cover">
                         </div>
 

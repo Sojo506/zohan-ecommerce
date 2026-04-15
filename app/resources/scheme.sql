@@ -162,9 +162,13 @@ CREATE TABLE COMENTARIO_TB (
     ID_COMENTARIO INT AUTO_INCREMENT PRIMARY KEY,
     ID_PRODUCTO INT,
     IDENTIFICACION VARCHAR(20),
+    AUTOR_NOMBRE VARCHAR(150),
+    META VARCHAR(255),
     CALIFICACION INT,
     COMENTARIO TEXT,
     FECHA_COMENTARIO DATETIME DEFAULT CURRENT_TIMESTAMP,
+    AYUDA_TOTAL INT DEFAULT 0,
+    COMPRA_VERIFICADA BOOLEAN DEFAULT TRUE,
     ID_ESTADO INT,
     FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTO_TB(ID_PRODUCTO),
     FOREIGN KEY (IDENTIFICACION) REFERENCES USUARIO_TB(IDENTIFICACION),
@@ -383,4 +387,79 @@ CREATE TABLE AUDITORIA_TB (
     ID_ESTADO INT,
     FOREIGN KEY (IDENTIFICACION) REFERENCES USUARIO_TB(IDENTIFICACION),
     FOREIGN KEY (ID_ESTADO) REFERENCES ESTADO_TB(ID_ESTADO)
+);
+
+-- ==============================
+-- SEED COMENTARIOS
+-- ==============================
+
+INSERT INTO COMENTARIO_TB (
+    ID_PRODUCTO,
+    IDENTIFICACION,
+    AUTOR_NOMBRE,
+    META,
+    CALIFICACION,
+    COMENTARIO,
+    FECHA_COMENTARIO,
+    AYUDA_TOTAL,
+    COMPRA_VERIFICADA,
+    ID_ESTADO
+)
+SELECT
+    P.ID_PRODUCTO,
+    NULL,
+    R.AUTOR_NOMBRE,
+    R.META,
+    R.CALIFICACION,
+    R.COMENTARIO,
+    R.FECHA_COMENTARIO,
+    R.AYUDA_TOTAL,
+    1,
+    1
+FROM PRODUCTO_TB P
+CROSS JOIN (
+    SELECT 'Andrea' AS AUTOR_NOMBRE, 'Color: Negro - Tamano: Estandar' AS META, 5 AS CALIFICACION, 'La calidad se siente premium, el empaque llego perfecto.' AS COMENTARIO, '2025-08-10 10:00:00' AS FECHA_COMENTARIO, 4 AS AYUDA_TOTAL
+    UNION ALL
+    SELECT 'Carlos', 'Color: Azul - Version: V2', 4, 'Cumple con lo que promete, envio rapido y sin problemas.', '2025-08-08 10:00:00', 3
+    UNION ALL
+    SELECT 'Sofia', 'Uso: Oficina - Entrega: Rapida', 5, 'Excelente compra, el rendimiento es top para mi trabajo.', '2025-08-05 10:00:00', 6
+    UNION ALL
+    SELECT 'Diego', 'Color: Blanco - Garantia: 1 ano', 4, 'Buen balance entre precio y calidad, lo recomiendo.', '2025-08-01 10:00:00', 2
+    UNION ALL
+    SELECT 'Valeria', 'Material: Premium - Uso: Diario', 5, 'Me encanto el acabado, se ve duradero.', '2025-07-28 10:00:00', 5
+    UNION ALL
+    SELECT 'Andres', 'Setup: Gaming - Compatibilidad: OK', 4, 'Funciona perfecto con mi setup, instalacion facil.', '2025-07-26 10:00:00', 1
+    UNION ALL
+    SELECT 'Kimberly', 'Entrega: 48 horas - Empaque: Excelente', 5, 'Supero mis expectativas, muy rapido.', '2025-07-22 10:00:00', 4
+    UNION ALL
+    SELECT 'Jose', 'Accesorios: Basicos - Color: Negro', 3, 'Todo bien, aunque esperaba un poco mas de accesorios.', '2025-07-20 10:00:00', 1
+    UNION ALL
+    SELECT 'Natalia', 'Compra verificada - Entrega: Anticipada', 5, 'Se siente solido y el envio llego antes de tiempo.', '2025-07-18 10:00:00', 7
+    UNION ALL
+    SELECT 'Mario', 'Soporte: Rapido - Respuesta: 1 dia', 4, 'Buen producto, el soporte respondio rapido.', '2025-07-16 10:00:00', 2
+    UNION ALL
+    SELECT 'Paula', 'Uso: Estudio - Rendimiento: Alto', 5, 'Ideal para estudiar y trabajar, lo uso a diario.', '2025-07-14 10:00:00', 3
+    UNION ALL
+    SELECT 'Bryan', 'Gaming: 1080p - Temperatura: Estable', 4, 'Buen desempeno en juegos, sin tirones.', '2025-07-12 10:00:00', 2
+    UNION ALL
+    SELECT 'Laura', 'Precio: Justo - Calidad: Alta', 5, 'Muy buena relacion calidad/precio.', '2025-07-10 10:00:00', 5
+    UNION ALL
+    SELECT 'Esteban', 'Temperatura: Media - Ruido: Bajo', 4, 'Se calienta un poco pero nada grave.', '2025-07-08 10:00:00', 1
+    UNION ALL
+    SELECT 'Maria Jose', 'Bateria: 6h - Uso: Mixto', 5, 'La bateria rinde bastante, muy contenta.', '2025-07-06 10:00:00', 4
+    UNION ALL
+    SELECT 'Jorge', 'WiFi: Estable - Bluetooth: OK', 4, 'Conectividad estable, sin cortes.', '2025-07-04 10:00:00', 2
+    UNION ALL
+    SELECT 'Ana', 'Diseno: Elegante - Color: Gris', 5, 'Se ve elegante y funciona de maravilla.', '2025-07-02 10:00:00', 3
+    UNION ALL
+    SELECT 'Luis', 'Empaque: Seguro - Entrega: Puntual', 4, 'Llego bien embalado, todo ok.', '2025-06-30 10:00:00', 2
+    UNION ALL
+    SELECT 'Fernanda', 'Recompra: Si - Calidad: Excelente', 5, 'Vale cada colon, lo volveria a comprar.', '2025-06-28 10:00:00', 6
+    UNION ALL
+    SELECT 'Kevin', 'Rendimiento: Alto - Uso: Diario', 4, 'Buen rendimiento general, recomendado.', '2025-06-26 10:00:00', 1
+) AS R
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM COMENTARIO_TB C
+    WHERE C.ID_PRODUCTO = P.ID_PRODUCTO
 );

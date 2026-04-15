@@ -23,6 +23,16 @@ body {
     display: block;
 }
 
+.hero-banner--brand {
+    background: #101827;
+}
+
+.hero-banner--brand img {
+    object-fit: contain;
+    object-position: center;
+    background: #101827;
+}
+
 .card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }

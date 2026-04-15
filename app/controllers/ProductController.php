@@ -2,16 +2,19 @@
 
 require_once __DIR__ . '/../repositories/ProductRepository.php';
 require_once __DIR__ . '/../repositories/CartRepository.php';
+require_once __DIR__ . '/../repositories/CommentRepository.php';
 
 class ProductController extends Controller
 {
     private ProductRepository $repository;
     private CartRepository $cartRepository;
+    private CommentRepository $commentRepository;
 
     public function __construct()
     {
         $this->repository = new ProductRepository();
         $this->cartRepository = new CartRepository($this->repository);
+        $this->commentRepository = new CommentRepository();
 
         // Mantiene la sesión del carrito alineada con el estado persistido del usuario.
         $this->cartRepository->syncSessionCart();

@@ -3,6 +3,8 @@
 class ProductModel
 {
     private $db;
+    private ?bool $productoTieneSku = null;
+    private ?bool $productoTieneStockMinimo = null;
 
     public function __construct()
     {
@@ -36,6 +38,142 @@ class ProductModel
         )";
     }
 
+    private function normalizarCategoriaFiltro(string $categoria): string
+    {
+        $categoria = trim(strtolower($categoria));
+
+        $map = [
+            'components' => 'componentes',
+            'componentes' => 'componentes',
+            'accessories' => 'accesorios',
+            'accesorios' => 'accesorios',
+            'gaming' => 'gaming',
+            'laptops' => 'laptops',
+        ];
+
+        return $map[$categoria] ?? $categoria;
+    }
+
+    private function textoClasificacionExpr(): string
+    {
+        return "LOWER(CONCAT_WS(' ', c.NOMBRE, p.NOMBRE, p.DESCRIPCION))";
+    }
+
+    private function productoTieneSku(): bool
+    {
+        if ($this->productoTieneSku !== null) {
+            return $this->productoTieneSku;
+        }
+
+        try {
+            $stmt = $this->db->query("SHOW COLUMNS FROM PRODUCTO_TB LIKE 'SKU'");
+            $this->productoTieneSku = (bool)$stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            $this->productoTieneSku = false;
+        }
+
+        return $this->productoTieneSku;
+    }
+
+    private function skuSelectExpr(): string
+    {
+        return $this->productoTieneSku() ? "p.SKU AS SKU" : "NULL AS SKU";
+    }
+
+    private function productoTieneStockMinimo(): bool
+    {
+        if ($this->productoTieneStockMinimo !== null) {
+            return $this->productoTieneStockMinimo;
+        }
+
+        try {
+            $stmt = $this->db->query("SHOW COLUMNS FROM PRODUCTO_TB LIKE 'STOCK_MINIMO'");
+            $this->productoTieneStockMinimo = (bool)$stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            $this->productoTieneStockMinimo = false;
+        }
+
+        return $this->productoTieneStockMinimo;
+    }
+
+    private function stockMinimoSelectExpr(): string
+    {
+        return $this->productoTieneStockMinimo() ? "p.STOCK_MINIMO AS STOCK_MINIMO" : "0 AS STOCK_MINIMO";
+    }
+
+    private function categoriaCanonicaExpr(): string
+    {
+        $texto = $this->textoClasificacionExpr();
+
+        return "CASE
+                    WHEN LOWER(c.NOMBRE) = 'laptops' THEN 'laptops'
+                    WHEN LOWER(c.NOMBRE) = 'componentes' THEN 'componentes'
+                    WHEN LOWER(c.NOMBRE) = 'gaming' THEN 'gaming'
+                    WHEN LOWER(c.NOMBRE) = 'accesorios' THEN 'accesorios'
+
+                    WHEN LOWER(c.NOMBRE) IN ('placa madre', 'placas madre', 'tarjeta grafica', 'tarjetas graficas', 'almacenamiento', 'fuente de poder', 'fuentes de poder', 'refrigeracion')
+                    THEN 'componentes'
+
+                    WHEN LOWER(c.NOMBRE) IN ('perifericos', 'periféricos')
+                      AND (
+                          $texto LIKE '%audio%'
+                          OR $texto LIKE '%audif%'
+                          OR $texto LIKE '%auricular%'
+                          OR $texto LIKE '%headset%'
+                      )
+                    THEN 'accesorios'
+
+                    WHEN LOWER(c.NOMBRE) IN ('perifericos', 'periféricos')
+                    THEN 'gaming'
+
+                    WHEN $texto LIKE '%legion go%'
+                      OR $texto LIKE '%playstation%'
+                      OR $texto LIKE '%ps5%'
+                      OR $texto LIKE '%xbox%'
+                      OR $texto LIKE '%nintendo%'
+                      OR $texto LIKE '%consola portatil%'
+                    THEN 'gaming'
+
+                    WHEN $texto LIKE '%mochila%'
+                      OR $texto LIKE '%funda%'
+                      OR $texto LIKE '%airpods%'
+                      OR $texto LIKE '%beats%'
+                      OR $texto LIKE '%audif%'
+                      OR $texto LIKE '%auricular%'
+                      OR $texto LIKE '%headset%'
+                      OR $texto LIKE '%audio%'
+                      OR $texto LIKE '%cable%'
+                      OR $texto LIKE '%hub%'
+                      OR $texto LIKE '%usb-c%'
+                      OR $texto LIKE '%cargador%'
+                    THEN 'accesorios'
+
+                    WHEN $texto LIKE '%caddy%'
+                      OR $texto LIKE '%placa madre%'
+                      OR $texto LIKE '%motherboard%'
+                      OR $texto LIKE '%tarjeta graf%'
+                      OR $texto LIKE '%gpu%'
+                      OR $texto LIKE '%ram%'
+                      OR $texto LIKE '%ssd%'
+                      OR $texto LIKE '%hdd%'
+                      OR $texto LIKE '%psu%'
+                      OR $texto LIKE '%nvme%'
+                      OR $texto LIKE '%m.2%'
+                      OR $texto LIKE '%disco duro%'
+                      OR $texto LIKE '%fuente de poder%'
+                      OR $texto LIKE '%refrigeracion%'
+                      OR $texto LIKE '%cooler%'
+                    THEN 'componentes'
+
+                    WHEN $texto LIKE '%laptop%'
+                      OR $texto LIKE '%notebook%'
+                      OR $texto LIKE '%macbook%'
+                    THEN 'laptops'
+
+                    ELSE REPLACE(LOWER(c.NOMBRE), ' ', '')
+                END";
+    }
+
     public function obtenerProductos(array $filtros = []): array
     {
         $sql = "SELECT
@@ -62,13 +200,19 @@ class ProductModel
         $params = [];
 
         if (!empty($filtros['categoria'])) {
-            $categoria = trim((string)$filtros['categoria']);
-            $sql .= " AND (
-                        LOWER(c.NOMBRE) = :categoriaExacta
-                        OR REPLACE(LOWER(c.NOMBRE), ' ', '') = :categoriaLimpia
-                      )";
-            $params[':categoriaExacta'] = strtolower($categoria);
-            $params[':categoriaLimpia'] = str_replace(' ', '', strtolower($categoria));
+            $categoria = $this->normalizarCategoriaFiltro((string)$filtros['categoria']);
+
+            if (in_array($categoria, ['laptops', 'componentes', 'gaming', 'accesorios'], true)) {
+                $sql .= " AND " . $this->categoriaCanonicaExpr() . " = :categoriaCanonica";
+                $params[':categoriaCanonica'] = $categoria;
+            } else {
+                $sql .= " AND (
+                            LOWER(c.NOMBRE) = :categoriaExacta
+                            OR REPLACE(LOWER(c.NOMBRE), ' ', '') = :categoriaLimpia
+                          )";
+                $params[':categoriaExacta'] = strtolower($categoria);
+                $params[':categoriaLimpia'] = str_replace(' ', '', strtolower($categoria));
+            }
         }
 
         if (!empty($filtros['marca'])) {
@@ -122,11 +266,11 @@ public function obtenerProductoPorId(int $idProducto): ?array
 {
     $sql = "SELECT
                 p.ID_PRODUCTO,
-                p.SKU,
+                " . $this->skuSelectExpr() . ",
                 p.NOMBRE,
                 p.DESCRIPCION,
                 p.PRECIO,
-                p.STOCK_MINIMO,
+                " . $this->stockMinimoSelectExpr() . ",
                 p.ID_CATEGORIA,
                 p.ID_MARCA,
                 c.NOMBRE AS CATEGORIA,
@@ -229,14 +373,12 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
     }
     public function obtenerCategoriasConProductos(): array
     {
-        $sql = "SELECT DISTINCT c.ID_CATEGORIA, c.NOMBRE
-                FROM CATEGORIA_TB c
-                JOIN PRODUCTO_TB p ON p.ID_CATEGORIA = c.ID_CATEGORIA
-                WHERE c.ID_ESTADO = 1 AND p.ID_ESTADO = 1
-                ORDER BY c.NOMBRE ASC";
-
-        $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return [
+            ['ID_CATEGORIA' => 1, 'NOMBRE' => 'Laptops'],
+            ['ID_CATEGORIA' => 2, 'NOMBRE' => 'Componentes'],
+            ['ID_CATEGORIA' => 3, 'NOMBRE' => 'Gaming'],
+            ['ID_CATEGORIA' => 4, 'NOMBRE' => 'Accesorios'],
+        ];
     }
 
     public function obtenerMarcasConProductos(): array
@@ -426,11 +568,11 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
     {
         $sql = "SELECT 
                 p.ID_PRODUCTO,
-                p.SKU,
+                " . $this->skuSelectExpr() . ",
                 p.NOMBRE,
                 p.DESCRIPCION,
                 p.PRECIO,
-                p.STOCK_MINIMO,
+                " . $this->stockMinimoSelectExpr() . ",
                 c.NOMBRE AS CATEGORIA,
                 m.NOMBRE AS MARCA,
                 GROUP_CONCAT(CONCAT(pi.ID_IMAGEN,'::',pi.URL_IMAGE) SEPARATOR '||') AS IMAGENES
@@ -573,3 +715,5 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
         $stmt->execute([':id' => $imageId]);
     }
 }
+
+
