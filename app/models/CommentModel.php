@@ -45,6 +45,28 @@ class CommentModel
         return $stmt->fetch();
     }
 
+    public function findVisibleByProduct(int $productId): array
+    {
+        $sql = "SELECT
+                    C.ID_COMENTARIO,
+                    C.CALIFICACION,
+                    C.COMENTARIO,
+                    C.FECHA_COMENTARIO,
+                    U.NOMBRE,
+                    U.APELLIDO_PATERNO
+                FROM COMENTARIO_TB C
+                JOIN USUARIO_TB U
+                    ON U.IDENTIFICACION = C.IDENTIFICACION
+                WHERE C.ID_PRODUCTO = :productId
+                  AND C.ID_ESTADO = 1
+                ORDER BY C.FECHA_COMENTARIO DESC, C.ID_COMENTARIO DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':productId' => $productId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function changeStatus($id, $status)
     {
         $stmt = $this->db->prepare("

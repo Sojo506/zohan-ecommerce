@@ -39,6 +39,20 @@ class ProductModel
         )";
     }
 
+    private function subconsultaResenas(): string
+    {
+        // Resume promedio y cantidad usando solo comentarios visibles.
+        return "(
+            SELECT
+                c.ID_PRODUCTO,
+                COUNT(*) AS TOTAL_COMENTARIOS,
+                ROUND(AVG(c.CALIFICACION), 1) AS CALIFICACION_PROMEDIO
+            FROM COMENTARIO_TB c
+            WHERE c.ID_ESTADO = 1
+            GROUP BY c.ID_PRODUCTO
+        )";
+    }
+
     public function obtenerProductos(array $filtros = []): array
     {
         // Consulta base del catálogo con joins comunes; luego se van agregando filtros opcionales.
@@ -54,12 +68,15 @@ class ProductModel
                     img.URL_IMAGE,
                     COALESCE(inv.STOCK, 0) AS STOCK,
                     promo.PORCENTAJE AS DESCUENTO,
-                    promo.PROMO_NOMBRE
+                    promo.PROMO_NOMBRE,
+                    COALESCE(resenas.CALIFICACION_PROMEDIO, 0) AS CALIFICACION_PROMEDIO,
+                    COALESCE(resenas.TOTAL_COMENTARIOS, 0) AS TOTAL_COMENTARIOS
                 FROM PRODUCTO_TB p
                 JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
                 JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
                 LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaResenas() . " resenas ON resenas.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
                 WHERE p.ID_ESTADO = 1";
 
@@ -108,10 +125,13 @@ class ProductModel
                     img.URL_IMAGE,
                     COALESCE(inv.STOCK, 0) AS STOCK,
                     promo.PORCENTAJE AS DESCUENTO,
-                    promo.PROMO_NOMBRE
+                    promo.PROMO_NOMBRE,
+                    COALESCE(resenas.CALIFICACION_PROMEDIO, 0) AS CALIFICACION_PROMEDIO,
+                    COALESCE(resenas.TOTAL_COMENTARIOS, 0) AS TOTAL_COMENTARIOS
                 FROM PRODUCTO_TB p
                 LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaResenas() . " resenas ON resenas.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
                 WHERE p.ID_ESTADO = 1
                 ORDER BY p.ID_PRODUCTO DESC
@@ -138,12 +158,15 @@ public function obtenerProductoPorId(int $idProducto): ?array
                 img.URL_IMAGE,
                 COALESCE(inv.STOCK, 0) AS STOCK,
                 promo.PORCENTAJE AS DESCUENTO,
-                promo.PROMO_NOMBRE
+                promo.PROMO_NOMBRE,
+                COALESCE(resenas.CALIFICACION_PROMEDIO, 0) AS CALIFICACION_PROMEDIO,
+                COALESCE(resenas.TOTAL_COMENTARIOS, 0) AS TOTAL_COMENTARIOS
             FROM PRODUCTO_TB p
             JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
             JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
             LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
             LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+            LEFT JOIN " . $this->subconsultaResenas() . " resenas ON resenas.ID_PRODUCTO = p.ID_PRODUCTO
             LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
             WHERE p.ID_PRODUCTO = :idProducto
               AND p.ID_ESTADO = 1
@@ -174,12 +197,15 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
                 img.URL_IMAGE,
                 COALESCE(inv.STOCK, 0) AS STOCK,
                 promo.PORCENTAJE AS DESCUENTO,
-                promo.PROMO_NOMBRE
+                promo.PROMO_NOMBRE,
+                COALESCE(resenas.CALIFICACION_PROMEDIO, 0) AS CALIFICACION_PROMEDIO,
+                COALESCE(resenas.TOTAL_COMENTARIOS, 0) AS TOTAL_COMENTARIOS
             FROM PRODUCTO_TB p
             JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
             JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
             LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
             LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+            LEFT JOIN " . $this->subconsultaResenas() . " resenas ON resenas.ID_PRODUCTO = p.ID_PRODUCTO
             LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
             WHERE p.ID_ESTADO = 1
               AND p.ID_PRODUCTO <> :idProducto
@@ -271,10 +297,13 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
                     img.URL_IMAGE,
                     COALESCE(inv.STOCK, 0) AS STOCK,
                     promo.PORCENTAJE AS DESCUENTO,
-                    promo.PROMO_NOMBRE
+                    promo.PROMO_NOMBRE,
+                    COALESCE(resenas.CALIFICACION_PROMEDIO, 0) AS CALIFICACION_PROMEDIO,
+                    COALESCE(resenas.TOTAL_COMENTARIOS, 0) AS TOTAL_COMENTARIOS
                 FROM PRODUCTO_TB p
                 LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaResenas() . " resenas ON resenas.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
                 WHERE p.ID_ESTADO = 1
                   AND p.ID_PRODUCTO IN ($placeholders)
@@ -297,12 +326,15 @@ public function obtenerProductosSimilares(string $categoria, int $idProducto, in
                     img.URL_IMAGE,
                     COALESCE(inv.STOCK, 0) AS STOCK,
                     promo.PORCENTAJE AS DESCUENTO,
-                    promo.PROMO_NOMBRE
+                    promo.PROMO_NOMBRE,
+                    COALESCE(resenas.CALIFICACION_PROMEDIO, 0) AS CALIFICACION_PROMEDIO,
+                    COALESCE(resenas.TOTAL_COMENTARIOS, 0) AS TOTAL_COMENTARIOS
                 FROM PRODUCTO_TB p
                 JOIN CATEGORIA_TB c ON c.ID_CATEGORIA = p.ID_CATEGORIA
                 JOIN MARCA_TB m ON m.ID_MARCA = p.ID_MARCA
                 LEFT JOIN " . $this->subconsultaImagen() . " img ON img.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN " . $this->subconsultaPromocion() . " promo ON promo.ID_PRODUCTO = p.ID_PRODUCTO
+                LEFT JOIN " . $this->subconsultaResenas() . " resenas ON resenas.ID_PRODUCTO = p.ID_PRODUCTO
                 LEFT JOIN INVENTARIO_TB inv ON inv.ID_PRODUCTO = p.ID_PRODUCTO AND inv.ID_ESTADO = 1
                 WHERE p.ID_ESTADO = 1
                   AND promo.PORCENTAJE IS NOT NULL

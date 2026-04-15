@@ -94,10 +94,14 @@ class ProductController extends Controller
             );
         }
 
+        $commentModel = new CommentModel();
+        $comments = $commentModel->findVisibleByProduct($idProducto);
+
         $this->view('products/producto', [
             'producto' => $producto,
             'imagenes' => $imagenes,
             'existencias' => $existencias,
+            'comments' => $comments,
             'similares' => $similares,
             'cartCount' => $this->cartModel->countCurrentCart()
         ]);
