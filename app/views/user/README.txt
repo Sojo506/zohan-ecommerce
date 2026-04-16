@@ -1,0 +1,1 @@
+Vistas del perfil y panel del usuario autenticado.
