@@ -1,1 +1,0 @@
-Clases base del sistema como Router, App, Controller, Model y Database.

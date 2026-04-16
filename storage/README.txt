@@ -1,1 +1,0 @@
-Almacenamiento interno del sistema.
